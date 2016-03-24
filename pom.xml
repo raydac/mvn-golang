@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.igormaznitsa</groupId>
+  <artifactId>mvngolang</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <modules>
+    <module>mvn-golang-builder</module>
+    <module>mvn-golang-tests</module>
+  </modules>
+    
+  <name>mvnGoLang</name>
+  <description>Maven plugin to build GoLang appliucations with maven</description>
+  <url>https://github.com/raydac/mvnGoLang</url>
+    
+  <inceptionYear>2016</inceptionYear>
+    
+  <packaging>pom</packaging>
+  <properties>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/raydac/mvnGoLang/issues</url>
+  </issueManagement>
+
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
+
+  <developers>
+    <developer>
+      <id>raydac</id>
+      <name>Igor Maznitsa</name>
+      <email>rrg4400@gmail.com</email>
+      <url>http://www.igormaznitsa.com</url>
+      <timezone>+3</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+    
+  <scm>
+    <url>https://github.com/raydac/mvnGoLang</url>
+    <connection>scm:git:git://github.com/raydac/mvnGoLang.git</connection>
+    <developerConnection>scm:git:git@github.com:raydac/mvnGoLang.git</developerConnection>
+  </scm>
+
+  <organization>
+    <name>Igor Maznitsa</name>
+    <url>http://www.igormaznitsa.com</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.4</version>
+        <configuration>
+          <detail>true</detail>
+          <aggregate>true</aggregate>
+          <format>html</format>
+          <verbose>true</verbose>
+          <printFailingErrors>true</printFailingErrors>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.7.5.201505241946</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>    
+</project>
