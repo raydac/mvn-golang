@@ -9,7 +9,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   
-  <artifactId>mvn-golang-builder</artifactId>
+  <artifactId>mvn-golang-wrapper</artifactId>
   <packaging>maven-plugin</packaging>
 
   <properties>
@@ -249,5 +249,5 @@
       </plugin>
     </plugins>
   </build>
-
+    <name>mvn-golang-wrapper</name>
 </project>

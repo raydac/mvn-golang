@@ -6,12 +6,12 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <modules>
-    <module>mvn-golang-builder</module>
+    <module>mvn-golang-wrapper</module>
     <module>mvn-golang-tests</module>
   </modules>
     
   <name>mvnGoLang</name>
-  <description>Maven plugin to build GoLang appliucations with maven</description>
+  <description>Maven plugin to wrap GoLang commands and provide possibility to build GoLang applications with the Maven build tool.</description>
   <url>https://github.com/raydac/mvnGoLang</url>
     
   <inceptionYear>2016</inceptionYear>
