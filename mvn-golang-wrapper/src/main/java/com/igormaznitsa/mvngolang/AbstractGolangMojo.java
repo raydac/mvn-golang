@@ -114,7 +114,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * GoLang source directory.
    */
-  @Parameter(defaultValue = "${basedir}${file.separator}src${file.separator}main${file.separator}golang", name = "sources")
+  @Parameter(defaultValue = "${basedir}${file.separator}src${file.separator}golang", name = "sources")
   private String sources;
 
   /**
@@ -160,15 +160,28 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean verbose;
 
   @Nonnull
+  public String getStoreFolder(){
+    return this.storeFolder;
+  }
+  
+  public boolean isVerbose(){
+    return this.verbose;
+  }
+  
+  public boolean isDisableSdkLoad(){
+    return this.disableSdkLoad;
+  }
+  
+  @Nonnull
   @MustNotContainNull
-  public String[] getFlags() {
+  public String[] getBuildFlags() {
     return GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY);
   }
 
   @Nonnull
-  public File getGoPath() throws IOException {
+  public File getGoPath(final boolean ensureExist) throws IOException {
     final File result = new File(this.goPath);
-    if (!result.isDirectory() && !result.mkdirs()) {
+    if (ensureExist && !result.isDirectory() && !result.mkdirs()) {
       throw new IOException("Can't create folder : " + goPath);
     }
     return result;
@@ -230,9 +243,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public File getSources() throws IOException {
+  public File getSources(final boolean ensureExist) throws IOException {
     final File result = new File(this.sources);
-    if (!result.isDirectory()) {
+    if (ensureExist && !result.isDirectory()) {
       throw new IOException("Can't find GoLang project sources : " + result);
     }
     return result;
@@ -610,17 +623,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private void assertProcessResult(@Nonnull final ProcessResult result) throws MojoFailureException {
     final int code = result.getExitValue();
     if (code != 0) {
-      throw new MojoFailureException("Exit code : " + code);
+      throw new MojoFailureException("Process exit code : " + code);
     }
   }
 
   @Nonnull
   @MustNotContainNull
-  public abstract String[] getCLITailArgs();
+  public abstract String[] getTailArguments();
 
   @Nonnull
   @MustNotContainNull
-  public String[] getAfterCLITailArgs() {
+  public String[] getOptionalExtraTailArguments() {
     return ArrayUtils.EMPTY_STRING_ARRAY;
   }
 
@@ -630,7 +643,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public abstract String getCommand();
+  public abstract String getGoCommand();
 
   @Nonnull
   @MustNotContainNull
@@ -658,21 +671,21 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final List<String> commandLine = new ArrayList<String>();
     commandLine.add(executableFile.getAbsolutePath());
-    commandLine.add(getCommand());
+    commandLine.add(getGoCommand());
 
     for (final String s : getCommandFlags()) {
       commandLine.add(s);
     }
 
-    for (final String s : getFlags()) {
+    for (final String s : getBuildFlags()) {
       commandLine.add(s);
     }
 
-    for (final String s : getCLITailArgs()) {
+    for (final String s : getTailArguments()) {
       commandLine.add(s);
     }
 
-    for (final String s : getAfterCLITailArgs()) {
+    for (final String s : getOptionalExtraTailArguments()) {
       commandLine.add(s);
     }
 
@@ -693,14 +706,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     logOptionally("Command line : " + cli.toString());
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
-    result.directory(getSources());
+    result.directory(getSources(true));
 
     getLog().info("");
     getLog().info("....Environment vars....");
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
 
-    final File gopath = getGoPath();
+    final File gopath = getGoPath(true);
     addEnvVar(result, "GOPATH", gopath.getAbsolutePath());
 
     final String trgtOs = this.getTargetOS();

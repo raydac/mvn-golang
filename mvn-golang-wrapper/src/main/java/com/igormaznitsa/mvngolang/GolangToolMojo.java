@@ -15,13 +15,12 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -49,10 +48,16 @@ public class GolangToolMojo extends AbstractGolangMojo {
   @Parameter(name = "args")
   private String [] args;
   
+  @Nullable
+  @MustNotContainNull
+  public String [] getArgs(){
+    return this.args;
+  }
+  
   @Override
   @Nonnull
   @MustNotContainNull
-  public String[] getCLITailArgs() {
+  public String[] getTailArguments() {
     final List<String> result = new ArrayList<String>();
     result.add(this.command);
     for(final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
@@ -61,9 +66,14 @@ public class GolangToolMojo extends AbstractGolangMojo {
     return result.toArray(new String[result.size()]);
   }
 
-  @Override
   @Nonnull
   public String getCommand() {
+    return this.command;
+  }
+  
+  @Override
+  @Nonnull
+  public String getGoCommand() {
     return "tool";
   }
 

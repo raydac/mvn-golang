@@ -20,23 +20,15 @@ import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import com.igormaznitsa.meta.common.utils.ArrayUtils;
-import com.igormaznitsa.meta.common.utils.GetUtils;
 
 /**
  * The Mojo wraps the 'get' command.
  */
 @Mojo(name = "get", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangGetMojo extends AbstractGolangMojo {
+public class GolangGetMojo extends AbstractPackageGolangMojo {
 
   private static final Pattern PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT = Pattern.compile("no\\s+submodule\\s+mapping\\s+found\\s+in\\s+.gitmodules for path\\s+\\'([\\S]+?)\\'", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern.compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-
-  /**
-   * List of packages to be built.
-   */
-  @Parameter(name = "packages")
-  private String[] packages;
 
   /**
    * Flag to make attempt to fix detected Git cache error and re-execute the command. It will try to execute
@@ -45,24 +37,14 @@ public class GolangGetMojo extends AbstractGolangMojo {
   @Parameter(name = "autofixGitCache", defaultValue = "false")
   private boolean autofixGitCache;
 
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  public String[] getCLITailArgs() {
-    return GetUtils.ensureNonNull(this.packages, ArrayUtils.EMPTY_STRING_ARRAY);
+  public boolean isAutoFixGitCache(){
+    return this.autofixGitCache;
   }
-
+  
   @Override
   @Nonnull
-  public String getCommand() {
+  public String getGoCommand() {
     return "get";
-  }
-
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  public String[] getCommandFlags() {
-    return ArrayUtils.EMPTY_STRING_ARRAY;
   }
 
   @Override
@@ -86,7 +68,7 @@ public class GolangGetMojo extends AbstractGolangMojo {
   }
 
   private boolean tryToFixGitCacheErrorsForPackages(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
-    final File goPath = getGoPath();
+    final File goPath = getGoPath(true);
 
     int fixed = 0;
 

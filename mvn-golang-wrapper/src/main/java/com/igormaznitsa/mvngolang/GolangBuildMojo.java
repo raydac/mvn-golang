@@ -26,14 +26,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import com.igormaznitsa.meta.common.utils.ArrayUtils;
-import com.igormaznitsa.meta.common.utils.GetUtils;
 
 /**
  * The Mojo wraps the 'build' command.
  */
 @Mojo(name = "build", defaultPhase = LifecyclePhase.COMPILE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangBuildMojo extends AbstractGolangMojo {
+public class GolangBuildMojo extends AbstractPackageGolangMojo {
 
   /**
    * Target folder where to place the result file.
@@ -47,19 +45,6 @@ public class GolangBuildMojo extends AbstractGolangMojo {
   @Parameter(name = "name", defaultValue = "undefined", required = true)
   private String name;
   
-  /**
-   * List of packages to be built.
-   */
-  @Parameter(name="packages")
-  private String [] packages;
-  
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  public String[] getCLITailArgs() {
-    return GetUtils.ensureNonNull(this.packages, ArrayUtils.EMPTY_STRING_ARRAY);
-  }
-
   @Nonnull
   private File getTargetFile(){
     return new File(getTarget(),this.name);
@@ -77,7 +62,7 @@ public class GolangBuildMojo extends AbstractGolangMojo {
 
   @Override
   @Nonnull
-  public String getCommand() {
+  public String getGoCommand() {
     return "build";
   }
 
