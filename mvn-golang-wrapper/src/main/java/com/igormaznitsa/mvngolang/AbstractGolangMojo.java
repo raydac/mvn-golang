@@ -678,7 +678,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       index++;
     }
 
-    logOptionally(" Generated command line : " + cli.toString());
+    logOptionally("Command line : " + cli.toString());
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
     result.directory(getSources());

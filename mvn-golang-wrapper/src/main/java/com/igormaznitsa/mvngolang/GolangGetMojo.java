@@ -39,7 +39,8 @@ public class GolangGetMojo extends AbstractGolangMojo {
   private String[] packages;
 
   /**
-   * Flag to make attempt to fix detected Git cache error and re-execute the command. It will try to execute <pre>'git rm -r --cached .'</pre>  just in the package directory to clear cache.
+   * Flag to make attempt to fix detected Git cache error and re-execute the command. It will try to execute
+   * <pre>'git rm -r --cached .'</pre> just in the package directory to clear cache.
    */
   @Parameter(name = "autofixGitCache", defaultValue = "false")
   private boolean autofixGitCache;
@@ -84,7 +85,7 @@ public class GolangGetMojo extends AbstractGolangMojo {
     return result;
   }
 
-  private boolean tryToFixGitCacheErrorsFor(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
+  private boolean tryToFixGitCacheErrorsForPackages(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
     final File goPath = getGoPath();
 
     int fixed = 0;
@@ -125,16 +126,21 @@ public class GolangGetMojo extends AbstractGolangMojo {
     boolean result = false;
     if (processResult.getExitValue() != 0) {
       final Matcher matcher = PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT.matcher(consoleErr);
+
       if (matcher.find()) {
-        final List<String> packagesWithGitCacheError = extractProblemPackagesFromErrorLog(consoleErr);
-        if (!packagesWithGitCacheError.isEmpty()) {
+        final List<String> packagesWithDetectedGitCacheErrors = extractProblemPackagesFromErrorLog(consoleErr);
+        if (!packagesWithDetectedGitCacheErrors.isEmpty()) {
           if (this.autofixGitCache) {
+
             getLog().warn("Trying to fix git cache errors automatically for direct order..");
-            result = tryToFixGitCacheErrorsFor(packagesWithGitCacheError);
+
+            result = tryToFixGitCacheErrorsForPackages(packagesWithDetectedGitCacheErrors);
           } else {
-            for (final String s : packagesWithGitCacheError) {
+
+            for (final String s : packagesWithDetectedGitCacheErrors) {
               getLog().error(String.format("Detected Git cache error for package '%s', can be fixed with 'git rm -r --cached .'", s));
             }
+
           }
         }
       }
