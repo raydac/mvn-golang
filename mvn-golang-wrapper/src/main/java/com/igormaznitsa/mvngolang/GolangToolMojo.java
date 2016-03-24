@@ -16,10 +16,12 @@
 package com.igormaznitsa.mvngolang;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -30,52 +32,46 @@ import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 
 /**
- * The Mojo wraps the 'build' command.
+ * The Mojo wraps the 'tool' command.
  */
-@Mojo(name = "build", defaultPhase = LifecyclePhase.COMPILE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class BuildMojo extends AbstractGolangMojo {
-
-  private static final String DELIMITER = "................................";
+@Mojo(name = "tool", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
+public class GolangToolMojo extends AbstractGolangMojo {
 
   /**
-   * Target folder where to place the result file.
+   * The Command to be executed.
    */
-  @Parameter(name = "target", defaultValue = "${project.build.directory}")
-  private String target;
+  @Parameter(name = "command", required = true)
+  private String command;
 
   /**
-   * Name of the result file.
+   * Command arguments.
    */
-  @Parameter(name = "name", defaultValue = "undefined", required = true)
-  private String name;
-  
-  /**
-   * List of packages to be built.
-   */
-  @Parameter(name="packages")
-  private String [] packages;
+  @Parameter(name = "args")
+  private String [] args;
   
   @Override
   @Nonnull
   @MustNotContainNull
   public String[] getCLITailArgs() {
-    return GetUtils.ensureNonNull(this.packages, ArrayUtils.EMPTY_STRING_ARRAY);
+    final List<String> result = new ArrayList<String>();
+    result.add(this.command);
+    for(final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
+      result.add(s);
+    }
+    return result.toArray(new String[result.size()]);
   }
 
+  @Override
   @Nonnull
-  public String getTarget() {
-    return this.target;
-  }
-
-  @Nonnull
-  public String getName() {
-    return this.name;
+  public String getCommand() {
+    return "tool";
   }
 
   @Override
   @Nonnull
   @MustNotContainNull
-  public String[] getCommandLine() {
-    return new String[]{"go", "build", "-o", getTarget() + File.separatorChar + this.name};
+  public String[] getCommandFlags() {
+    return ArrayUtils.EMPTY_STRING_ARRAY;
   }
+  
 }

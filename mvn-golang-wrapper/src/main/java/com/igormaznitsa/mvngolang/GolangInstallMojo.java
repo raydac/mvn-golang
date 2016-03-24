@@ -12,35 +12,40 @@ import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 
 /**
- * The Mojo wraps the 'generate' command.
+ * The Mojo wraps the 'install' command.
  */
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GenerateMojo extends AbstractGolangMojo {
+@Mojo(name = "install", defaultPhase = LifecyclePhase.INSTALL, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
+public class GolangInstallMojo extends AbstractGolangMojo {
 
   /**
-   * List of either filer or packages to be processed.
+   * List of packages to be built.
    */
-  @Parameter(name = "filesOrPackages")
-  private String[] filesOrPackages;
+  @Parameter(name = "packages")
+  private String[] packages;
 
   @Override
   @Nonnull
   @MustNotContainNull
   public String[] getCLITailArgs() {
-    return GetUtils.ensureNonNull(this.filesOrPackages, ArrayUtils.EMPTY_STRING_ARRAY);
+    return GetUtils.ensureNonNull(this.packages, ArrayUtils.EMPTY_STRING_ARRAY);
   }
-  
-  
+
+  @Override
+  @Nonnull
+  public String getCommand() {
+    return "install";
+  }
+
   @Override
   @Nonnull
   @MustNotContainNull
-  public String[] getCommandLine() {
-    return new String[]{"go","generate"};
+  public String[] getCommandFlags() {
+    return ArrayUtils.EMPTY_STRING_ARRAY;
   }
-
+  
   @Override
   public boolean enforcePrintOutput() {
     return true;
   }
- 
+
 }

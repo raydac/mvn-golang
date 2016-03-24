@@ -12,13 +12,13 @@ import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 
 /**
- * The Mojo wraps the 'install' command.
+ * The Mojo wraps the 'fmt' command.
  */
-@Mojo(name = "install", defaultPhase = LifecyclePhase.INSTALL, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class InstallMojo extends AbstractGolangMojo {
-
+@Mojo(name = "fmt", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
+public class GolangFmtMojo extends AbstractGolangMojo {
+  
   /**
-   * List of packages to be built.
+   * List of packages to be formatted.
    */
   @Parameter(name = "packages")
   private String[] packages;
@@ -29,12 +29,11 @@ public class InstallMojo extends AbstractGolangMojo {
   public String[] getCLITailArgs() {
     return GetUtils.ensureNonNull(this.packages, ArrayUtils.EMPTY_STRING_ARRAY);
   }
-  
+
   @Override
   @Nonnull
-  @MustNotContainNull
-  public String[] getCommandLine() {
-    return new String [] {"go","install"};
+  public String getCommand() {
+    return "fmt";
   }
 
   @Override
@@ -42,4 +41,12 @@ public class InstallMojo extends AbstractGolangMojo {
     return true;
   }
 
+  @Override
+  @Nonnull
+  @MustNotContainNull
+  public String[] getCommandFlags() {
+    return ArrayUtils.EMPTY_STRING_ARRAY;
+  }
+  
+  
 }
