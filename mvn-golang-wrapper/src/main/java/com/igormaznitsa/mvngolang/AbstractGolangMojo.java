@@ -427,6 +427,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       variants.add(sdkBaseName + '.' + ext);
     }
 
+    final List<String> listedSdk = new ArrayList<String>();
+    
     final Element root = doc.getDocumentElement();
     if ("ListBucketResult".equals(root.getTagName())) {
       final NodeList list = root.getElementsByTagName("Contents");
@@ -438,9 +440,19 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           if (variants.contains(text)) {
             logOptionally("Detected compatible SDK in the SDK list : " + text);
             return text;
+          } else {
+            listedSdk.add(text);
           }
         }
       }
+      
+      getLog().error("Can't find any SDK to be used as "+sdkBaseName);
+      getLog().error("GoLang list contains listed SDKs");
+      getLog().error("..................................................");
+      for(final String s : listedSdk){
+        getLog().error(s);
+      }
+      
       throw new IOException("Can't find SDK : " + sdkBaseName);
     } else {
       throw new IOException("It is not a ListBucket file [" + root.getTagName() + ']');
