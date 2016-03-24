@@ -9,4 +9,37 @@
 __The Plugin is under development and there is not any ready version yet!__
 
 # Introduction
-The Maven plugin makes some auto download and caching of GoLang SDK and wraps main commands to build and test GoLang applications in Maven life cycle.
+The Maven plugin makes some auto download and caching of GoLang SDK and wraps main command set to build and test GoLang applications in Maven life cycle.
+
+# Wrapped GoLang commands
+
+* Build
+* Clean
+* Fix
+* Fmt
+* Get
+* Generate
+* Install
+* Test
+* Tool
+* Vet
+
+## Build
+
+## Clean
+
+## Fix
+
+## Fmt
+
+## Get
+
+## Generate
+
+## Install
+
+## Test
+
+## Tool
+
+## Vet
