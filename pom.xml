@@ -11,7 +11,7 @@
   </modules>
     
   <name>mvnGoLang</name>
-  <description>Maven plugin to wrap GoLang commands and provide possibility to build GoLang applications with the Maven build tool.</description>
+  <description>Maven plugin to wrap main GoLang commands and provide possibility to build GoLang applications with the Apache Maven build tool.</description>
   <url>https://github.com/raydac/mvnGoLang</url>
     
   <inceptionYear>2016</inceptionYear>
@@ -40,7 +40,6 @@
       <url>http://www.igormaznitsa.com</url>
       <timezone>+3</timezone>
       <roles>
-        <role>architect</role>
         <role>developer</role>
       </roles>
     </developer>
