@@ -38,7 +38,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     final GolangCleanMojo cleanMojo = (GolangCleanMojo) lookupMojo("clean", new File(GolangMojoCfgTest.class.getResource("mojoClean.xml").toURI()));
     assertNull(cleanMojo.getTargetArch());
     assertNull(cleanMojo.getTargetOS());
-    assertTrue(cleanMojo.isDontUseEnvVars());
+    assertFalse(cleanMojo.isUseEnvVars());
     assertEquals("clean",cleanMojo.getGoCommand());
     assertFalse(cleanMojo.isVerbose());
     assertFalse(cleanMojo.isHideBanner());
@@ -52,7 +52,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangFixMojoConfiguration() throws Exception {
     final GolangFixMojo fixMojo = (GolangFixMojo) lookupMojo("fix", new File(GolangMojoCfgTest.class.getResource("mojoFix.xml").toURI()));
-    assertTrue(fixMojo.isDontUseEnvVars());
+    assertFalse(fixMojo.isUseEnvVars());
     assertEquals("fix",fixMojo.getGoCommand());
     assertFalse(fixMojo.isVerbose());
     assertFalse(fixMojo.isHideBanner());
@@ -66,7 +66,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangFmtMojoConfiguration() throws Exception {
     final GolangFmtMojo fmtMojo = (GolangFmtMojo) lookupMojo("fmt", new File(GolangMojoCfgTest.class.getResource("mojoFmt.xml").toURI()));
-    assertTrue(fmtMojo.isDontUseEnvVars());
+    assertFalse(fmtMojo.isUseEnvVars());
     assertEquals("fmt",fmtMojo.getGoCommand());
     assertFalse(fmtMojo.isVerbose());
     assertFalse(fmtMojo.isHideBanner());
@@ -80,7 +80,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangGenerateMojoConfiguration() throws Exception {
     final GolangGenerateMojo genMojo = (GolangGenerateMojo) lookupMojo("generate", new File(GolangMojoCfgTest.class.getResource("mojoGenerate.xml").toURI()));
-    assertTrue(genMojo.isDontUseEnvVars());
+    assertFalse(genMojo.isUseEnvVars());
     assertEquals("generate",genMojo.getGoCommand());
     assertFalse(genMojo.isVerbose());
     assertFalse(genMojo.isHideBanner());
@@ -94,7 +94,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangInstallMojoConfiguration() throws Exception {
     final GolangInstallMojo instMojo = (GolangInstallMojo) lookupMojo("install", new File(GolangMojoCfgTest.class.getResource("mojoInstall.xml").toURI()));
-    assertTrue(instMojo.isDontUseEnvVars());
+    assertFalse(instMojo.isUseEnvVars());
     assertEquals("install",instMojo.getGoCommand());
     assertFalse(instMojo.isVerbose());
     assertFalse(instMojo.isHideBanner());
@@ -108,7 +108,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangVetMojoConfiguration() throws Exception {
     final GolangVetMojo vetMojo = (GolangVetMojo) lookupMojo("vet", new File(GolangMojoCfgTest.class.getResource("mojoVet.xml").toURI()));
-    assertTrue(vetMojo.isDontUseEnvVars());
+    assertFalse(vetMojo.isUseEnvVars());
     assertEquals("vet",vetMojo.getGoCommand());
     assertFalse(vetMojo.isVerbose());
     assertFalse(vetMojo.isHideBanner());
@@ -122,7 +122,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangTestMojoConfiguration() throws Exception {
     final GolangTestMojo instMojo = (GolangTestMojo) lookupMojo("test", new File(GolangMojoCfgTest.class.getResource("mojoTest.xml").toURI()));
-    assertTrue(instMojo.isDontUseEnvVars());
+    assertFalse(instMojo.isUseEnvVars());
     assertEquals("test",instMojo.getGoCommand());
     assertFalse(instMojo.isVerbose());
     assertFalse(instMojo.isHideBanner());
@@ -137,7 +137,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangToolMojoConfiguration() throws Exception {
     final GolangToolMojo toolMojo = (GolangToolMojo) lookupMojo("tool", new File(GolangMojoCfgTest.class.getResource("mojoTool.xml").toURI()));
-    assertTrue(toolMojo.isDontUseEnvVars());
+    assertFalse(toolMojo.isUseEnvVars());
     assertEquals("tool",toolMojo.getGoCommand());
     assertFalse(toolMojo.isVerbose());
     assertFalse(toolMojo.isHideBanner());
@@ -153,7 +153,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangGetMojoConfiguration() throws Exception {
     final GolangGetMojo getMojo = (GolangGetMojo) lookupMojo("get", new File(GolangMojoCfgTest.class.getResource("mojoGet.xml").toURI()));
-    assertTrue(getMojo.isDontUseEnvVars());
+    assertFalse(getMojo.isUseEnvVars());
     assertEquals("get",getMojo.getGoCommand());
     assertNull(getMojo.getUseGoTool());
     assertTrue(getMojo.isAutoFixGitCache());
@@ -171,7 +171,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     final GolangBuildMojo buildMojo = (GolangBuildMojo) lookupMojo("build", new File(GolangMojoCfgTest.class.getResource("mojoBuild.xml").toURI()));
     assertEquals("somearch",buildMojo.getTargetArch());
     assertEquals("someos",buildMojo.getTargetOS());
-    assertTrue(buildMojo.isDontUseEnvVars());
+    assertFalse(buildMojo.isUseEnvVars());
     assertEquals("build", buildMojo.getGoCommand());
     assertEquals("someGo.bat",buildMojo.getUseGoTool());
     assertFalse(buildMojo.isVerbose());
@@ -183,5 +183,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("targetName", buildMojo.getName());
     assertArrayEquals(new String[]{"one_pack","two_pack"},buildMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},buildMojo.getBuildFlags());
+    assertEquals(1,buildMojo.getEnv().size());
+    assertEquals("somevalue",buildMojo.getEnv().get("somekey"));
   }
 }

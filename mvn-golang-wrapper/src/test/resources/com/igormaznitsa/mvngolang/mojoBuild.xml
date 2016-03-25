@@ -20,7 +20,6 @@
         <configuration>
           <targetOs>someos</targetOs>
           <targetArch>somearch</targetArch>
-          <dontUseEnvVars>true</dontUseEnvVars>
           <useGoTool>someGo.bat</useGoTool>
           <target>target/place</target>
           <name>targetName</name>
@@ -36,6 +35,9 @@
             <package>one_pack</package>
             <package>two_pack</package>
           </packages>
+          <env>
+            <somekey>somevalue</somekey>
+          </env>
         </configuration>
       </plugin>  
     </plugins>

@@ -18,7 +18,6 @@
           <goal>get</goal>
         </goals>
         <configuration>
-          <dontUseEnvVars>true</dontUseEnvVars>
           <autofixGitCache>true</autofixGitCache>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>

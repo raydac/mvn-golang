@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -196,16 +197,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String sdkArchiveName;
 
   /**
-   * Disable search and usage of environment variables $GOROOT, $GOROOT_BOOTSTRAP, $GOOS, $GOARCH, $GOPATH which will be used if there is not directly defined info.
+   * Allows to find environment variable values for $GOROOT, $GOROOT_BOOTSTRAP, $GOOS, $GOARCH, $GOPATH and use them for process..
    */
-  @Parameter(name = "dontUseEnvVars", defaultValue = "false")
-  private boolean dontUseEnvVars;
+  @Parameter(name = "useEnvVars", defaultValue = "false")
+  private boolean useEnvVars;
 
   /**
    * It allows to define key value pairs which will be used as environment variables for started GoLang process.
    */
   @Parameter(name = "env")
-  private Properties env;
+  private Map env;
 
   /**
    * Keep unpacked wrongly SDK folder.
@@ -214,12 +215,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean keepUnarchFolderIfError;
 
   @Nonnull
-  public Properties getEnv() {
-    return GetUtils.ensureNonNull(this.env, new Properties());
+  public Map getEnv() {
+    return GetUtils.ensureNonNull(this.env, Collections.EMPTY_MAP);
   }
 
-  public boolean isDontUseEnvVars() {
-    return this.dontUseEnvVars;
+  public boolean isUseEnvVars() {
+    return this.useEnvVars;
   }
 
   public boolean isKeepSdkArchive() {
@@ -313,7 +314,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final String foundInEnvironment = System.getenv("GOPATH");
     String result = assertNotNull(this.goPath);
 
-    if (foundInEnvironment != null && !isDontUseEnvVars()){
+    if (foundInEnvironment != null && isUseEnvVars()){
       result = foundInEnvironment;
     }
     return result;
@@ -322,7 +323,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getTargetOS() {
     String result = this.targetOs;
-    if (result == null && !isDontUseEnvVars()) {
+    if (result == null && isUseEnvVars()) {
       result = System.getenv("GOOS");
     }
     return result;
@@ -331,7 +332,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getTargetArch() {
     String result = this.targetArch;
-    if (result == null && !isDontUseEnvVars()) {
+    if (result == null && isUseEnvVars()) {
       result = System.getenv("GOARCH");
     }
     return result;
@@ -355,7 +356,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public String getGoRoot() {
     String result = this.goRoot;
 
-    if (result == null && !isDontUseEnvVars()) {
+    if (result == null && isUseEnvVars()) {
       result = System.getenv("GOROOT");
     }
 
@@ -366,7 +367,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public String getGoRootBootstrap() {
     String result = this.goRootBootstrap;
 
-    if (result == null && !isDontUseEnvVars()) {
+    if (result == null && isUseEnvVars()) {
       result = System.getenv("GOROOT_BOOTSTRAP");
     }
 
@@ -860,10 +861,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
     }
 
-    final Properties envProperties = getEnv();
+    final Map envVarMap = getEnv();
 
-    for (final String key : envProperties.stringPropertyNames()) {
-      addEnvVar(result, key, envProperties.getProperty(key));
+    for (final Object key : envVarMap.keySet()) {
+      addEnvVar(result, key.toString(), envVarMap.get(key).toString());
     }
 
     getLog().info("........................");
