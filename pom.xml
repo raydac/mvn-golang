@@ -122,4 +122,35 @@
       </build>
     </profile>
   </profiles>    
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>uber-pom</artifactId>
+        <version>1.0.0</version>
+        <configuration>
+          <remove>
+            <section>parent</section>
+            <section>modules</section>
+          </remove>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>upom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>      
+  </build>
 </project>
