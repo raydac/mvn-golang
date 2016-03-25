@@ -23,7 +23,88 @@ Mainly all main commands of GoLang are accessible through the plugin and their l
 * Tool
 * Vet
 
+# Example
+The Example pom.xml below shows how to build a GoLang executable file from an example of [termui framework](https://github.com/gizak/termui). It will download the package automatically and as the result in the target folder will be placed the completed executable file named as 'sparklines'.
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>TestGoLangWrapper</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <target.name>sparklines</target.name>
+    </properties>
+
+    <profiles>
+      <profile> 
+        <id>windows-exe</id>
+        <activation>
+          <os>
+            <family>windows</family>
+          </os>
+        </activation>
+        <properties>
+          <target.name>sparklines.exe</target.name>
+        </properties>
+      </profile>
+    </profiles>
+    
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>com.igormaznitsa</groupId>
+          <artifactId>mvn-golang-wrapper</artifactId>
+          <version>1.0.0-SNAPSHOT</version>
+          <executions>
+            <execution>
+              <id>golang-get</id>
+              <goals>
+                <goal>get</goal>
+              </goals>
+              <configuration combine.self="override">
+                <autofixGitCache>true</autofixGitCache>
+                <packages>
+                  <package>github.com/gizak/termui</package>
+                </packages>
+                <buildFlags>
+                  <flag>-u</flag>
+                </buildFlags>
+              </configuration>
+            </execution>
+            <execution>
+              <id>golang-test</id>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>golang-build</id>
+              <goals>
+                <goal>build</goal>
+              </goals>
+              <configuration>
+                <name>${target.name}</name>
+              </configuration>
+            </execution>
+          </executions>
+          <configuration>
+            <goVersion>1.6</goVersion>
+            <packages>
+              <file>sparklines.go</file>
+            </packages>
+          </configuration>
+        </plugin>
+      </plugins>
+    </build>
+    
+</project>
+```
+
+# Configuration 
 ## Build
 
 ## Clean
