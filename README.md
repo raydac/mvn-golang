@@ -12,16 +12,16 @@ __The Plugin is under development and there is not any ready version yet!__
 I very like Maven build tool and use it very actively in my work so that I decided to develop a small maven plugin to bring possibility to build and GoLang executable applications with the build tool.   
 The Plugin is a full cycle one and allows to build a GoLang application with Maven even if there is not any installed GoLang SDK in OS, in the case the plugin will download compatible one and unpack an SDK from GoLang page and will be using the SDK in its work.   
 Mainly all main commands of GoLang are accessible through the plugin and their list you can see below:
-* Build
-* Clean
-* Fix
-* Fmt
-* Get
-* Generate
-* Install
-* Test
-* Tool
-* Vet
+* build
+* clean
+* fix
+* fmt
+* get
+* generate
+* install
+* test
+* tool
+* vet
 
 # Example
 The Example pom.xml below shows how to build a GoLang executable file from an example of [termui framework](https://github.com/gizak/termui). It will download the package automatically and as the result in the target folder will be placed the completed executable file named as 'sparklines'.
@@ -105,22 +105,5 @@ The Example pom.xml below shows how to build a GoLang executable file from an ex
 ```
 
 # Configuration 
-## Build
 
-## Clean
-
-## Fix
-
-## Fmt
-
-## Get
-
-## Generate
-
-## Install
-
-## Test
-
-## Tool
-
-## Vet
+About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvnGoLang/wiki/PluginConfigParameters).
