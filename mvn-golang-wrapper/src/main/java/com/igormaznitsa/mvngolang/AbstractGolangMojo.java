@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -40,7 +39,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -206,7 +204,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * It allows to define key value pairs which will be used as environment variables for started GoLang process.
    */
   @Parameter(name = "env")
-  private Map env;
+  private Map<?,?> env;
 
   /**
    * Keep unpacked wrongly SDK folder.
@@ -215,7 +213,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean keepUnarchFolderIfError;
 
   @Nonnull
-  public Map getEnv() {
+  public Map<?,?> getEnv() {
     return GetUtils.ensureNonNull(this.env, Collections.EMPTY_MAP);
   }
 
@@ -449,16 +447,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   private void initConsoleBuffers() {
+    getLog().debug("Initing console out and console err buffers");
     this.consoleErrBuffer = new ByteArrayOutputStream();
     this.consoleOutBuffer = new ByteArrayOutputStream();
-  }
-
-  @Nonnull
-  private static String extractArchiveName(@Nonnull final ArchiveInputStream reader) {
-    final String name = reader.getClass().getSimpleName();
-    final String basename = ArchiveInputStream.class.getSimpleName().toLowerCase(Locale.ENGLISH);
-    final int index = name.toLowerCase(Locale.ENGLISH).indexOf(basename);
-    return index < 0 ? name : name.substring(0, index);
   }
 
   @Nonnull
@@ -784,6 +775,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private ProcessExecutor prepareExecutor() throws IOException, MojoFailureException {
     initConsoleBuffers();
+    
     final String execNameAdaptedForOs = adaptExecNameForOS(getMainGoExecName());
     final File detectedRoot = findGoRoot();
     final File executableFile = new File(getPathToFolder(detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
@@ -833,8 +825,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
     final File sourcesFile = getSources(true);
-    logOptionally("GoLang project folder : " + sourcesFile);
-
+    logOptionally("GoLang project sources folder : " + sourcesFile);
     result.directory(sourcesFile);
 
     getLog().info("");
@@ -861,10 +852,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
     }
 
-    final Map envVarMap = getEnv();
-
-    for (final Object key : envVarMap.keySet()) {
-      addEnvVar(result, key.toString(), envVarMap.get(key).toString());
+    for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
+      addEnvVar(result, record.getKey().toString(), record.getValue().toString());
     }
 
     getLog().info("........................");
