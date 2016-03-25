@@ -18,6 +18,8 @@
           <goal>build</goal>
         </goals>
         <configuration>
+          <targetOs>someos</targetOs>
+          <targetArch>somearch</targetArch>
           <dontUseEnvVars>true</dontUseEnvVars>
           <useGoTool>someGo.bat</useGoTool>
           <target>target/place</target>
