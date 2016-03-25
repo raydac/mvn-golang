@@ -18,6 +18,7 @@
           <goal>build</goal>
         </goals>
         <configuration>
+          <useGoTool>someGo.bat</useGoTool>
           <target>target/place</target>
           <name>targetName</name>
           <hideBanner>true</hideBanner>

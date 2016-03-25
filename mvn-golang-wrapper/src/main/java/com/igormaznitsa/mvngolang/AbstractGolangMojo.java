@@ -1,5 +1,6 @@
 package com.igormaznitsa.mvngolang;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -25,9 +27,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.StreamingNotSupportedException;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -51,6 +57,7 @@ import com.igormaznitsa.meta.annotation.LazyInited;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
+import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -159,19 +166,61 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Parameter(name = "verbose", defaultValue = "false")
   private boolean verbose;
 
+  /**
+   * Do not delete SDK archive after unpacking.
+   */
+  @Parameter(name = "keepSdkArchive", defaultValue = "false")
+  private boolean keepSdkArchive;
+
+  /**
+   * Name of tool to be called instead of standard 'go' tool.
+   */
+  @Parameter(name = "useGoTool")
+  private String useGoTool;
+
+  /**
+   * Allows directly define the name of the SDK archive.
+   */
+  @Parameter(name = "sdkArchiveName")
+  private String sdkArchiveName;
+
+  /**
+   * Keep unpacked wrongly SDK folder.
+   */
+  @Parameter(name = "keepUnarchFolderIfError", defaultValue = "false")
+  private boolean keepUnarchFolderIfError;
+      
+  public boolean isKeepSdkArchive() {
+    return this.keepSdkArchive;
+  }
+
+  public boolean isKeepUnarchFolderIfError() {
+    return this.keepUnarchFolderIfError;
+  }
+  
+  @Nullable
+  public String getSdkArchiveName() {
+    return this.sdkArchiveName;
+  }
+
   @Nonnull
-  public String getStoreFolder(){
+  public String getStoreFolder() {
     return this.storeFolder;
   }
-  
-  public boolean isVerbose(){
+
+  @Nullable
+  public String getUseGoTool() {
+    return this.useGoTool;
+  }
+
+  public boolean isVerbose() {
     return this.verbose;
   }
-  
-  public boolean isDisableSdkLoad(){
+
+  public boolean isDisableSdkLoad() {
     return this.disableSdkLoad;
   }
-  
+
   @Nonnull
   @MustNotContainNull
   public String[] getBuildFlags() {
@@ -322,72 +371,36 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
+  private static String extractArchiveName(@Nonnull final ArchiveInputStream reader) {
+    final String name = reader.getClass().getSimpleName();
+    final String basename = ArchiveInputStream.class.getSimpleName().toLowerCase(Locale.ENGLISH);
+    final int index = name.toLowerCase(Locale.ENGLISH).indexOf(basename);
+    return index < 0 ? name : name.substring(0, index);
+  }
+
+  @Nonnull
   private File unpackArchToFolder(@Nonnull final File archiveFile, @Nonnull final String folderInArchive, @Nonnull final File destinationFolder) throws IOException {
     getLog().info(String.format("Unpacking archive %s to folder %s", archiveFile.getName(), destinationFolder.getName()));
 
-    final String nameLC = archiveFile.getName().toLowerCase(Locale.ENGLISH);
-
-    final InputStream in = new FileInputStream(archiveFile);
+    boolean detectedError = true;
     try {
-      final ArchiveInputStream archive;
 
-      if (nameLC.endsWith(".zip")) {
-        archive = new ZipArchiveInputStream(in);
-      } else if (nameLC.endsWith("tar.gz")) {
-        archive = new TarArchiveInputStream(new GZIPInputStream(in));
+      final int unpackedFileCounter = UnpackUtils.unpackFileToFolder(folderInArchive, archiveFile, destinationFolder, true);
+      if (unpackedFileCounter == 0) {
+        throw new IOException("Couldn't find folder '" + folderInArchive + "' in archive or the archive is empty");
       } else {
-        throw new IOException("Unsupported archive : " + archiveFile.getName());
+        getLog().info("Unpacked " + unpackedFileCounter + " file(s)");
       }
 
-      int unpackedFilesCounter = 0;
+      detectedError = false;
 
-      final String normalizedFolder = FilenameUtils.normalize(folderInArchive, true) + '/';
-
-      ArchiveEntry entry;
-      while ((entry = archive.getNextEntry()) != null) {
-        final String normalizedPath = FilenameUtils.normalize(entry.getName(), true);
-        if (normalizedPath.startsWith(normalizedFolder)) {
-          final File file = new File(destinationFolder, normalizedPath.substring(normalizedFolder.length()));
-          if (entry.isDirectory()) {
-            getLog().debug("Creating folder : " + file);
-            if (!file.mkdirs()) {
-              throw new IOException("Can't create folder " + file);
-            }
-          } else {
-            getLog().debug("Unpack file : " + normalizedPath + " to " + file);
-            final File parent = file.getParentFile();
-            if (parent != null && !parent.isDirectory() && !parent.mkdirs()) {
-              throw new IOException("Can't create folder : " + parent);
-            }
-            final FileOutputStream fos = new FileOutputStream(file, false);
-            try {
-              IOUtils.copy(archive, fos);
-            } finally {
-              fos.close();
-            }
-            try {
-              file.setExecutable(true, true);
-            } catch (SecurityException ex) {
-              throw new IOException("Can't make file executable : " + file, ex);
-            }
-            unpackedFilesCounter++;
-          }
-        } else {
-          getLog().debug("Ignoring " + normalizedPath);
-        }
-      }
-      archive.close();
-
-      if (unpackedFilesCounter == 0) {
-        throw new IOException("Couldn't find folder '" + folderInArchive + "' in archive");
-      } else {
-        getLog().info("Unpacked " + unpackedFilesCounter + " file(s)");
-      }
-
-      return destinationFolder;
     } finally {
-      IOUtils.closeQuietly(in);
+      if (detectedError && !isKeepUnarchFolderIfError()) {
+        logOptionally("Deleting folder because error during unpack : " + destinationFolder);
+        FileUtils.deleteQuietly(destinationFolder);
+      }
     }
+    return destinationFolder;
   }
 
   @Nonnull
@@ -399,6 +412,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final GetMethod methodGet = new GetMethod(sdkUrl);
     methodGet.setFollowRedirects(true);
+
+    boolean errorsDuringLoading = true;
 
     try {
       if (!archiveFile.isFile()) {
@@ -424,10 +439,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         getLog().info("Archive file of SDK has been found in the cache : " + archiveFile);
       }
 
+      errorsDuringLoading = false;
+
       return unpackArchToFolder(archiveFile, "go", sdkFolder);
     } finally {
       methodGet.releaseConnection();
-      deleteFileIfExists(archiveFile);
+      if (errorsDuringLoading || !this.isKeepSdkArchive()) {
+        logOptionally("Deleting archive : " + archiveFile + (errorsDuringLoading ? " (because error during loading)" : ""));
+        deleteFileIfExists(archiveFile);
+      } else {
+        logOptionally("Archive file is kept : " + archiveFile);
+      }
     }
   }
 
@@ -441,7 +463,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     final List<String> listedSdk = new ArrayList<String>();
-    
+
     final Element root = doc.getDocumentElement();
     if ("ListBucketResult".equals(root.getTagName())) {
       final NodeList list = root.getElementsByTagName("Contents");
@@ -458,14 +480,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           }
         }
       }
-      
-      getLog().error("Can't find any SDK to be used as "+sdkBaseName);
+
+      getLog().error("Can't find any SDK to be used as " + sdkBaseName);
       getLog().error("GoLang list contains listed SDKs");
       getLog().error("..................................................");
-      for(final String s : listedSdk){
+      for (final String s : listedSdk) {
         getLog().error(s);
       }
-      
+
       throw new IOException("Can't find SDK : " + sdkBaseName);
     } else {
       throw new IOException("It is not a ListBucket file [" + root.getTagName() + ']');
@@ -492,7 +514,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             this.getGoVersion().toLowerCase(Locale.ENGLISH),
             this.getOs().toLowerCase(Locale.ENGLISH),
             this.getArch().toLowerCase(Locale.ENGLISH),
-            osx == null ? "" : "-" + osx.toLowerCase(Locale.ENGLISH));
+            osx == null || !SystemUtils.IS_OS_MAC_OSX ? "" : "-" + osx.toLowerCase(Locale.ENGLISH));
 
         final File alreadyCached = new File(cacheFolder, sdkBaseName);
 
@@ -504,7 +526,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             throw new MojoFailureException("Can't find " + sdkBaseName + " in the cache but loading is directly disabled");
           }
           final Document parsed = convertSdkListToDocument(loadGoLangSdkList());
-          return loadSDKAndUnpackIntoCache(cacheFolder, sdkBaseName, extractSDKFileName(parsed, sdkBaseName, new String[]{"tar.gz", "zip"}));
+          final String predefinedArchive = this.getSdkArchiveName();
+          if (predefinedArchive != null) {
+            getLog().warn("Detected predefined archive name : " + predefinedArchive);
+          }
+          return loadSDKAndUnpackIntoCache(cacheFolder, sdkBaseName, predefinedArchive == null ? extractSDKFileName(parsed, sdkBaseName, new String[]{"tar.gz", "zip"}) : predefinedArchive);
         }
       } else {
         return new File(this.goRoot);
@@ -557,16 +583,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         final ProcessExecutor executor = prepareExecutor();
         final ProcessResult result = executor.executeNoTimeout();
         iterations++;
-        
+
         final String outLog = extractOutAsString();
         final String errLog = extractErrorOutAsString();
 
         printLogs(outLog, errLog);
 
         if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
-          if (iterations > 10) throw new MojoExecutionException("Too many iterations detected, may be some loop and bug at mojo "+this.getClass().getName());
+          if (iterations > 10) {
+            throw new MojoExecutionException("Too many iterations detected, may be some loop and bug at mojo " + this.getClass().getName());
+          }
           getLog().warn("Make one more attempt...");
-        }else{
+        } else {
           assertProcessResult(result);
           break;
         }
@@ -638,8 +666,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public String getExecFileBaseName() {
-    return "go";
+  public String getMainGoExecName() {
+    return "bin" + File.separatorChar + "go";
   }
 
   @Nonnull
@@ -658,15 +686,27 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   protected static String adaptExecNameForOS(@Nonnull final String execName) {
     return execName + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "");
   }
-  
+
+  @Nonnull
+  private static String getPathToFolder(@Nonnull final File path) {
+    String text = path.getAbsolutePath();
+    if (!text.endsWith("/") && !text.endsWith("\\")) {
+      text = text + File.separatorChar;
+    }
+    return text;
+  }
+
   @Nonnull
   private ProcessExecutor prepareExecutor() throws IOException, MojoFailureException {
     initConsoleBuffers();
-    final String execNameAdaptedForOs = adaptExecNameForOS(getExecFileBaseName());
+    final String execNameAdaptedForOs = adaptExecNameForOS(getMainGoExecName());
     final File detectedRoot = findGoRoot();
-    final File executableFile = new File(detectedRoot, "bin" + File.separatorChar + execNameAdaptedForOs);
+    final File executableFile = new File(getPathToFolder(detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
+    
     if (!executableFile.isFile()) {
       throw new IOException("Can't find executable file : " + executableFile);
+    } else {
+      logOptionally("Executable go tool file detected : "+executableFile);
     }
 
     final List<String> commandLine = new ArrayList<String>();
@@ -706,7 +746,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     logOptionally("Command line : " + cli.toString());
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
-    result.directory(getSources(true));
+    
+    final File sourcesFile = getSources(true);
+    logOptionally("GoLang project folder : "+sourcesFile);
+    
+    result.directory(sourcesFile);
 
     getLog().info("");
     getLog().info("....Environment vars....");

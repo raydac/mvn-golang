@@ -70,8 +70,15 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   public void afterExecution(final boolean error) throws MojoFailureException {
     if (!error){
       final File targetFile = getTargetFile();
+      // check that it exists
       if (!targetFile.isFile()) {
         throw new MojoFailureException("Can't find generated target file : "+targetFile);
+      }
+      // softly try to make it executable
+      try{
+        targetFile.setExecutable(true);
+      }catch(SecurityException ex){
+        getLog().warn("Security exception during setting executable flag : "+targetFile);
       }
     }
   }

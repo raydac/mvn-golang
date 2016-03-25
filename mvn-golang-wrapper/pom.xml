@@ -212,6 +212,7 @@
           </failForAnnotations>
           <ignoreClasses>
             <class>*.HelpMojo</class>
+            <class>*.UnpackUtils$*</class>
           </ignoreClasses>
         </configuration>
         <executions>

@@ -144,6 +144,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   public void testGolangGetMojoConfiguration() throws Exception {
     final GolangGetMojo getMojo = (GolangGetMojo) lookupMojo("get", new File(GolangMojoCfgTest.class.getResource("mojoGet.xml").toURI()));
     assertEquals("get",getMojo.getGoCommand());
+    assertNull(getMojo.getUseGoTool());
     assertTrue(getMojo.isAutoFixGitCache());
     assertFalse(getMojo.isVerbose());
     assertFalse(getMojo.isHideBanner());
@@ -158,6 +159,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   public void testGolangBuildMojoConfiguration() throws Exception {
     final GolangBuildMojo buildMojo = (GolangBuildMojo) lookupMojo("build", new File(GolangMojoCfgTest.class.getResource("mojoBuild.xml").toURI()));
     assertEquals("build", buildMojo.getGoCommand());
+    assertEquals("someGo.bat",buildMojo.getUseGoTool());
     assertFalse(buildMojo.isVerbose());
     assertTrue(buildMojo.isHideBanner());
     assertEquals("some/sources", buildMojo.getSources(false).getPath());
