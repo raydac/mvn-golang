@@ -1,5 +1,7 @@
 package com.igormaznitsa.mvngolang;
 
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -82,7 +85,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String storeFolder;
 
   /**
-   * Folder to be used as GOPATH.
+   * Folder to be used as GOPATH. NB! The Environment variable also will be checked and if environment variable detected then value of it will be used.
    */
   @Parameter(defaultValue = "${user.home}${file.separator}.mvnGoLang${file.separator}.go_path", name = "goPath")
   private String goPath;
@@ -98,6 +101,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    */
   @Parameter(name = "goRoot")
   private String goRoot;
+
+  /**
+   * The Go bootstrap home.
+   */
+  @Parameter(name = "goRootBootstrap")
+  private String goRootBootstrap;
 
   /**
    * Disable loading GoLang SDK through network if it is not found at cache.
@@ -172,11 +181,32 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String sdkArchiveName;
 
   /**
+   * Disable search and usage of environment variables $GOROOT, $GOROOT_BOOTSTRAP, $GOOS, $GOARCH, $GOPATH which will be used if there is not directly defined info.
+   */
+  @Parameter(name = "dontUseEnvVars", defaultValue = "false")
+  private boolean dontUseEnvVars;
+
+  /**
+   * It allows to define key value pairs which will be used as environment variables for started GoLang process.
+   */
+  @Parameter(name = "env")
+  private Properties env;
+
+  /**
    * Keep unpacked wrongly SDK folder.
    */
   @Parameter(name = "keepUnarchFolderIfError", defaultValue = "false")
   private boolean keepUnarchFolderIfError;
-      
+
+  @Nonnull
+  public Properties getEnv() {
+    return GetUtils.ensureNonNull(this.env, new Properties());
+  }
+
+  public boolean isDontUseEnvVars() {
+    return this.dontUseEnvVars;
+  }
+
   public boolean isKeepSdkArchive() {
     return this.keepSdkArchive;
   }
@@ -184,7 +214,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public boolean isKeepUnarchFolderIfError() {
     return this.keepUnarchFolderIfError;
   }
-  
+
   @Nullable
   public String getSdkArchiveName() {
     return this.sdkArchiveName;
@@ -215,10 +245,24 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public File getGoPath(final boolean ensureExist) throws IOException {
-    final File result = new File(this.goPath);
+  public File findGoPath(final boolean ensureExist) throws IOException {
+    final String theGoPath = getGoPath();
+    final File result = new File(theGoPath);
     if (ensureExist && !result.isDirectory() && !result.mkdirs()) {
-      throw new IOException("Can't create folder : " + goPath);
+      throw new IOException("Can't create folder : " + theGoPath);
+    }
+    return result;
+  }
+
+  @Nullable
+  public File findGoRootBootstrap(final boolean ensureExist) throws IOException {
+    final String value = getGoRootBootstrap();
+    File result = null;
+    if (value != null) {
+      result = new File(value);
+      if (ensureExist && !result.isDirectory()) {
+        throw new IOException("Can't find folder for GOROOT_BOOTSTRAP: " + result);
+      }
     }
     return result;
   }
@@ -249,14 +293,33 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return result;
   }
 
+  @Nonnull
+  public String getGoPath() {
+    final String foundInEnvironment = System.getenv("GOPATH");
+    String result = assertNotNull(this.goPath);
+
+    if (foundInEnvironment != null && !isDontUseEnvVars()){
+      result = foundInEnvironment;
+    }
+    return result;
+  }
+
   @Nullable
   public String getTargetOS() {
-    return this.targetOs;
+    String result = this.targetOs;
+    if (result == null && !isDontUseEnvVars()) {
+      result = System.getenv("GOOS");
+    }
+    return result;
   }
 
   @Nullable
   public String getTargetArch() {
-    return this.targetArch;
+    String result = this.targetArch;
+    if (result == null && !isDontUseEnvVars()) {
+      result = System.getenv("GOARCH");
+    }
+    return result;
   }
 
   @Nullable
@@ -275,7 +338,24 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nullable
   public String getGoRoot() {
-    return this.goRoot;
+    String result = this.goRoot;
+
+    if (result == null && !isDontUseEnvVars()) {
+      result = System.getenv("GOROOT");
+    }
+
+    return result;
+  }
+
+  @Nullable
+  public String getGoRootBootstrap() {
+    String result = this.goRootBootstrap;
+
+    if (result == null && !isDontUseEnvVars()) {
+      result = System.getenv("GOROOT_BOOTSTRAP");
+    }
+
+    return result;
   }
 
   @Nonnull
@@ -485,7 +565,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private File findGoRoot() throws IOException, MojoFailureException {
     LOCKER.lock();
     try {
-      if (this.goRoot == null) {
+      final String definedGoRoot = this.getGoRoot();
+
+      if (definedGoRoot == null) {
         final File cacheFolder = new File(this.storeFolder);
 
         if (!cacheFolder.isDirectory()) {
@@ -520,7 +602,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           return loadSDKAndUnpackIntoCache(cacheFolder, sdkBaseName, predefinedArchive == null ? extractSDKFileName(parsed, sdkBaseName, new String[]{"tar.gz", "zip"}) : predefinedArchive);
         }
       } else {
-        return new File(this.goRoot);
+        return new File(definedGoRoot);
       }
     } finally {
       LOCKER.unlock();
@@ -689,11 +771,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final String execNameAdaptedForOs = adaptExecNameForOS(getMainGoExecName());
     final File detectedRoot = findGoRoot();
     final File executableFile = new File(getPathToFolder(detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
-    
+
     if (!executableFile.isFile()) {
       throw new IOException("Can't find executable file : " + executableFile);
     } else {
-      logOptionally("Executable go tool file detected : "+executableFile);
+      logOptionally("Executable go tool file detected : " + executableFile);
     }
 
     final List<String> commandLine = new ArrayList<String>();
@@ -733,10 +815,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     logOptionally("Command line : " + cli.toString());
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
-    
+
     final File sourcesFile = getSources(true);
-    logOptionally("GoLang project folder : "+sourcesFile);
-    
+    logOptionally("GoLang project folder : " + sourcesFile);
+
     result.directory(sourcesFile);
 
     getLog().info("");
@@ -744,7 +826,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
 
-    final File gopath = getGoPath(true);
+    final File gopath = findGoPath(true);
     addEnvVar(result, "GOPATH", gopath.getAbsolutePath());
 
     final String trgtOs = this.getTargetOS();
@@ -756,6 +838,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (trgtArch != null) {
       addEnvVar(result, "GOARCH", trgtArch);
+    }
+
+    final File gorootbootstrap = findGoRootBootstrap(true);
+    if (gorootbootstrap != null) {
+      addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
+    }
+
+    final Properties envProperties = getEnv();
+
+    for (final String key : envProperties.stringPropertyNames()) {
+      addEnvVar(result, key, envProperties.getProperty(key));
     }
 
     getLog().info("........................");

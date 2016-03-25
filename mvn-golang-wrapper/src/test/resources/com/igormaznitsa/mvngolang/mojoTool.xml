@@ -18,6 +18,7 @@
           <goal>tool</goal>
         </goals>
         <configuration>
+          <dontUseEnvVars>true</dontUseEnvVars>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>
           <sources>some/sources</sources>

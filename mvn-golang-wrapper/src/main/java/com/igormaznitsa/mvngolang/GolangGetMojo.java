@@ -68,7 +68,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   }
 
   private boolean tryToFixGitCacheErrorsForPackages(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
-    final File goPath = getGoPath(true);
+    final File goPath = findGoPath(true);
 
     int fixed = 0;
 

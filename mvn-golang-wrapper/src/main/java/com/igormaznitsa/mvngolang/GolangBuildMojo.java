@@ -80,6 +80,8 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
       }catch(SecurityException ex){
         getLog().warn("Security exception during setting executable flag : "+targetFile);
       }
+      
+      getLog().info("Result file successfuly saved : " + targetFile);
     }
   }
 
