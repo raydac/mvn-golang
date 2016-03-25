@@ -51,7 +51,7 @@ public class GolangToolMojo extends AbstractGolangMojo {
   @Nullable
   @MustNotContainNull
   public String [] getArgs(){
-    return this.args;
+    return this.args == null ? null : this.args.clone();
   }
   
   @Override

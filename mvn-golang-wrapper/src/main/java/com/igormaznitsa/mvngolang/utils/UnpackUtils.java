@@ -45,7 +45,7 @@ public final class UnpackUtils {
   private interface ArchEntryGetter {
 
     @Nullable
-    ArchiveEntry getNextEntry() throws IOException ;
+    ArchiveEntry getNextEntry() throws IOException;
   }
 
   private UnpackUtils() {
@@ -65,13 +65,17 @@ public final class UnpackUtils {
 
     final ArchEntryGetter entryGetter;
 
+    boolean modeZipFile = false;
+
     final ZipFile theZipFile;
     final ArchiveInputStream archInputStream;
     if (normalizedName.endsWith(".zip")) {
+      modeZipFile = true;
+
       theZipFile = new ZipFile(archiveFile);
       archInputStream = null;
       entryGetter = new ArchEntryGetter() {
-        private Enumeration<ZipArchiveEntry> iterator = theZipFile.getEntries();
+        private final Enumeration<ZipArchiveEntry> iterator = theZipFile.getEntries();
 
         @Override
         @Nullable
@@ -95,7 +99,7 @@ public final class UnpackUtils {
 
         entryGetter = new ArchEntryGetter() {
           @Override
-          public ArchiveEntry getNextEntry() throws IOException{
+          public ArchiveEntry getNextEntry() throws IOException {
             return archInputStream.getNextEntry();
           }
         };
@@ -119,7 +123,7 @@ public final class UnpackUtils {
           break;
         }
         final String normalizedPath = FilenameUtils.normalize(entry.getName(), true);
-        if (normalizedPath.startsWith(normalizedFolder)) {
+        if (normalizedFolder == null || normalizedPath.startsWith(normalizedFolder)) {
           final File targetFile = new File(destinationFolder, normalizedFolder == null ? normalizedPath : normalizedPath.substring(normalizedFolder.length()));
           if (entry.isDirectory()) {
             if (!targetFile.mkdirs()) {
@@ -135,21 +139,21 @@ public final class UnpackUtils {
             final FileOutputStream fos = new FileOutputStream(targetFile);
 
             try {
-              if (archInputStream != null) {
+              if (modeZipFile) {
+                final InputStream zipEntryInStream = theZipFile.getInputStream((ZipArchiveEntry) entry);
+                try {
+                  if (IOUtils.copy(zipEntryInStream, fos) != entry.getSize()) {
+                    throw new IOException("Can't unpack file, illegal unpacked length : " + entry.getName());
+                  }
+                } finally {
+                  IOUtils.closeQuietly(zipEntryInStream);
+                }
+              } else {
                 if (!archInputStream.canReadEntryData(entry)) {
                   throw new IOException("Can't read archive entry data : " + normalizedPath);
                 }
                 if (IOUtils.copy(archInputStream, fos) != entry.getSize()) {
                   throw new IOException("Can't unpack file, illegal unpacked length : " + entry.getName());
-                };
-              } else {
-                final InputStream zipEntryInStream = theZipFile.getInputStream((ZipArchiveEntry) entry);
-                try {
-                  if (IOUtils.copy(zipEntryInStream, fos) != entry.getSize()) {
-                    throw new IOException("Can't unpack file, illegal unpacked length : " + entry.getName());
-                  };
-                } finally {
-                  IOUtils.closeQuietly(zipEntryInStream);
                 }
               }
             } finally {

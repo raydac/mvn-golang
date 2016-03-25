@@ -42,7 +42,7 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
   @Nullable
   @MustNotContainNull
   public String [] getTestFlags(){
-    return this.testFlags;
+    return this.testFlags == null ? null : this.testFlags.clone() ;
   }
   
   @Override
