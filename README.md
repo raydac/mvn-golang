@@ -9,10 +9,9 @@
 __The Plugin is under development and there is not any ready version yet!__
 
 # Introduction
-The Maven plugin makes some auto download and caching of GoLang SDK and wraps main command set to build and test GoLang applications in Maven life cycle.
-
-# Wrapped GoLang commands
-
+I very like Maven build tool and use it very actively in my work so that I decided to develop a small maven plugin to bring possibility to build and GoLang executable applications with the build tool.   
+The Plugin is a full cycle one and allows to build a GoLang application with Maven even if there is not any installed GoLang SDK in OS, in the case the plugin will download compatible one and unpack an SDK from GoLang page and will be using the SDK in its work.   
+Mainly all main commands of GoLang are accessible through the plugin and their list you can see below:
 * Build
 * Clean
 * Fix
@@ -23,6 +22,7 @@ The Maven plugin makes some auto download and caching of GoLang SDK and wraps ma
 * Test
 * Tool
 * Vet
+
 
 ## Build
 
