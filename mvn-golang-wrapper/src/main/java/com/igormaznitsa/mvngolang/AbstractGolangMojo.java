@@ -189,12 +189,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String useGoTool;
 
   /**
-   * Allows directly define the name of the SDK archive.
-   */
-  @Parameter(name = "sdkArchiveName")
-  private String sdkArchiveName;
-
-  /**
    * Allows to find environment variable values for $GOROOT, $GOROOT_BOOTSTRAP, $GOOS, $GOARCH, $GOPATH and use them for process..
    */
   @Parameter(name = "useEnvVars", defaultValue = "false")
@@ -207,6 +201,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private Map<?,?> env;
 
   /**
+   * Allows directly define name of SDK archive. If it is not defined then plug-in will try to generate name and find such one in downloaded SDK list..
+   */
+  @Parameter(name = "sdkArchiveName")
+  private String sdkArchiveName;
+
+  /**
+   * Directly defined URL to download SDK. In the case SDK list will not be downloaded and plug-in will try download archive through the link.
+   */
+  @Parameter(name = "sdkDownloadUrl")
+  private String sdkDownloadUrl;
+  
+  /**
    * Keep unpacked wrongly SDK folder.
    */
   @Parameter(name = "keepUnarchFolderIfError", defaultValue = "false")
@@ -217,6 +223,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return GetUtils.ensureNonNull(this.env, Collections.EMPTY_MAP);
   }
 
+  @Nullable
+  public String getSdkDownloadUrl() {
+    return this.sdkDownloadUrl;
+  }
+  
   public boolean isUseEnvVars() {
     return this.useEnvVars;
   }
@@ -284,7 +295,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   public String getOs() {
     String result = this.os;
-    if (result == null) {
+    if (isSafeEmpty(result)) {
       if (SystemUtils.IS_OS_WINDOWS) {
         result = "windows";
       } else if (SystemUtils.IS_OS_LINUX) {
@@ -301,7 +312,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   public String getArch() {
     String result = this.arch;
-    if (result == null) {
+    if (isSafeEmpty(result)) {
       result = investigateArch();
     }
     return result;
@@ -321,7 +332,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getTargetOS() {
     String result = this.targetOs;
-    if (result == null && isUseEnvVars()) {
+    if (isSafeEmpty(result) && isUseEnvVars()) {
       result = System.getenv("GOOS");
     }
     return result;
@@ -330,7 +341,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getTargetArch() {
     String result = this.targetArch;
-    if (result == null && isUseEnvVars()) {
+    if (isSafeEmpty(result) && isUseEnvVars()) {
       result = System.getenv("GOARCH");
     }
     return result;
@@ -339,7 +350,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getOSXVersion() {
     String result = this.osxVersion;
-    if (result == null && SystemUtils.IS_OS_MAC_OSX) {
+    if (isSafeEmpty(result) && SystemUtils.IS_OS_MAC_OSX) {
       result = "osx10.6";
     }
     return result;
@@ -354,7 +365,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public String getGoRoot() {
     String result = this.goRoot;
 
-    if (result == null && isUseEnvVars()) {
+    if (isSafeEmpty(result) && isUseEnvVars()) {
       result = System.getenv("GOROOT");
     }
 
@@ -365,7 +376,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public String getGoRootBootstrap() {
     String result = this.goRootBootstrap;
 
-    if (result == null && isUseEnvVars()) {
+    if (isSafeEmpty(result) && isUseEnvVars()) {
       result = System.getenv("GOROOT_BOOTSTRAP");
     }
 
@@ -459,7 +470,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     boolean detectedError = true;
     try {
 
-      final int unpackedFileCounter = UnpackUtils.unpackFileToFolder(folderInArchive, archiveFile, destinationFolder, true);
+      final int unpackedFileCounter = UnpackUtils.unpackFileToFolder(getLog(), folderInArchive, archiveFile, destinationFolder, true);
       if (unpackedFileCounter == 0) {
         throw new IOException("Couldn't find folder '" + folderInArchive + "' in archive or the archive is empty");
       } else {
@@ -477,25 +488,56 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return destinationFolder;
   }
 
+  private static boolean isSafeEmpty(@Nullable final String value) {
+    return value == null || value.isEmpty();
+  }
+  
   @Nonnull
-  private File loadSDKAndUnpackIntoCache(@Nonnull final File cacheFolder, @Nonnull final String baseSdkName, @Nonnull final String sdkFileName) throws IOException {
-    final File archiveFile = new File(cacheFolder, sdkFileName);
+  private static String extractExtensionOfArchive(@Nonnull final String archiveName) {
+    final String lcName = archiveName;
+    final String result;
+    if (lcName.endsWith(".tar.gz")) {
+      result = archiveName.substring(archiveName.length()-"tar.gz".length());
+    } else {
+      result = FilenameUtils.getExtension(archiveName);
+    }
+    return result;
+  }
+  
+  @Nonnull
+  private File loadSDKAndUnpackIntoCache(@Nonnull final File cacheFolder, @Nonnull final String baseSdkName) throws IOException {
     final File sdkFolder = new File(cacheFolder, baseSdkName);
 
-    final String sdkUrl = SDK_BASE_URL + sdkFileName;
+    final String predefinedLink = getSdkDownloadUrl();
+    
+    final File archiveFile;
+    final String linkForDownloading;
+    
+    if (isSafeEmpty(predefinedLink)) {
+      logOptionally("There is not any predefined SDK URL");
+      final String sdkFileName = findSdkArchiveFileName(baseSdkName);
+      archiveFile = new File(cacheFolder, sdkFileName);
+      linkForDownloading = SDK_BASE_URL + sdkFileName;
+    } else {
+      final String extension = extractExtensionOfArchive(assertNotNull(predefinedLink));
+      archiveFile = new File(cacheFolder, baseSdkName+'.'+extension);
+      linkForDownloading = predefinedLink;
+      logOptionally("Using predefined URL to download SDK : "+linkForDownloading);
+      logOptionally("Detected extension of archive : "+extension);
+    }
 
-    final GetMethod methodGet = new GetMethod(sdkUrl);
+    final GetMethod methodGet = new GetMethod(linkForDownloading);
     methodGet.setFollowRedirects(true);
 
     boolean errorsDuringLoading = true;
 
     try {
       if (!archiveFile.isFile()) {
-        getLog().warn("Loading SDK archive with URL : " + sdkUrl);
+        getLog().warn("Loading SDK archive with URL : " + linkForDownloading);
 
         final int status = getHttpClient().executeMethod(methodGet);
         if (status != HttpStatus.SC_OK) {
-          throw new IOException("Can't load SDK archive for URL : " + sdkUrl + " [" + status + ']');
+          throw new IOException("Can't load SDK archive for URL : " + linkForDownloading + " [" + status + ']');
         }
         final String contentType = methodGet.getResponseHeader("Content-Type").getValue();
 
@@ -504,6 +546,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         }
 
         final InputStream inStream = methodGet.getResponseBodyAsStream();
+        getLog().info("Downloading SDK archive into file : "+archiveFile);
         FileUtils.copyInputStreamToFile(inStream, archiveFile);
 
         getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
@@ -522,7 +565,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         logOptionally("Deleting archive : " + archiveFile + (errorsDuringLoading ? " (because error during loading)" : ""));
         deleteFileIfExists(archiveFile);
       } else {
-        logOptionally("Archive file is kept : " + archiveFile);
+        logOptionally("Archive file is kept for special flag : " + archiveFile);
       }
     }
   }
@@ -569,12 +612,38 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
+  private String findSdkArchiveFileName(@Nonnull final String sdkBaseName) throws IOException {
+    String result = getSdkArchiveName();
+    if (isSafeEmpty(result)) {
+      final Document parsed = convertSdkListToDocument(loadGoLangSdkList());
+      result = extractSDKFileName(parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
+    } else {
+      getLog().info("SDK archive name is predefined : "+result);
+    }
+    return GetUtils.ensureNonNull(result,"");
+  }
+  
+  private void warnIfContainsUC(@Nonnull final String message, @Nonnull final String str) {
+    boolean detected = false;
+    for(final char c : str.toCharArray()) {
+      if (Character.isUpperCase(c)) {
+        detected = true;
+        break;
+      }
+    }
+    if (detected){
+      getLog().warn(message+" : "+str);
+    }
+  }
+  
+  @Nonnull
   private File findGoRoot() throws IOException, MojoFailureException {
+    final File result;
     LOCKER.lock();
     try {
-      final String definedGoRoot = this.getGoRoot();
+      final String predefinedGoRoot = this.getGoRoot();
 
-      if (definedGoRoot == null) {
+      if (isSafeEmpty(predefinedGoRoot)) {
         final File cacheFolder = new File(this.storeFolder);
 
         if (!cacheFolder.isDirectory()) {
@@ -584,36 +653,31 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           }
         }
 
-        final String osx = getOSXVersion();
+        final String definedOsx = getOSXVersion();
 
-        final String sdkBaseName = String.format(NAME_PATTERN,
-            this.getGoVersion().toLowerCase(Locale.ENGLISH),
-            this.getOs().toLowerCase(Locale.ENGLISH),
-            this.getArch().toLowerCase(Locale.ENGLISH),
-            osx == null || !SystemUtils.IS_OS_MAC_OSX ? "" : "-" + osx.toLowerCase(Locale.ENGLISH));
-
+        final String sdkBaseName = String.format(NAME_PATTERN, this.getGoVersion(), this.getOs(), this.getArch(), isSafeEmpty(definedOsx) || !SystemUtils.IS_OS_MAC_OSX ? "" : "-" + definedOsx);
+        warnIfContainsUC("Prefer usage of lower case chars only for SDK base name", sdkBaseName);
+        
         final File alreadyCached = new File(cacheFolder, sdkBaseName);
 
         if (alreadyCached.isDirectory()) {
           logOptionally("Cached SDK detected : " + alreadyCached);
-          return alreadyCached;
+          result = alreadyCached;
         } else {
           if (this.disableSdkLoad) {
             throw new MojoFailureException("Can't find " + sdkBaseName + " in the cache but loading is directly disabled");
           }
-          final Document parsed = convertSdkListToDocument(loadGoLangSdkList());
-          final String predefinedArchive = this.getSdkArchiveName();
-          if (predefinedArchive != null) {
-            getLog().warn("Detected predefined archive name : " + predefinedArchive);
-          }
-          return loadSDKAndUnpackIntoCache(cacheFolder, sdkBaseName, predefinedArchive == null ? extractSDKFileName(parsed, sdkBaseName, new String[]{"tar.gz", "zip"}) : predefinedArchive);
+          result = loadSDKAndUnpackIntoCache(cacheFolder, sdkBaseName);
         }
       } else {
-        return new File(definedGoRoot);
+        logOptionally("Detected predefined SDK root folder : "+predefinedGoRoot);
+        result = new File(predefinedGoRoot);
+        if (!result.isDirectory()) throw new MojoFailureException("Predefined SDK root is not a directory : "+result);
       }
     } finally {
       LOCKER.unlock();
     }
+    return result;
   }
 
   @Nonnull

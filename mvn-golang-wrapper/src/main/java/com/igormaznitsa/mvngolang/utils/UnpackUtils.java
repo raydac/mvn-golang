@@ -37,6 +37,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.logging.Log;
 
 public final class UnpackUtils {
 
@@ -60,7 +61,7 @@ public final class UnpackUtils {
     }
   }
 
-  public static int unpackFileToFolder(@Nullable final String folder, @Nonnull final File archiveFile, @Nonnull final File destinationFolder, final boolean makeAllExecutable) throws IOException {
+  public static int unpackFileToFolder(@Nonnull final Log logger, @Nullable final String folder, @Nonnull final File archiveFile, @Nonnull final File destinationFolder, final boolean makeAllExecutable) throws IOException {
     final String normalizedName = archiveFile.getName().toLowerCase(Locale.ENGLISH);
 
     final ArchEntryGetter entryGetter;
@@ -70,6 +71,8 @@ public final class UnpackUtils {
     final ZipFile theZipFile;
     final ArchiveInputStream archInputStream;
     if (normalizedName.endsWith(".zip")) {
+      logger.debug("Detected ZIP archive");
+      
       modeZipFile = true;
 
       theZipFile = new ZipFile(archiveFile);
@@ -89,12 +92,15 @@ public final class UnpackUtils {
       };
     } else {
       theZipFile = null;
-      final InputStream in = new BufferedInputStream(new FileInputStream(archiveFile), 512 * 1024);
+      final InputStream in = new BufferedInputStream(new FileInputStream(archiveFile));
       try {
         if (normalizedName.endsWith(".tar.gz")) {
-          archInputStream = new TarArchiveInputStream(normalizedName.endsWith(".gz") ? new GzipCompressorInputStream(in) : in);
+          logger.debug("Detected TAR.GZ archive");
+          archInputStream = new TarArchiveInputStream(new GzipCompressorInputStream(in));
         } else {
+          logger.debug("Detected OTHER archive");
           archInputStream = ARCHIVE_STREAM_FACTORY.createArchiveInputStream(in);
+          logger.debug("Created archive stream : "+archInputStream.getClass().getName());
         }
 
         entryGetter = new ArchEntryGetter() {
@@ -123,10 +129,14 @@ public final class UnpackUtils {
           break;
         }
         final String normalizedPath = FilenameUtils.normalize(entry.getName(), true);
+        
+        logger.debug("Detected archive entry : "+normalizedPath);
+
         if (normalizedFolder == null || normalizedPath.startsWith(normalizedFolder)) {
           final File targetFile = new File(destinationFolder, normalizedFolder == null ? normalizedPath : normalizedPath.substring(normalizedFolder.length()));
           if (entry.isDirectory()) {
-            if (!targetFile.mkdirs()) {
+            logger.debug("Folder : " + normalizedPath);
+            if (!targetFile.exists() && !targetFile.mkdirs()) {
               throw new IOException("Can't create folder " + targetFile);
             }
           } else {
@@ -140,6 +150,8 @@ public final class UnpackUtils {
 
             try {
               if (modeZipFile) {
+                logger.debug("Unpacking ZIP entry : " + normalizedPath);
+
                 final InputStream zipEntryInStream = theZipFile.getInputStream((ZipArchiveEntry) entry);
                 try {
                   if (IOUtils.copy(zipEntryInStream, fos) != entry.getSize()) {
@@ -149,6 +161,8 @@ public final class UnpackUtils {
                   IOUtils.closeQuietly(zipEntryInStream);
                 }
               } else {
+                logger.debug("Unpacking archive entry : " + normalizedPath);
+
                 if (!archInputStream.canReadEntryData(entry)) {
                   throw new IOException("Can't read archive entry data : " + normalizedPath);
                 }
@@ -169,6 +183,8 @@ public final class UnpackUtils {
             }
             unpackedFilesCounter++;
           }
+        } else {
+          logger.debug("Archive entry "+normalizedPath+" ignored");
         }
       }
       return unpackedFilesCounter;
