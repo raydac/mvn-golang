@@ -14,16 +14,16 @@ __1.0.0-SNAPSHOT (under development)__
 I very much like Maven build tool and use it very actively in my work so that I decided to develop a small maven plug-in to bring possibility to build and GoLang executable applications with the build tool.   
 The Plug-in is a full cycle one and allows to build a GoLang application with Maven even if there is not any installed GoLang SDK in OS, in the case the plug-in will download compatible one and unpack an SDK from GoLang page and will be using the SDK in its work.   
 Mainly all main commands of GoLang are accessible through the plug-in and their list you can see below:
-* clean (by default works in CLEAN phase)
-* fix (by default works in VALIDATE phase)
-* generate (by default works in GENERATE_SOURCES phase)
-* fmt (by default works in PROCESS_SOURCES phase)
-* get (by default works in GENERATE_RESOURCES phase)
-* test (by default works in TEST phase)
-* build (by default works in PACKAGE phase)
-* tool (by default works in VERIFY phase)
-* vet (by default works in VERIFY phase)
-* install (by default works in INSTALL phase)
+* __clean__ (by default works in maven _CLEAN_ phase)
+* __fix__ (by default works in maven _VALIDATE_ phase)
+* __generate__ (by default works in maven _GENERATE_SOURCES_ phase)
+* __fmt__ (by default works in maven _PROCESS_SOURCES_ phase)
+* __get__ (by default works in maven _GENERATE_RESOURCES_ phase)
+* __test__ (by default works in maven _TEST_ phase)
+* __build__ (by default works in maven _PACKAGE_ phase)
+* __tool__ (by default works in maven _VERIFY_ phase)
+* __vet__ (by default works in maven _VERIFY_ phase)
+* __install__ (by default works in maven _INSTALL_ phase)
 
 # Example
 The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folde.
