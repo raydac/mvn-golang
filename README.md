@@ -6,7 +6,9 @@
 
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
-__The Plugin is under development and there is not any ready version yet!__
+# Changelog
+__1.0.0-SNAPSHOT (under development)__
+- initial version
 
 # Introduction
 I very like Maven build tool and use it very actively in my work so that I decided to develop a small maven plug-in to bring possibility to build and GoLang executable applications with the build tool.   
