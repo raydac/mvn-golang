@@ -11,7 +11,7 @@
   </modules>
     
   <name>mvn-golang</name>
-  <description>Maven plugin to wrap main GoLang commands and provide possibility to build GoLang applications with the Apache Maven build tool.</description>
+  <description>Maven plugin to wrap main GoLang commands and provide way to build GoLang applications with Apache Maven build tool.</description>
   <url>https://github.com/raydac/mvn-golang</url>
     
   <inceptionYear>2016</inceptionYear>
