@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <name>TermUI example</name>
-    <description>Example of mvn-golang-wrapper usage to build a application with getting of some external package.</description>
+    <description>Example of mvn-golang-wrapper usage to build a application with getting of some external dependency. It builds a sample from https://github.com/gizak/termui</description>
 
     <properties>
         <target.name>sparklines</target.name>
