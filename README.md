@@ -25,6 +25,33 @@ Mainly all main commands of GoLang are accessible through the plug-in and their 
 * __vet__ (by default works in maven _VERIFY_ phase)
 * __install__ (by default works in maven _INSTALL_ phase)
 
+# Provide some custom non-standard command
+The Plug-in contains also mojo to provide some custom non-standard or non-covered command.
+```
+<build>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <id>golang-build</id>
+            <goals>
+              <goal>custom</goal>
+            </goals>
+            <configuration>
+              <customCommand>run</customCommand>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <goVersion>1.6</goVersion>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+```
 # Example
 The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folde.
 ```
