@@ -25,7 +25,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * The Mojo wraps the 'fmt' command.
  */
-@Mojo(name = "fmt", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
+@Mojo(name = "fmt", defaultPhase = LifecyclePhase.PROCESS_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangFmtMojo extends AbstractPackageGolangMojo {
   
   @Override
