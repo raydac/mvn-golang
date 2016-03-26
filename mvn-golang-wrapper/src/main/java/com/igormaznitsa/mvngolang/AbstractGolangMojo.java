@@ -65,8 +65,6 @@ import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
-  public static final String SDK_BASE_URL = "https://storage.googleapis.com/golang/";
-
   private static final List<String> ALLOWED_SDKARCHIVE_CONTENT_TYPE = Collections.unmodifiableList(Arrays.asList("application/octet-stream", "application/zip", "application/x-tar"));
 
   private static final ReentrantLock LOCKER = new ReentrantLock();
@@ -86,6 +84,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    */
   public static final String NAME_PATTERN = "go%s.%s-%s%s";
 
+  /**
+   * Base site for SDK download.
+   */
+  @Parameter(name="sdkSite",defaultValue = "https://storage.googleapis.com/golang/")
+  private String sdkSite;
+  
   /**
    * Hide ASC banner.
    */
@@ -264,6 +268,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
+  public String getSdkSite(){
+    return assertNotNull(this.sdkSite);
+  }
+  
+  @Nonnull
   @MustNotContainNull
   public String[] getBuildFlags() {
     return GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY);
@@ -405,9 +414,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   private String loadGoLangSdkList() throws IOException {
-    getLog().warn("Loading list of available GoLang SDKs from " + SDK_BASE_URL);
+    final String sdksite = getSdkSite();
+    
+    getLog().warn("Loading list of available GoLang SDKs from " + sdksite);
+    final GetMethod get = new GetMethod(sdksite);
 
-    final GetMethod get = new GetMethod(SDK_BASE_URL);
     get.setRequestHeader("Accept", "application/xml");
     try {
       final int status = getHttpClient().executeMethod(get);
@@ -517,7 +528,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       logOptionally("There is not any predefined SDK URL");
       final String sdkFileName = findSdkArchiveFileName(baseSdkName);
       archiveFile = new File(cacheFolder, sdkFileName);
-      linkForDownloading = SDK_BASE_URL + sdkFileName;
+      linkForDownloading = getSdkSite() + sdkFileName;
     } else {
       final String extension = extractExtensionOfArchive(assertNotNull(predefinedLink));
       archiveFile = new File(cacheFolder, baseSdkName+'.'+extension);
@@ -845,9 +856,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final File executableFile = new File(getPathToFolder(detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
 
     if (!executableFile.isFile()) {
-      throw new IOException("Can't find executable file : " + executableFile);
+      throw new MojoFailureException("Can't find executable file : " + executableFile);
     } else {
-      logOptionally("Executable go tool file detected : " + executableFile);
+      logOptionally("Executable file detected : " + executableFile);
     }
 
     final List<String> commandLine = new ArrayList<String>();
