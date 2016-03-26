@@ -10,7 +10,7 @@
   </parent>
   
   <artifactId>mvn-golang-wrapper</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>maven-plugin</packaging>
 
   <name>mvn-golang-wrapper</name>
@@ -131,7 +131,7 @@
                 </goals>
                 <configuration>
                   <appendAssemblyId>false</appendAssemblyId>
-                  <finalName>${project.artifactId}-${project.version}-${timestamp}-distr</finalName>
+                  <finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}-distr</finalName>
                   <descriptors>
                     <descriptor>src/assemble/distribution.xml</descriptor>
                   </descriptors>

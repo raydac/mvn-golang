@@ -7,7 +7,7 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__1.0.0-SNAPSHOT (under development)__
+__1.0.0 (26-mar-2016)__
 - initial version
 
 # Introduction

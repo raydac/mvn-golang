@@ -4,6 +4,7 @@
   <groupId>com.igormaznitsa</groupId>
   <artifactId>mvn-golang</artifactId>
   <version>${main-project-version}</version>
+  <packaging>pom</packaging>
 
   <modules>
     <module>mvn-golang-wrapper</module>
@@ -16,12 +17,12 @@
     
   <inceptionYear>2016</inceptionYear>
     
-  <packaging>pom</packaging>
   <properties>
-    <main-project-version>1.0.0-SNAPSHOT</main-project-version>
+    <main-project-version>1.0.0</main-project-version>
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
   </properties>
 
   <issueManagement>
