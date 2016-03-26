@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+      <groupId>com.igormaznitsa</groupId>
+      <artifactId>mvn-golang-examples</artifactId>
+      <relativePath>../pom.xml</relativePath>
+      <version>${main-project-version}</version>
+    </parent>
+
+    <artifactId>mvn-golang-examples-termui</artifactId>
+    <packaging>pom</packaging>
+
+    <name>TermUI example</name>
+    <description>Example of mvn-golang-wrapper usage to build a application with getting of some external package.</description>
+
+    <properties>
+        <target.name>sparklines</target.name>
+    </properties>
+
+    <profiles>
+      <profile> 
+        <id>windows</id>
+        <activation>
+          <os>
+            <family>windows</family>
+          </os>
+        </activation>
+        <properties>
+          <target.name>sparklines.exe</target.name>
+        </properties>
+      </profile>
+    </profiles>
+    
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>com.igormaznitsa</groupId>
+          <artifactId>mvn-golang-wrapper</artifactId>
+          <version>${project.version}</version>
+          <executions>
+            <execution>
+              <id>golang-get</id>
+              <goals>
+                <goal>get</goal>
+              </goals>
+              <configuration combine.self="override">
+                <autofixGitCache>true</autofixGitCache>
+                <packages>
+                  <package>github.com/gizak/termui</package>
+                </packages>
+                <buildFlags>
+                  <flag>-u</flag>
+                </buildFlags>
+              </configuration>
+            </execution>
+            <execution>
+              <id>golang-build</id>
+              <goals>
+                <goal>build</goal>
+              </goals>
+              <configuration>
+                <name>${target.name}</name>
+              </configuration>
+            </execution>
+          </executions>
+          <configuration>
+            <goVersion>1.6</goVersion>
+            <hideBanner>true</hideBanner>
+            <packages>
+              <file>sparklines.go</file>
+            </packages>
+          </configuration>
+        </plugin>
+      </plugins>
+    </build>
+    
+</project>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang</artifactId>
+    <version>${main-project-version}</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>mvn-golang-examples</artifactId>
+  <packaging>pom</packaging>
+
+  <name>examples</name>
+  <description>Set of examples for mvn-golang-wrapper</description>
+    <modules>
+        <module>mvn-golang-example-helloworld</module>
+        <module>mvn-golang-example-termui</module>
+    </modules>
+</project>
