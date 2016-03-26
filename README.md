@@ -4,7 +4,7 @@
 [![Maven 3.0.3+](https://img.shields.io/badge/maven-3.0.3%2b-green.svg)](https://maven.apache.org/)
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-red.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
 
-![MvnGoLang](https://raw.githubusercontent.com/raydac/mvnGoLang/master/assets/mvngolang.png)
+![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 __The Plugin is under development and there is not any ready version yet!__
 
@@ -100,4 +100,4 @@ The Example pom.xml below shows how to build a GoLang executable file from an ex
 
 # Configuration 
 
-About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvnGoLang/wiki/PluginConfigParameters).
+About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvn-golang/wiki/PluginConfigParameters).

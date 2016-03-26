@@ -9,9 +9,9 @@
     <module>mvn-golang-wrapper</module>
   </modules>
     
-  <name>mvnGoLang</name>
+  <name>mvn-golang</name>
   <description>Maven plugin to wrap main GoLang commands and provide possibility to build GoLang applications with the Apache Maven build tool.</description>
-  <url>https://github.com/raydac/mvnGoLang</url>
+  <url>https://github.com/raydac/mvn-golang</url>
     
   <inceptionYear>2016</inceptionYear>
     
@@ -24,7 +24,7 @@
 
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/raydac/mvnGoLang/issues</url>
+    <url>https://github.com/raydac/mvn-golang/issues</url>
   </issueManagement>
 
   <prerequisites>
@@ -45,9 +45,9 @@
   </developers>
     
   <scm>
-    <url>https://github.com/raydac/mvnGoLang</url>
-    <connection>scm:git:git://github.com/raydac/mvnGoLang.git</connection>
-    <developerConnection>scm:git:git@github.com:raydac/mvnGoLang.git</developerConnection>
+    <url>https://github.com/raydac/mvn-golang</url>
+    <connection>scm:git:git://github.com/raydac/mvn-golang.git</connection>
+    <developerConnection>scm:git:git@github.com:raydac/mvn-golang.git</developerConnection>
   </scm>
 
   <organization>
