@@ -43,4 +43,8 @@ public class GolangCustomMojo extends AbstractPackageGolangMojo {
     return assertNotNull(this.customCommand);
   }
 
+  @Override
+  public boolean enforcePrintOutput() {
+    return true;
+  }
 }
