@@ -33,7 +33,6 @@ The Example pom.xml below shows how to build a GoLang executable file from an ex
     <artifactId>TestGoLangWrapper</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <target.name>sparklines</target.name>
@@ -41,7 +40,7 @@ The Example pom.xml below shows how to build a GoLang executable file from an ex
 
     <profiles>
       <profile> 
-        <id>windows-exe</id>
+        <id>windows</id>
         <activation>
           <os>
             <family>windows</family>
@@ -76,12 +75,6 @@ The Example pom.xml below shows how to build a GoLang executable file from an ex
               </configuration>
             </execution>
             <execution>
-              <id>golang-test</id>
-              <goals>
-                <goal>test</goal>
-              </goals>
-            </execution>
-            <execution>
               <id>golang-build</id>
               <goals>
                 <goal>build</goal>
@@ -93,6 +86,7 @@ The Example pom.xml below shows how to build a GoLang executable file from an ex
           </executions>
           <configuration>
             <goVersion>1.6</goVersion>
+            <hideBanner>true</hideBanner>
             <packages>
               <file>sparklines.go</file>
             </packages>
