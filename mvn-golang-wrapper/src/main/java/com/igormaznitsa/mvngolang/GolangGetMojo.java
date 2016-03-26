@@ -129,7 +129,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         if (!packagesWithDetectedGitCacheErrors.isEmpty()) {
           if (this.autofixGitCache) {
 
-            getLog().warn("Trying to fix git cache errors automatically for direct order..");
+            getLog().warn("Trying to fix the detected git cache errors automatically..");
 
             result = tryToFixGitCacheErrorsForPackages(packagesWithDetectedGitCacheErrors);
           } else {

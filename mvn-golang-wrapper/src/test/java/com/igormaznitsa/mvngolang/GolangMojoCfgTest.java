@@ -33,6 +33,12 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     super.tearDown();
   }
 
+  private static void assertEqualsPath(final String etalon, final String toCheck) {
+    final String normalizedEtalon = etalon.replace('\\', '/');
+    final String normalizedToCheck = toCheck.replace('\\', '/');
+    assertEquals("Wrong path : "+toCheck+" instead of "+etalon,normalizedEtalon,normalizedToCheck);
+  }
+  
   @Test
   public void testGolangCleanMojoConfiguration() throws Exception {
     final GolangCleanMojo cleanMojo = (GolangCleanMojo) lookupMojo("clean", new File(GolangMojoCfgTest.class.getResource("mojoClean.xml").toURI()));
@@ -42,9 +48,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("clean",cleanMojo.getGoCommand());
     assertFalse(cleanMojo.isVerbose());
     assertFalse(cleanMojo.isHideBanner());
-    assertEquals("some/sources", cleanMojo.getSources(false).getPath());
-    assertEquals("some/root", cleanMojo.getGoRoot());
-    assertEquals("some/path", cleanMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", cleanMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", cleanMojo.getGoRoot());
+    assertEqualsPath("some/path", cleanMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},cleanMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},cleanMojo.getBuildFlags());
   }
@@ -56,9 +62,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("fix",fixMojo.getGoCommand());
     assertFalse(fixMojo.isVerbose());
     assertFalse(fixMojo.isHideBanner());
-    assertEquals("some/sources", fixMojo.getSources(false).getPath());
-    assertEquals("some/root", fixMojo.getGoRoot());
-    assertEquals("some/path", fixMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", fixMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", fixMojo.getGoRoot());
+    assertEqualsPath("some/path", fixMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},fixMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},fixMojo.getBuildFlags());
   }
@@ -70,9 +76,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("fmt",fmtMojo.getGoCommand());
     assertFalse(fmtMojo.isVerbose());
     assertFalse(fmtMojo.isHideBanner());
-    assertEquals("some/sources", fmtMojo.getSources(false).getPath());
-    assertEquals("some/root", fmtMojo.getGoRoot());
-    assertEquals("some/path", fmtMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", fmtMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", fmtMojo.getGoRoot());
+    assertEqualsPath("some/path", fmtMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},fmtMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},fmtMojo.getBuildFlags());
   }
@@ -84,9 +90,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("generate",genMojo.getGoCommand());
     assertFalse(genMojo.isVerbose());
     assertFalse(genMojo.isHideBanner());
-    assertEquals("some/sources", genMojo.getSources(false).getPath());
-    assertEquals("some/root", genMojo.getGoRoot());
-    assertEquals("some/path", genMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", genMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", genMojo.getGoRoot());
+    assertEqualsPath("some/path", genMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},genMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},genMojo.getBuildFlags());
   }
@@ -98,9 +104,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("install",instMojo.getGoCommand());
     assertFalse(instMojo.isVerbose());
     assertFalse(instMojo.isHideBanner());
-    assertEquals("some/sources", instMojo.getSources(false).getPath());
-    assertEquals("some/root", instMojo.getGoRoot());
-    assertEquals("some/path", instMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", instMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", instMojo.getGoRoot());
+    assertEqualsPath("some/path", instMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},instMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},instMojo.getBuildFlags());
   }
@@ -112,9 +118,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("vet",vetMojo.getGoCommand());
     assertFalse(vetMojo.isVerbose());
     assertFalse(vetMojo.isHideBanner());
-    assertEquals("some/sources", vetMojo.getSources(false).getPath());
-    assertEquals("some/root", vetMojo.getGoRoot());
-    assertEquals("some/path", vetMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", vetMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", vetMojo.getGoRoot());
+    assertEqualsPath("some/path", vetMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},vetMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},vetMojo.getBuildFlags());
   }
@@ -126,9 +132,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("test",instMojo.getGoCommand());
     assertFalse(instMojo.isVerbose());
     assertFalse(instMojo.isHideBanner());
-    assertEquals("some/sources", instMojo.getSources(false).getPath());
-    assertEquals("some/root", instMojo.getGoRoot());
-    assertEquals("some/path", instMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", instMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", instMojo.getGoRoot());
+    assertEqualsPath("some/path", instMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},instMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},instMojo.getBuildFlags());
     assertArrayEquals(new String[]{"binFlag1","binFlag2"},instMojo.getTestFlags());
@@ -141,10 +147,10 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("tool",toolMojo.getGoCommand());
     assertFalse(toolMojo.isVerbose());
     assertFalse(toolMojo.isHideBanner());
-    assertEquals("some/sources", toolMojo.getSources(false).getPath());
+    assertEqualsPath("some/sources", toolMojo.getSources(false).getPath());
     assertEquals("theCommand", toolMojo.getCommand());
-    assertEquals("some/root", toolMojo.getGoRoot());
-    assertEquals("some/path", toolMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/root", toolMojo.getGoRoot());
+    assertEqualsPath("some/path", toolMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"theCommand","arg1","arg2"},toolMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},toolMojo.getBuildFlags());
     assertArrayEquals(new String[]{"arg1","arg2"},toolMojo.getArgs());
@@ -159,9 +165,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertTrue(getMojo.isAutoFixGitCache());
     assertFalse(getMojo.isVerbose());
     assertFalse(getMojo.isHideBanner());
-    assertEquals("some/sources", getMojo.getSources(false).getPath());
-    assertEquals("some/root", getMojo.getGoRoot());
-    assertEquals("some/path", getMojo.findGoPath(false).getPath());
+    assertEqualsPath("some/sources", getMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", getMojo.getGoRoot());
+    assertEqualsPath("some/path", getMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},getMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},getMojo.getBuildFlags());
   }
@@ -176,10 +182,10 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("someGo.bat",buildMojo.getUseGoTool());
     assertFalse(buildMojo.isVerbose());
     assertTrue(buildMojo.isHideBanner());
-    assertEquals("some/sources", buildMojo.getSources(false).getPath());
-    assertEquals("some/root", buildMojo.getGoRoot());
-    assertEquals("some/path", buildMojo.findGoPath(false).getPath());
-    assertEquals("target/place", buildMojo.getTarget());
+    assertEqualsPath("some/sources", buildMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", buildMojo.getGoRoot());
+    assertEqualsPath("some/path", buildMojo.findGoPath(false).getPath());
+    assertEqualsPath("target/place", buildMojo.getTarget());
     assertEquals("targetName", buildMojo.getName());
     assertArrayEquals(new String[]{"one_pack","two_pack"},buildMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},buildMojo.getBuildFlags());
