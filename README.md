@@ -11,7 +11,7 @@ __1.0.0-SNAPSHOT (under development)__
 - initial version
 
 # Introduction
-I very like Maven build tool and use it very actively in my work so that I decided to develop a small maven plug-in to bring possibility to build and GoLang executable applications with the build tool.   
+I very much like Maven build tool and use it very actively in my work so that I decided to develop a small maven plug-in to bring possibility to build and GoLang executable applications with the build tool.   
 The Plug-in is a full cycle one and allows to build a GoLang application with Maven even if there is not any installed GoLang SDK in OS, in the case the plug-in will download compatible one and unpack an SDK from GoLang page and will be using the SDK in its work.   
 Mainly all main commands of GoLang are accessible through the plug-in and their list you can see below:
 * clean (by default works in CLEAN phase)
