@@ -7,6 +7,7 @@
 
   <modules>
     <module>mvn-golang-wrapper</module>
+    <module>mvn-golang-example-helloworld</module>
   </modules>
     
   <name>mvn-golang</name>

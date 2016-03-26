@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <groupId>com.igormaznitsa</groupId>
+  <artifactId>mvn-golang-examples-helloworld</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Hello World example</name>
+  <description>Example of minimalistic usage of mvn-golang-wrapper to build a 'Hello World' example.</description>
+  
+  <properties>
+    <target.name>helloworld</target.name>
+  </properties>
+
+  <profiles>
+    <profile> 
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <target.name>helloworld.exe</target.name>
+      </properties>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>golang-build</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <name>${target.name}</name>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <goVersion>1.6</goVersion>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
