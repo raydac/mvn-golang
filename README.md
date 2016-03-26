@@ -25,33 +25,6 @@ Mainly all main commands of GoLang are accessible through the plug-in and their 
 * __vet__ (by default works in maven _VERIFY_ phase)
 * __install__ (by default works in maven _INSTALL_ phase)
 
-# Execute some a non-covered command
-The Plug-in covers only the main set of commands but there are another commands for Go tool and also in future their number will be increased. To cover such cases I have added the `custom` mojo into the plug-in.
-```
-<build>
-    <plugins>
-      <plugin>
-        <groupId>com.igormaznitsa</groupId>
-        <artifactId>mvn-golang-wrapper</artifactId>
-        <version>1.0.0</version>
-        <executions>
-          <execution>
-            <id>golang-build</id>
-            <goals>
-              <goal>custom</goal>
-            </goals>
-            <configuration>
-              <customCommand>run</customCommand>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <goVersion>1.6</goVersion>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-```
 # Example
 The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folde.
 ```
@@ -101,3 +74,32 @@ The Part pom.xml below shows how to build 'Hello world' application with the plu
 # Configuration 
 
 About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvn-golang/wiki/PluginConfigParameters).
+
+
+# How to execute command non-covered by the plug-in?
+The Plug-in covers only the main set of commands but there are another commands for Go tool and also in future their number will be increased. To cover such cases I have added the `custom` mojo into the plug-in.
+```
+<build>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <id>golang-build</id>
+            <goals>
+              <goal>custom</goal>
+            </goals>
+            <configuration>
+              <customCommand>run</customCommand>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <goVersion>1.6</goVersion>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+```
