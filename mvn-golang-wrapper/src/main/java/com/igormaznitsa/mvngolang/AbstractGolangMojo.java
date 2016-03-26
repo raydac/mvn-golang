@@ -75,7 +75,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     "_  /  / / __ |/ /_  / / / /_/ / / /_/ /  /___/ /_/ /_  / / /  /_/ / ",
     "/_/  /_/  _____/ /_/ /_/\\____/  \\____//_____/\\__,_/ /_/ /_/_\\__, /",
     "                                                           /____/",
-    "                  https://github.com/raydac/mvnGoLang",
+    "                  https://github.com/raydac/mvn-golang",
     ""
   };
 
