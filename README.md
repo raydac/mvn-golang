@@ -24,7 +24,7 @@ Mainly all main commands of GoLang are accessible through the plug-in and their 
 * vet
 
 # Example
-The Part pom.xml below shows how to build 'Hello world' application with the plug-in.
+The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folde.
 ```
   <properties>
     <target.name>helloworld</target.name>
