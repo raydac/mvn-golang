@@ -40,6 +40,22 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   }
   
   @Test
+  public void testGolangCustomMojoConfiguration() throws Exception {
+    final GolangCustomMojo customMojo = (GolangCustomMojo) lookupMojo("custom", new File(GolangMojoCfgTest.class.getResource("mojoCustom.xml").toURI()));
+    assertNull(customMojo.getTargetArch());
+    assertNull(customMojo.getTargetOS());
+    assertFalse(customMojo.isUseEnvVars());
+    assertEquals("someCustomCommand",customMojo.getGoCommand());
+    assertFalse(customMojo.isVerbose());
+    assertFalse(customMojo.isHideBanner());
+    assertEqualsPath("some/sources", customMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", customMojo.getGoRoot());
+    assertEqualsPath("some/path", customMojo.findGoPath(false).getPath());
+    assertArrayEquals(new String[]{"one_pack","two_pack"},customMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1","flag2"},customMojo.getBuildFlags());
+  }
+
+  @Test
   public void testGolangCleanMojoConfiguration() throws Exception {
     final GolangCleanMojo cleanMojo = (GolangCleanMojo) lookupMojo("clean", new File(GolangMojoCfgTest.class.getResource("mojoClean.xml").toURI()));
     assertNull(cleanMojo.getTargetArch());
