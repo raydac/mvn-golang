@@ -25,8 +25,8 @@ Mainly all main commands of GoLang are accessible through the plug-in and their 
 * __vet__ (by default works in maven _VERIFY_ phase)
 * __install__ (by default works in maven _INSTALL_ phase)
 
-# Provide some custom non-standard command
-The Plug-in contains also mojo to provide some custom non-standard or non-covered command.
+# Execute some a non-covered command
+The Plug-in covers only the main set of commands but there are another commands for Go tool and also in future their number will be increased. To cover such cases I have added the `custom` mojo into the plug-in.
 ```
 <build>
     <plugins>
