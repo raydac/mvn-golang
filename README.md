@@ -25,6 +25,21 @@ Mainly all main commands of GoLang are accessible through the plug-in and their 
 * __vet__ (by default works in maven _VERIFY_ phase)
 * __install__ (by default works in maven _INSTALL_ phase)
 
+# How it works
+On start the plug-in makes such steps:
+- analyzing the current platform to generate needed distributive name
+- check that such distributive already cached
+  - if the distributive is not cached, then it will load the distributive list from the GoLang server and will find *.zip or *.tar.gz file and download and unpack that into cache folder of the plug-in
+- execute the go lang tool `bin/go` with needed command over the sources folder
+
+# What to do if I want to use already installed SDK?
+In the case just define `<goRoot>` in plug-in configuration
+```
+<goRoot>some/folder/where/go</goRoot>
+````
+and plug-in will be using already installed distributive
+
+
 # Example
 The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folde.
 ```
