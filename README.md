@@ -39,6 +39,11 @@ In the case just define `<goRoot>` in plug-in configuration
 ````
 and plug-in will be using already installed distributive
 
+# I want to use values of already defined environment variables!
+By defaut the plug-in using only parameters defined in its configuration, if you want to enable import of environment parameters $GOROOT, $GOOS, $GOARCH and $GOROOT_BOOTSTRAP (if they defined), then just add flag `<useEnvVars>`into plug-in configuration
+```
+<useEnvVars>true</useEnvVars>
+```
 
 # Example
 The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folde.
