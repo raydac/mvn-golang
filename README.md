@@ -46,7 +46,7 @@ By defaut the plug-in using only parameters defined in its configuration, if you
 ```
 
 # Example
-To Check the plugin fastly you can clone [the example "Hello World" project](https://github.com/raydac/mvn-golang-example). The Example will be working for Linux and Windows just out of the box but if you use Mac OS then you should have installed GoLang SDK and define `<goRoot>`.`    
+To Check the plugin fastly you can clone [the example "Hello World" project](https://github.com/raydac/mvn-golang-example). The Example will be working for Linux and Windows just out of the box but if you use Mac OS then you should have installed GoLang SDK and define `<goRoot>`.      
 The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folder.
 ```
   <properties>
