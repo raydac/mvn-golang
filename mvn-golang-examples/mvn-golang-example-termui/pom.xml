@@ -53,6 +53,7 @@
                 <buildFlags>
                   <flag>-u</flag>
                 </buildFlags>
+                <goVersion>${go.sdk.version}</goVersion>
               </configuration>
             </execution>
             <execution>
@@ -66,7 +67,7 @@
             </execution>
           </executions>
           <configuration>
-            <goVersion>1.6</goVersion>
+            <goVersion>${go.sdk.version}</goVersion>
             <hideBanner>true</hideBanner>
             <packages>
               <file>sparklines.go</file>

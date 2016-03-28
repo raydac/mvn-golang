@@ -17,7 +17,6 @@
   
   <properties>
     <target.name>helloworld</target.name>
-    <go.sdk.name></go.sdk.name>
   </properties>
 
   <profiles>
@@ -30,17 +29,6 @@
       </activation>
       <properties>
         <target.name>helloworld.exe</target.name>
-      </properties>
-    </profile>
-    <profile> 
-      <id>macos</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <properties>
-        <go.sdk.name>go1.6.darwin-amd64.tar.gz</go.sdk.name>
       </properties>
     </profile>
   </profiles>
@@ -63,8 +51,7 @@
           </execution>
         </executions>
         <configuration>
-          <sdkArchiveName>${go.sdk.name}</sdkArchiveName>
-          <goVersion>1.6</goVersion>
+          <goVersion>${go.sdk.version}</goVersion>
         </configuration>
       </plugin>
     </plugins>

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,7 +35,6 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.logging.Log;
@@ -96,19 +96,28 @@ public final class UnpackUtils {
       try {
         if (normalizedName.endsWith(".tar.gz")) {
           logger.debug("Detected TAR.GZ archive");
-          archInputStream = new TarArchiveInputStream(new GzipCompressorInputStream(in));
+          archInputStream = new TarArchiveInputStream(new GZIPInputStream(in));
+
+          entryGetter = new ArchEntryGetter() {
+            @Override
+            public ArchiveEntry getNextEntry() throws IOException {
+              return ((TarArchiveInputStream)archInputStream).getNextTarEntry();
+            }
+          };
+
         } else {
           logger.debug("Detected OTHER archive");
           archInputStream = ARCHIVE_STREAM_FACTORY.createArchiveInputStream(in);
           logger.debug("Created archive stream : "+archInputStream.getClass().getName());
+
+          entryGetter = new ArchEntryGetter() {
+            @Override
+            public ArchiveEntry getNextEntry() throws IOException {
+              return archInputStream.getNextEntry();
+            }
+          };
         }
 
-        entryGetter = new ArchEntryGetter() {
-          @Override
-          public ArchiveEntry getNextEntry() throws IOException {
-            return archInputStream.getNextEntry();
-          }
-        };
       } catch (ArchiveException ex) {
         IOUtils.closeQuietly(in);
         throw new IOException("Can't recognize or read archive file : " + archiveFile, ex);

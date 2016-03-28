@@ -12,6 +12,10 @@
   <artifactId>mvn-golang-examples</artifactId>
   <packaging>pom</packaging>
 
+  <properties>
+    <go.sdk.version>1.6</go.sdk.version>
+  </properties>
+
   <name>examples</name>
   <description>Set of examples for mvn-golang-wrapper</description>
     <modules>
