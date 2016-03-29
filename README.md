@@ -7,7 +7,8 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__1.0.1-SNAPSHOT
+__1.0.1-SNAPSHOT__
+- Fixed racing issue for the maven `-T4` flag
 - Fixed "Truncated TAR archive exception" for Mac OS tar.gz archive
 - Removed predefined values for `<goVersion>` and `<osx>`
 
