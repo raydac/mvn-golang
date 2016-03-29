@@ -280,25 +280,35 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   public File findGoPath(final boolean ensureExist) throws IOException {
-    final String theGoPath = getGoPath();
-    final File result = new File(theGoPath);
-    if (ensureExist && !result.isDirectory() && !result.mkdirs()) {
-      throw new IOException("Can't create folder : " + theGoPath);
+    LOCKER.lock();
+    try {
+      final String theGoPath = getGoPath();
+      final File result = new File(theGoPath);
+      if (ensureExist && !result.isDirectory() && !result.mkdirs()) {
+        throw new IOException("Can't create folder : " + theGoPath);
+      }
+      return result;
+    } finally {
+      LOCKER.unlock();
     }
-    return result;
   }
 
   @Nullable
   public File findGoRootBootstrap(final boolean ensureExist) throws IOException {
-    final String value = getGoRootBootstrap();
-    File result = null;
-    if (value != null) {
-      result = new File(value);
-      if (ensureExist && !result.isDirectory()) {
-        throw new IOException("Can't find folder for GOROOT_BOOTSTRAP: " + result);
+    LOCKER.lock();
+    try {
+      final String value = getGoRootBootstrap();
+      File result = null;
+      if (value != null) {
+        result = new File(value);
+        if (ensureExist && !result.isDirectory()) {
+          throw new IOException("Can't find folder for GOROOT_BOOTSTRAP: " + result);
+        }
       }
+      return result;
+    } finally {
+      LOCKER.unlock();
     }
-    return result;
   }
 
   @Nonnull
@@ -449,7 +459,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
+  @LazyInited
   private ByteArrayOutputStream consoleErrBuffer;
+  
+  @LazyInited
   private ByteArrayOutputStream consoleOutBuffer;
 
   private static void deleteFileIfExists(@Nonnull final File file) throws IOException {
