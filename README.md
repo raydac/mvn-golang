@@ -8,9 +8,16 @@
 
 # Changelog
 __1.0.1-SNAPSHOT__
+- Added test example for `gomobile` for Android ARM 7 
+- Added `<findExecInGoPath>`, it allows to find golang tool in $GOPATH instead of $GOROOT (by default `false`)
+- Added `<echo>` and `echoWarn` to print echo messages into maven log
+- Added `<exec>` parameter to define gotool name (by default `go`)
+- Added `<execSubpath>` parameter to provide sub-path in SDK root to find golang tool (by default `bin`)
+- Renamed parameter `<name>` to `resultName` and `<target>` to `<resultFolder>` for `build`
 - Fixed racing issue for the maven `-T4` flag
 - Fixed "Truncated TAR archive exception" for Mac OS tar.gz archive
 - Removed predefined values for `<goVersion>` and `<osx>`
+- Minor refactoring
 
 __1.0.0 (26-mar-2016)__
 - initial version

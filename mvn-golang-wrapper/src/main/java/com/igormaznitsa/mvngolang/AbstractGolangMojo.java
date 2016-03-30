@@ -15,8 +15,6 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +60,8 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
+
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -125,6 +125,34 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    */
   @Parameter(name = "goRootBootstrap")
   private String goRootBootstrap;
+
+  /**
+   * Sub-path to executing go tool in SDK folder.
+   *
+   * @since 1.0.1
+   */
+  @Parameter(name = "execSubpath", defaultValue = "bin")
+  private String execSubpath;
+
+  /**
+   * Go tool to be executed. NB! An Extension for OS will be automatically added.
+   *
+   * @since 1.0.1
+   */
+  @Parameter(name = "exec", defaultValue = "go")
+  private String exec;
+
+  /**
+   * Allows defined text to be printed before execution as warning in to log.
+   */
+  @Parameter(name = "echoWarn")
+  private String[] echoWarn;
+
+  /**
+   * Allows defined text to be printed before execution as info into log.
+   */
+  @Parameter(name = "echo")
+  private String[] echo;
 
   /**
    * Disable loading GoLang SDK through network if it is not found at cache.
@@ -222,6 +250,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Parameter(name = "keepUnarchFolderIfError", defaultValue = "false")
   private boolean keepUnarchFolderIfError;
 
+  /**
+   * Make tool finding the go tool in $GOPATH instead of $GOROOT.
+   */
+  @Parameter(name = "findExecInGoPath", defaultValue = "false")
+  private boolean findExecInGoPath;
+
   @Nonnull
   public Map<?, ?> getEnv() {
     return GetUtils.ensureNonNull(this.env, Collections.EMPTY_MAP);
@@ -230,6 +264,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getSdkDownloadUrl() {
     return this.sdkDownloadUrl;
+  }
+
+  @Nonnull
+  public String getExecSubpath() {
+    return ensureNoSurroundingSlashes(assertNotNull(this.execSubpath));
+  }
+
+  @Nonnull
+  public String getExec() {
+    return ensureNoSurroundingSlashes(assertNotNull(this.exec));
   }
 
   public boolean isUseEnvVars() {
@@ -265,6 +309,22 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public boolean isDisableSdkLoad() {
     return this.disableSdkLoad;
+  }
+
+  public boolean isFindExecInGoPath() {
+    return this.findExecInGoPath;
+  }
+
+  @Nonnull
+  private static String ensureNoSurroundingSlashes(@Nonnull final String str) {
+    String result = str;
+    if (!result.isEmpty() && (result.charAt(0) == '/' || result.charAt(0) == '\\')) {
+      result = result.substring(1);
+    }
+    if (!result.isEmpty() && (result.charAt(result.length() - 1) == '/' || result.charAt(result.length() - 1) == '\\')) {
+      result = result.substring(0, result.length() - 1);
+    }
+    return result;
   }
 
   @Nonnull
@@ -461,9 +521,23 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @LazyInited
   private ByteArrayOutputStream consoleErrBuffer;
-  
+
   @LazyInited
   private ByteArrayOutputStream consoleOutBuffer;
+
+  private void printEcho() {
+    if (this.echoWarn != null) {
+      for (final String s : this.echoWarn) {
+        getLog().warn(s);
+      }
+    }
+
+    if (this.echo != null) {
+      for (final String s : this.echo) {
+        getLog().info(s);
+      }
+    }
+  }
 
   private static void deleteFileIfExists(@Nonnull final File file) throws IOException {
     if (file.isFile() && !file.delete()) {
@@ -740,6 +814,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       printBanner();
     }
 
+    printEcho();
+    
     beforeExecution();
 
     boolean error = false;
@@ -776,7 +852,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  public void beforeExecution() {
+  public void beforeExecution() throws MojoFailureException {
 
   }
 
@@ -833,8 +909,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public String getMainGoExecName() {
-    return "bin" + File.separatorChar + "go";
+  public String makeExecutableFileSubpath() {
+    return getExecSubpath() + File.separatorChar + getExec();
   }
 
   @Nonnull
@@ -867,15 +943,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private ProcessExecutor prepareExecutor() throws IOException, MojoFailureException {
     initConsoleBuffers();
 
-    final String execNameAdaptedForOs = adaptExecNameForOS(getMainGoExecName());
+    final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
     final File detectedRoot = findGoRoot();
-    final File executableFile = new File(getPathToFolder(detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
+    final File gopath = findGoPath(true);
 
-    if (!executableFile.isFile()) {
-      throw new MojoFailureException("Can't find executable file : " + executableFile);
-    } else {
-      logOptionally("Executable file detected : " + executableFile);
+    final boolean pathInsteadRoot = this.isFindExecInGoPath();
+    if (pathInsteadRoot) {
+      getLog().warn("GOPATH is used as the root for executable go tool!");
     }
+
+    final File executableFile = new File(getPathToFolder(pathInsteadRoot ? gopath : detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
 
     final List<String> commandLine = new ArrayList<String>();
     commandLine.add(executableFile.getAbsolutePath());
@@ -911,8 +988,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       index++;
     }
 
-    logOptionally("Command line : " + cli.toString());
+    getLog().info(String.format("Prepared сommand line : %s", cli.toString()));
 
+    if (!executableFile.isFile()) {
+      throw new MojoFailureException("Can't find executable file : " + executableFile);
+    } else {
+      logOptionally("Executable file detected : " + executableFile);
+    }
+    
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
     final File sourcesFile = getSources(true);
@@ -923,8 +1006,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     getLog().info("....Environment vars....");
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
-
-    final File gopath = findGoPath(true);
     addEnvVar(result, "GOPATH", gopath.getAbsolutePath());
 
     final String trgtOs = this.getTargetOS();
@@ -942,6 +1023,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if (gorootbootstrap != null) {
       addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
     }
+
+    String thePath = GetUtils.ensureNonNull(System.getenv("PATH"), "");
+    thePath = thePath + (thePath.isEmpty() ? "" : SystemUtils.IS_OS_WINDOWS ? ";" : ":") + detectedRoot + File.separatorChar + getExecSubpath();
+    addEnvVar(result, "PATH", thePath);
 
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
       addEnvVar(result, record.getKey().toString(), record.getValue().toString());

@@ -5,20 +5,16 @@
   <parent>
     <groupId>com.igormaznitsa</groupId>
     <artifactId>mvn-golang</artifactId>
-    <version>${main-project-version}</version>
+    <version>1.0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
   <artifactId>mvn-golang-wrapper</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>${parent.project.version}</version>
   <packaging>maven-plugin</packaging>
 
   <name>mvn-golang-wrapper</name>
   
-  <properties>
-    <meta.version>1.1.0</meta.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -152,6 +148,24 @@
             </executions>
           </plugin>
           <plugin>
+            <groupId>com.igormaznitsa</groupId>
+            <artifactId>uber-pom</artifactId>
+            <version>1.0.0</version>
+            <configuration>
+              <remove>
+                <section>parent</section>
+                <section>modules</section>
+              </remove>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>upom</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
             <version>2.4</version>
@@ -205,7 +219,7 @@
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>meta-checker</artifactId>
-        <version>1.1.0</version>
+        <version>${meta.version}</version>
         <configuration>
           <restrictClassFormat>6</restrictClassFormat>
           <checkNullable>true</checkNullable>

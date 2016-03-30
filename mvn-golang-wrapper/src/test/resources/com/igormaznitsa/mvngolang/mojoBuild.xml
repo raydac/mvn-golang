@@ -4,6 +4,7 @@
 
   <groupId>com.igormaznitsa</groupId>
   <artifactId>mvngolang-tests</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   
   <packaging>jar</packaging>
   <name>Test GoLangMojo</name>
@@ -20,12 +21,15 @@
           <targetOs>someos</targetOs>
           <targetArch>somearch</targetArch>
           <useGoTool>someGo.bat</useGoTool>
-          <target>target/place</target>
-          <name>targetName</name>
+          <resultFolder>target/place</resultFolder>
+          <resultName>targetName</resultName>
           <hideBanner>true</hideBanner>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>
           <sources>some/sources</sources>
+          <findExecInGoPath>true</findExecInGoPath>
+          <exec>gomobile</exec>
+          <execSubpath>/bin/misc/</execSubpath>
           <buildFlags>
             <flag>flag1</flag>
             <flag>flag2</flag>

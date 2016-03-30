@@ -15,6 +15,8 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+
 import java.io.File;
 
 import javax.annotation.Nonnull;
@@ -36,28 +38,28 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   /**
    * Target folder where to place the result file.
    */
-  @Parameter(name = "target", defaultValue = "${project.build.directory}")
-  private String target;
+  @Parameter(name = "resultFolder", defaultValue = "${project.build.directory}")
+  private String resultFolder;
 
   /**
-   * Name of the result file.
+   * Name of the result file. NB! Keep in mind that in the case of gomobile you must define right extension!
    */
-  @Parameter(name = "name", defaultValue = "undefined", required = true)
-  private String name;
+  @Parameter(name = "resultName", required = true)
+  private String resultName;
   
   @Nonnull
-  private File getTargetFile(){
-    return new File(getTarget(),this.name);
+  private File getResultFile(){
+    return new File(getResultFolder(),this.resultName);
   }
   
   @Nonnull
-  public String getTarget() {
-    return this.target;
+  public String getResultFolder() {
+    return assertNotNull(this.resultFolder);
   }
 
   @Nonnull
-  public String getName() {
-    return this.name;
+  public String getResultName() {
+    return assertNotNull(this.resultName);
   }
 
   @Override
@@ -67,21 +69,29 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
+  public void beforeExecution() throws MojoFailureException {
+    final File folder = new File(getResultFolder());
+    if (!folder.isDirectory() && !folder.mkdirs()) {
+      throw new MojoFailureException("Can't create folder : "+folder);
+    }
+  }
+
+  @Override
   public void afterExecution(final boolean error) throws MojoFailureException {
     if (!error){
-      final File targetFile = getTargetFile();
+      final File resultFile = getResultFile();
       // check that it exists
-      if (!targetFile.isFile()) {
-        throw new MojoFailureException("Can't find generated target file : "+targetFile);
+      if (!resultFile.isFile()) {
+        throw new MojoFailureException("Can't find generated target file : "+resultFile);
       }
       // softly try to make it executable
       try{
-        targetFile.setExecutable(true);
+        resultFile.setExecutable(true);
       }catch(SecurityException ex){
-        getLog().warn("Security exception during setting executable flag : "+targetFile);
+        getLog().warn("Security exception during setting executable flag : "+resultFile);
       }
       
-      getLog().info("Result file successfuly saved : " + targetFile);
+      getLog().info("The Result file has been successfuly created : " + resultFile);
     }
   }
 
@@ -89,7 +99,7 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getCommandFlags() {
-    return new String[]{"-o", getTargetFile().getAbsolutePath()};
+    return new String[]{"-o", getResultFile().getAbsolutePath()};
   }
   
 }

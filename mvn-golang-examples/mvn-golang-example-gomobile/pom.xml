@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>mvn-golang-examples-gomobile</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>GoMobile example</name>
+  <description>Example of minimalistic usage of mvn-golang-wrapper to build a 'Hello World' example.</description>
+  
+  <properties>
+    <target.name>helloworld</target.name>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <executions>
+          <execution>
+            <id>golang-get</id>
+            <goals>
+              <goal>get</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>golang.org/x/mobile/cmd/gomobile</package>
+              </packages>
+            </configuration>
+          </execution>
+          <execution>
+            <id>gomobile-init</id>
+            <goals>
+              <goal>custom</goal>
+            </goals>
+            <configuration>
+              <echoWarn>
+                <warn>!!!It is a very hard operation because GoMobile downloads about half gigabyte data!!!</warn>
+              </echoWarn>
+              <exec>gomobile</exec>
+              <findExecInGoPath>true</findExecInGoPath>
+              <customCommand>init</customCommand>
+            </configuration>
+          </execution>
+          <execution>
+            <id>gomobile-build</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <exec>gomobile</exec>
+              <findExecInGoPath>true</findExecInGoPath>
+              <buildFlags>
+                <flag>-target=android</flag>
+              </buildFlags>
+              <env>
+                <GOARM>7</GOARM>
+              </env>
+              <resultName>example.apk</resultName>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

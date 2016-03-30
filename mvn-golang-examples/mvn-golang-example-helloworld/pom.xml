@@ -5,18 +5,19 @@
   <parent>
     <groupId>com.igormaznitsa</groupId>
     <artifactId>mvn-golang-examples</artifactId>
-    <version>${main-project-version}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>mvn-golang-examples-helloworld</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hello World example</name>
   <description>Example of minimalistic usage of mvn-golang-wrapper to build a 'Hello World' example.</description>
   
   <properties>
-    <target.name>helloworld</target.name>
+    <result.file.name>helloworld</result.file.name>
   </properties>
 
   <profiles>
@@ -28,7 +29,7 @@
         </os>
       </activation>
       <properties>
-        <target.name>helloworld.exe</target.name>
+        <result.file.name>helloworld.exe</result.file.name>
       </properties>
     </profile>
   </profiles>
@@ -38,7 +39,7 @@
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>${project.version}</version>
+        <version>${main-project-version}</version>
         <executions>
           <execution>
             <id>golang-build</id>
@@ -46,7 +47,7 @@
               <goal>build</goal>
             </goals>
             <configuration>
-              <name>${target.name}</name>
+              <resultName>${result.file.name}</resultName>
             </configuration>
           </execution>
         </executions>
