@@ -100,6 +100,7 @@ public final class UnpackUtils {
 
           entryGetter = new ArchEntryGetter() {
             @Override
+            @Nullable
             public ArchiveEntry getNextEntry() throws IOException {
               return ((TarArchiveInputStream)archInputStream).getNextTarEntry();
             }
@@ -112,6 +113,7 @@ public final class UnpackUtils {
 
           entryGetter = new ArchEntryGetter() {
             @Override
+            @Nullable
             public ArchiveEntry getNextEntry() throws IOException {
               return archInputStream.getNextEntry();
             }

@@ -10,7 +10,6 @@
   </parent>
   
   <artifactId>mvn-golang-wrapper</artifactId>
-  <version>${parent.project.version}</version>
   <packaging>maven-plugin</packaging>
 
   <name>mvn-golang-wrapper</name>
@@ -229,7 +228,6 @@
           </failForAnnotations>
           <ignoreClasses>
             <class>*.HelpMojo</class>
-            <class>*.UnpackUtils$*</class>
           </ignoreClasses>
         </configuration>
         <executions>

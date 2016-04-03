@@ -714,7 +714,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     } else {
       getLog().info("SDK archive name is predefined : " + result);
     }
-    return GetUtils.ensureNonNull(result, "");
+    return GetUtils.ensureNonNullStr(result);
   }
 
   private void warnIfContainsUC(@Nonnull final String message, @Nonnull final String str) {
@@ -949,7 +949,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final boolean pathInsteadRoot = this.isFindExecInGoPath();
     if (pathInsteadRoot) {
-      getLog().warn("GOPATH is used as the root for executable go tool!");
+      getLog().warn("$GOPATH is used instead of $GOROOT as the root folder to find the go tool");
     }
 
     final File executableFile = new File(getPathToFolder(pathInsteadRoot ? gopath : detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
@@ -1024,7 +1024,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
     }
 
-    String thePath = GetUtils.ensureNonNull(System.getenv("PATH"), "");
+    String thePath = GetUtils.ensureNonNullStr(System.getenv("PATH"));
     thePath = thePath + (thePath.isEmpty() ? "" : SystemUtils.IS_OS_WINDOWS ? ";" : ":") + detectedRoot + File.separatorChar + getExecSubpath();
     addEnvVar(result, "PATH", thePath);
 

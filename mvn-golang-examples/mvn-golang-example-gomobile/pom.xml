@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <name>GoMobile example</name>
-  <description>Example of minimalistic usage of mvn-golang-wrapper to build a 'Hello World' example.</description>
+  <description>Example how to buid Android application with gomobile</description>
   
   <properties>
     <target.name>helloworld</target.name>
