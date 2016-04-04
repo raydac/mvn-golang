@@ -7,7 +7,7 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__1.0.1-SNAPSHOT__
+__1.1.0-SNAPSHOT__
 - Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile) 
 - Added `<findExecInGoPath>`, it allows to find golang tool in $GOPATH instead of $GOROOT (by default `false`)
 - Added `<echo>` and `<echoWarn>` to print echo messages into maven log

@@ -129,7 +129,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Sub-path to executing go tool in SDK folder.
    *
-   * @since 1.0.1
+   * @since 1.1.0
    */
   @Parameter(name = "execSubpath", defaultValue = "bin")
   private String execSubpath;
@@ -137,7 +137,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Go tool to be executed. NB! An Extension for OS will be automatically added.
    *
-   * @since 1.0.1
+   * @since 1.1.0
    */
   @Parameter(name = "exec", defaultValue = "go")
   private String exec;
