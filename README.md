@@ -7,6 +7,8 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__1.1.1-SNAPSHOT__
+
 __1.1.0 (05-apr-2016)__
 - Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile) 
 - Added `<findExecInGoPath>`, it allows to find golang tool in $GOPATH instead of $GOROOT (by default `false`)
@@ -84,7 +86,7 @@ The Part pom.xml below shows how to build 'Hello world' application with the plu
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <executions>
           <execution>
             <id>golang-build</id>
@@ -92,7 +94,7 @@ The Part pom.xml below shows how to build 'Hello world' application with the plu
               <goal>build</goal>
             </goals>
             <configuration>
-              <name>${target.name}</name>
+              <resultName>${target.name}</resultName>
             </configuration>
           </execution>
         </executions>
@@ -117,7 +119,7 @@ The Plug-in covers only the main set of commands but there are another commands 
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <executions>
           <execution>
             <id>golang-build</id>
