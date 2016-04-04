@@ -85,7 +85,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public static final String NAME_PATTERN = "go%s.%s-%s%s";
 
   /**
-   * Base site for SDK download.
+   * Base site for SDK download. By default it uses <a href="https://storage.googleapis.com/golang/">https://storage.googleapis.com/golang/</a>
    */
   @Parameter(name = "sdkSite", defaultValue = "https://storage.googleapis.com/golang/")
   private String sdkSite;
@@ -97,13 +97,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean hideBanner;
 
   /**
-   * Folder to be used to save and unpack loaded SDKs and also keep different info.
+   * Folder to be used to save and unpack loaded SDKs and also keep different info. By default it has value "${user.home}${file.separator}.mvnGoLang"
    */
   @Parameter(defaultValue = "${user.home}${file.separator}.mvnGoLang", name = "storeFolder")
   private String storeFolder;
 
   /**
-   * Folder to be used as GOPATH. NB! The Environment variable also will be checked and if environment variable detected then value of it will be used.
+   * Folder to be used as $GOPATH. NB! By default it has value "${user.home}${file.separator}.mvnGoLang${file.separator}.go_path"
    */
   @Parameter(defaultValue = "${user.home}${file.separator}.mvnGoLang${file.separator}.go_path", name = "goPath")
   private String goPath;
@@ -815,7 +815,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     printEcho();
-    
+
     beforeExecution();
 
     boolean error = false;
@@ -995,7 +995,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     } else {
       logOptionally("Executable file detected : " + executableFile);
     }
-    
+
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
     final File sourcesFile = getSources(true);
