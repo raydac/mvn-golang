@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <relativePath>../pom.xml</relativePath>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>mvn-golang-examples-nes</artifactId>
+  <packaging>pom</packaging>
+
+  <name>NES emulator example</name>
+  <description>Example of mvn-golang-wrapper usage to build the NES emulator project : https://github.com/fogleman/nes</description>
+
+  <properties>
+    <result.file.name>nes</result.file.name>
+  </properties>
+
+  <profiles>
+    <profile> 
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <result.file.name>${result.file.name}.exe</result.file.name>
+      </properties>
+    </profile>
+  </profiles>
+    
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <executions>
+          <execution>
+            <id>golang-get</id>
+            <goals>
+              <goal>get</goal>
+            </goals>
+            <configuration>
+              <echoWarn>
+                <warn>Needs native library dependencies: sudo apt-get install portaudio19-dev libgl1-mesa-dev xorg-dev</warn>
+              </echoWarn>
+              <autofixGitCache>true</autofixGitCache>
+              <packages>
+                <package>github.com/gordonklaus/portaudio</package>
+                <package>github.com/fogleman/nes</package>
+              </packages>
+            </configuration>
+          </execution>
+          <execution>
+            <id>golang-build</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>github.com/fogleman/nes</package>
+              </packages>
+              <resultName>${result.file.name}</resultName>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <hideBanner>true</hideBanner>
+          <goVersion>${go.sdk.version}</goVersion>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+    
+</project>

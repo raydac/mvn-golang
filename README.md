@@ -8,6 +8,12 @@
 
 # Changelog
 __1.1.1-SNAPSHOT__
+- Added possibility to define golang dependencies through usual `<dependency>` tag situated in the special profile
+- Added extension of life-cycle marked as `mvn-golang`, adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)
+- Improved logging of command console output, now it is split to lines and every line logged separately
+- Added support for loading of archives marked as `application/x-gzip`
+- Added one more integration test based on [the NES emulator project](https://github.com/fogleman/nes)
+- Integration tests moved to special profile `integration-tests`
 
 __1.1.0 (05-apr-2016)__
 - Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile) 

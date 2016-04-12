@@ -17,11 +17,25 @@
     <go.sdk.version>1.6</go.sdk.version>
   </properties>
 
+  <profiles>
+    <profile>
+      <id>underLinux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <modules>
+        <module>mvn-golang-example-nes</module>
+        <module>mvn-golang-example-gomobile</module>
+      </modules>
+    </profile>
+  </profiles>
+
   <name>examples</name>
   <description>Set of examples for mvn-golang-wrapper</description>
-    <modules>
-        <module>mvn-golang-example-helloworld</module>
-        <module>mvn-golang-example-termui</module>
-        <module>mvn-golang-example-gomobile</module>
-    </modules>
+  <modules>
+    <module>mvn-golang-example-helloworld</module>
+    <module>mvn-golang-example-termui</module>
+  </modules>
 </project>

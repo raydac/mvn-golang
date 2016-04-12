@@ -11,46 +11,18 @@
 
   <artifactId>mvn-golang-examples-helloworld</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>mvn-golang</packaging>
 
   <name>Hello World example</name>
   <description>Example of minimalistic usage of mvn-golang-wrapper to build a 'Hello World' example.</description>
   
-  <properties>
-    <result.file.name>helloworld</result.file.name>
-  </properties>
-
-  <profiles>
-    <profile> 
-      <id>windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <properties>
-        <result.file.name>helloworld.exe</result.file.name>
-      </properties>
-    </profile>
-  </profiles>
-
   <build>
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${main-project-version}</version>
-        <executions>
-          <execution>
-            <id>golang-build</id>
-            <goals>
-              <goal>build</goal>
-            </goals>
-            <configuration>
-              <resultName>${result.file.name}</resultName>
-            </configuration>
-          </execution>
-        </executions>
+        <extensions>true</extensions>
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
         </configuration>

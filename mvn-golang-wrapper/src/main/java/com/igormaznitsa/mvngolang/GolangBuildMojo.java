@@ -43,8 +43,9 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
 
   /**
    * Name of the result file. NB! Keep in mind that in the case of gomobile you must define right extension!
+   * <b>By default it uses ${project.build.finalName}</b>
    */
-  @Parameter(name = "resultName", required = true)
+  @Parameter(name = "resultName", defaultValue = "${project.build.finalName}")
   private String resultName;
   
   @Nonnull

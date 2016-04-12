@@ -8,7 +8,6 @@
 
   <modules>
     <module>mvn-golang-wrapper</module>
-    <module>mvn-golang-examples</module>
   </modules>
     
   <name>mvn-golang</name>
@@ -99,6 +98,12 @@
   </dependencies>
 
   <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>mvn-golang-examples</module>
+      </modules>
+    </profile>
     <profile>
       <id>coverage</id>
       <build>

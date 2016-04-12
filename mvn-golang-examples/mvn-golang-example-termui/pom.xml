@@ -10,68 +10,33 @@
     </parent>
 
     <artifactId>mvn-golang-examples-termui</artifactId>
-    <packaging>pom</packaging>
+    <packaging>mvn-golang</packaging>
 
     <name>TermUI example</name>
     <description>Example of mvn-golang-wrapper usage to build a application with getting of some external dependency. It builds a sample from https://github.com/gizak/termui</description>
 
-    <properties>
-        <result.file.name>sparklines</result.file.name>
-    </properties>
-
     <profiles>
-      <profile> 
-        <id>windows</id>
-        <activation>
-          <os>
-            <family>windows</family>
-          </os>
-        </activation>
-        <properties>
-          <result.file.name>sparklines.exe</result.file.name>
-        </properties>
+      <profile>
+        <id>golang-dependencies</id>
+        <dependencies>
+          <dependency>
+            <groupId>github.com</groupId>
+            <artifactId>gizak.termui</artifactId>
+          </dependency>
+        </dependencies>
       </profile>
     </profiles>
-    
+
     <build>
       <plugins>
         <plugin>
           <groupId>com.igormaznitsa</groupId>
           <artifactId>mvn-golang-wrapper</artifactId>
           <version>${main-project-version}</version>
-          <executions>
-            <execution>
-              <id>golang-get</id>
-              <goals>
-                <goal>get</goal>
-              </goals>
-              <configuration combine.self="override">
-                <autofixGitCache>true</autofixGitCache>
-                <packages>
-                  <package>github.com/gizak/termui</package>
-                </packages>
-                <buildFlags>
-                  <flag>-u</flag>
-                </buildFlags>
-                <goVersion>${go.sdk.version}</goVersion>
-              </configuration>
-            </execution>
-            <execution>
-              <id>golang-build</id>
-              <goals>
-                <goal>build</goal>
-              </goals>
-              <configuration>
-                <resultName>${result.file.name}</resultName>
-              </configuration>
-            </execution>
-          </executions>
+          <extensions>true</extensions>
           <configuration>
             <goVersion>${go.sdk.version}</goVersion>
             <hideBanner>true</hideBanner>
-            <packages>
-              <file>sparklines.go</file>
-            </packages>
           </configuration>
         </plugin>
       </plugins>

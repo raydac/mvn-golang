@@ -26,15 +26,22 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.meta.common.utils.ArrayUtils;
+import com.igormaznitsa.meta.common.utils.GetUtils;
+import com.igormaznitsa.mvngolang.utils.NameUtils;
 
 /**
  * The Mojo wraps the 'get' command.
@@ -46,16 +53,29 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern.compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   /**
+   * Name of the profile to be used to keep GoLang dependencies. By default it is named as <b>golang-dependencies</b>
+   *
+   * @since 1.1.1
+   */
+  @Parameter(name = "dependencyProfileName", defaultValue = "golang-dependencies")
+  private String dependencyProfileName;
+
+  /**
    * Flag to make attempt to fix detected Git cache error and re-execute the command. It will try to execute
    * <pre>'git rm -r --cached .'</pre> just in the package directory to clear cache.
    */
   @Parameter(name = "autofixGitCache", defaultValue = "false")
   private boolean autofixGitCache;
 
-  public boolean isAutoFixGitCache(){
+  @Nonnull
+  public String getDependencyProfileName() {
+    return this.dependencyProfileName;
+  }
+
+  public boolean isAutoFixGitCache() {
     return this.autofixGitCache;
   }
-  
+
   @Override
   @Nonnull
   public String getGoCommand() {
@@ -65,6 +85,62 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Override
   public boolean enforcePrintOutput() {
     return true;
+  }
+
+  private String[] cachedTailArguments;
+
+  @Override
+  @Nonnull
+  @MustNotContainNull
+  public String[] getTailArguments() {
+    if (this.cachedTailArguments == null) {
+      final String[] packages = GetUtils.ensureNonNull(getPackages(), ArrayUtils.EMPTY_STRING_ARRAY);
+      final String[] goDependencies = findGoDependencies();
+      this.cachedTailArguments = ArrayUtils.joinArrays(packages, goDependencies);
+    }
+    return this.cachedTailArguments;
+  }
+
+  @Override
+  public boolean isExecutionShouldBeIgnored() throws MojoFailureException {
+    final String[] detectedPackagesToLoad = getTailArguments();
+    boolean result = false;
+    if (detectedPackagesToLoad.length == 0) {
+      getLog().info("There is not any GoLang dependency for GET command");
+      result = true;
+    }
+    return result;
+  }
+
+  @Nonnull
+  @MustNotContainNull
+  private String[] findGoDependencies() {
+    final MavenProject project = getProject();
+    final List<String> result = new ArrayList<String>();
+
+    final String srcProfileName = getDependencyProfileName();
+
+    Profile golangProfile = null;
+    for (final Profile p : project.getModel().getProfiles()) {
+      if (p.getId().equals(srcProfileName)) {
+        golangProfile = p;
+        break;
+      }
+    }
+    if (golangProfile == null) {
+      getLog().info(String.format("Profile '%s' is not defined", srcProfileName));
+    } else {
+      getLog().info(String.format("Profile '%s' has been detected", srcProfileName));
+      getLog().info(".......Detected dependencies.......");
+      for (final Dependency d : golangProfile.getDependencies()) {
+        String version = GetUtils.ensureNonNullStr(d.getVersion());
+        final String packageName = NameUtils.makePackageNameFromDependency(GetUtils.ensureNonNullStr(d.getGroupId()), GetUtils.ensureNonNullStr(d.getArtifactId()), version);
+        getLog().info(String.format("Detected GoLang package dependency in the profile : %s (%s)",packageName,d.toString()));
+        result.add(packageName);
+      }
+      getLog().info("...................................");
+    }
+    return result.toArray(new String[result.size()]);
   }
 
   @Nonnull

@@ -17,6 +17,7 @@ package com.igormaznitsa.mvngolang;
 
 import javax.annotation.Nonnull;
 
+import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
@@ -30,6 +31,12 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   @Parameter(name = "packages")
   private String[] packages;
 
+  @Nullable
+  @MustNotContainNull
+  public String [] getPackages(){
+    return this.packages;
+  }
+  
   @Override
   @Nonnull
   @MustNotContainNull

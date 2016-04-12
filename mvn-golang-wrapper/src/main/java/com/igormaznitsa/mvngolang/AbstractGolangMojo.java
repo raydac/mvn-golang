@@ -62,10 +62,13 @@ import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import org.apache.maven.project.MavenProject;
+import com.igormaznitsa.meta.common.utils.StrUtils;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
-  private static final List<String> ALLOWED_SDKARCHIVE_CONTENT_TYPE = Collections.unmodifiableList(Arrays.asList("application/octet-stream", "application/zip", "application/x-tar"));
+  private static final List<String> ALLOWED_SDKARCHIVE_CONTENT_TYPE = Collections.unmodifiableList(Arrays.asList("application/octet-stream", "application/zip", "application/x-tar", "application/x-gzip"));
 
   private static final ReentrantLock LOCKER = new ReentrantLock();
 
@@ -84,6 +87,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    */
   public static final String NAME_PATTERN = "go%s.%s-%s%s";
 
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  private MavenProject project;
+  
   /**
    * Base site for SDK download. By default it uses <a href="https://storage.googleapis.com/golang/">https://storage.googleapis.com/golang/</a>
    */
@@ -256,6 +262,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Parameter(name = "findExecInGoPath", defaultValue = "false")
   private boolean findExecInGoPath;
 
+  @Nonnull
+  public MavenProject getProject(){
+    return this.project;
+  }
+  
   @Nonnull
   public Map<?, ?> getEnv() {
     return GetUtils.ensureNonNull(this.env, Collections.EMPTY_MAP);
@@ -824,6 +835,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
       while (true) {
         final ProcessExecutor executor = prepareExecutor();
+        if (executor == null) {
+          getLog().info("The Mojo has decided to skip its execution for its inside business rules");
+          break;
+        }
         final ProcessResult result = executor.executeNoTimeout();
         iterations++;
 
@@ -878,6 +893,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if ((enforcePrintOutput() || getLog().isDebugEnabled()) && !outLog.isEmpty()) {
       getLog().info("");
       getLog().info("---------Exec.Out---------");
+      for (final String str : outLog.split("\n")) {
+        getLog().info(StrUtils.trimRight(str));
+      }
       getLog().info(outLog);
       getLog().info("");
     }
@@ -885,7 +903,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if (!errLog.isEmpty()) {
       getLog().error("");
       getLog().error("---------Exec.Err---------");
-      getLog().error(errLog);
+      for (final String str : errLog.split("\n")) {
+        getLog().error(StrUtils.trimRight(str));
+      }
       getLog().error("");
     }
 
@@ -898,6 +918,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
+  public boolean isExecutionShouldBeIgnored() throws MojoFailureException {
+    return false;
+  }
+  
   @Nonnull
   @MustNotContainNull
   public abstract String[] getTailArguments();
@@ -939,7 +963,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return text;
   }
 
-  @Nonnull
+  @Nullable
   private ProcessExecutor prepareExecutor() throws IOException, MojoFailureException {
     initConsoleBuffers();
 
@@ -947,6 +971,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final File detectedRoot = findGoRoot();
     final File gopath = findGoPath(true);
 
+    if (isExecutionShouldBeIgnored()) {
+      return null;
+    }
+    
     final boolean pathInsteadRoot = this.isFindExecInGoPath();
     if (pathInsteadRoot) {
       getLog().warn("$GOPATH is used instead of $GOROOT as the root folder to find the go tool");

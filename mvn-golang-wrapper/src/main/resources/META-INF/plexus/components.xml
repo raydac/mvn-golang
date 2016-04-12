@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>mvn-golang</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <phases>
+              <clean>com.igormaznitsa:mvn-golang-wrapper:clean</clean>
+              <validate>com.igormaznitsa:mvn-golang-wrapper:fix</validate>
+              <generate-sources>com.igormaznitsa:mvn-golang-wrapper:generate</generate-sources>
+              <process-sources>com.igormaznitsa:mvn-golang-wrapper:fmt</process-sources>
+              <process-resources>com.igormaznitsa:mvn-golang-wrapper:get</process-resources>
+              <compile>com.igormaznitsa:mvn-golang-wrapper:build</compile>
+              <test>com.igormaznitsa:mvn-golang-wrapper:test</test>
+              <deploy>com.igormaznitsa:mvn-golang-wrapper:install</deploy>
+            </phases>
+          </lifecycle>
+        </lifecycles>
+      </configuration>
+    </component>
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>mvn-golang</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>mvn-golang</type>
+        <addedToClasspath>false</addedToClasspath>
+        <includesDependencies>false</includesDependencies>
+      </configuration>
+    </component>
+  </components>
+</component-set>
