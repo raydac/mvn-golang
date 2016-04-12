@@ -8,8 +8,10 @@
 
 # Changelog
 __1.1.1-SNAPSHOT__
-- Added possibility to define golang dependencies through usual `<dependency>` tag situated in the special profile
-- Added extension of life-cycle marked as `mvn-golang`, adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)
+- Improved CLEAN to delete the project target folder
+- The Banner is hidden by default
+- Project may not contain existed source folder
+- Added life-cycle for packaging `mvn-golang`, as example see adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)
 - Improved logging of command console output, now it is split to lines and every line logged separately
 - Added support for loading of archives marked as `application/x-gzip`
 - Added one more integration test based on [the NES emulator project](https://github.com/fogleman/nes)

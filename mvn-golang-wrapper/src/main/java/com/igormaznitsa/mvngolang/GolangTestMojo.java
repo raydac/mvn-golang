@@ -46,6 +46,11 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
   }
   
   @Override
+  public boolean isSourceFolderRequired() {
+    return true;
+  }
+  
+  @Override
   @Nonnull
   @MustNotContainNull
   public String[] getOptionalExtraTailArguments() {

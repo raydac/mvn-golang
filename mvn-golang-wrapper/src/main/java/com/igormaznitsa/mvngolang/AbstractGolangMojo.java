@@ -61,9 +61,11 @@ import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import org.apache.maven.project.MavenProject;
 import com.igormaznitsa.meta.common.utils.StrUtils;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
@@ -99,7 +101,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Hide ASC banner.
    */
-  @Parameter(defaultValue = "false", name = "hideBanner")
+  @Parameter(defaultValue = "true", name = "hideBanner")
   private boolean hideBanner;
 
   /**
@@ -836,7 +838,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       while (true) {
         final ProcessExecutor executor = prepareExecutor();
         if (executor == null) {
-          getLog().info("The Mojo has decided to skip its execution for its inside business rules");
+          logOptionally("The Mojo should not be executed");
           break;
         }
         final ProcessResult result = executor.executeNoTimeout();
@@ -918,9 +920,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  public boolean isExecutionShouldBeIgnored() throws MojoFailureException {
+  public boolean isSourceFolderRequired(){
     return false;
   }
+  
+  public boolean isMojoMustNotBeExecuted() throws MojoFailureException {
+    try {
+      return isSourceFolderRequired() && !this.getSources(false).isDirectory();
+    } catch (IOException ex) {
+      throw new MojoFailureException("Can't check source folder", ex);
+    }
+  }
+
   
   @Nonnull
   @MustNotContainNull
@@ -971,7 +982,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final File detectedRoot = findGoRoot();
     final File gopath = findGoPath(true);
 
-    if (isExecutionShouldBeIgnored()) {
+    if (isMojoMustNotBeExecuted()) {
       return null;
     }
     
@@ -1026,9 +1037,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
-    final File sourcesFile = getSources(true);
+    final File sourcesFile = getSources(isSourceFolderRequired());
     logOptionally("GoLang project sources folder : " + sourcesFile);
-    result.directory(sourcesFile);
+    if (sourcesFile.isDirectory()) {
+      result.directory(sourcesFile);
+    }
 
     getLog().info("");
     getLog().info("....Environment vars....");

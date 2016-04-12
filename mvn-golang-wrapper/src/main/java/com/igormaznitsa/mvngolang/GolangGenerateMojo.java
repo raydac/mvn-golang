@@ -35,6 +35,11 @@ public class GolangGenerateMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
+  public boolean isSourceFolderRequired() {
+    return true;
+  }
+  
+  @Override
   public boolean enforcePrintOutput() {
     return true;
   }

@@ -63,7 +63,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(customMojo.isUseEnvVars());
     assertEquals("someCustomCommand",customMojo.getGoCommand());
     assertFalse(customMojo.isVerbose());
-    assertFalse(customMojo.isHideBanner());
+    assertTrue(customMojo.isHideBanner());
     assertEqualsPath("some/sources", customMojo.getSources(false).getPath());
     assertEqualsPath("some/root", customMojo.getGoRoot());
     assertEqualsPath("some/path", customMojo.findGoPath(false).getPath());
@@ -79,7 +79,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(cleanMojo.isUseEnvVars());
     assertEquals("clean",cleanMojo.getGoCommand());
     assertFalse(cleanMojo.isVerbose());
-    assertFalse(cleanMojo.isHideBanner());
+    assertTrue(cleanMojo.isHideBanner());
     assertEqualsPath("some/sources", cleanMojo.getSources(false).getPath());
     assertEqualsPath("some/root", cleanMojo.getGoRoot());
     assertEqualsPath("some/path", cleanMojo.findGoPath(false).getPath());
@@ -93,7 +93,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(fixMojo.isUseEnvVars());
     assertEquals("fix",fixMojo.getGoCommand());
     assertFalse(fixMojo.isVerbose());
-    assertFalse(fixMojo.isHideBanner());
+    assertTrue(fixMojo.isHideBanner());
     assertEqualsPath("some/sources", fixMojo.getSources(false).getPath());
     assertEqualsPath("some/root", fixMojo.getGoRoot());
     assertEqualsPath("some/path", fixMojo.findGoPath(false).getPath());
@@ -107,7 +107,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(fmtMojo.isUseEnvVars());
     assertEquals("fmt",fmtMojo.getGoCommand());
     assertFalse(fmtMojo.isVerbose());
-    assertFalse(fmtMojo.isHideBanner());
+    assertTrue(fmtMojo.isHideBanner());
     assertEqualsPath("some/sources", fmtMojo.getSources(false).getPath());
     assertEqualsPath("some/root", fmtMojo.getGoRoot());
     assertEqualsPath("some/path", fmtMojo.findGoPath(false).getPath());
@@ -121,7 +121,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(genMojo.isUseEnvVars());
     assertEquals("generate",genMojo.getGoCommand());
     assertFalse(genMojo.isVerbose());
-    assertFalse(genMojo.isHideBanner());
+    assertTrue(genMojo.isHideBanner());
     assertEqualsPath("some/sources", genMojo.getSources(false).getPath());
     assertEqualsPath("some/root", genMojo.getGoRoot());
     assertEqualsPath("some/path", genMojo.findGoPath(false).getPath());
@@ -135,7 +135,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(instMojo.isUseEnvVars());
     assertEquals("install",instMojo.getGoCommand());
     assertFalse(instMojo.isVerbose());
-    assertFalse(instMojo.isHideBanner());
+    assertTrue(instMojo.isHideBanner());
     assertEqualsPath("some/sources", instMojo.getSources(false).getPath());
     assertEqualsPath("some/root", instMojo.getGoRoot());
     assertEqualsPath("some/path", instMojo.findGoPath(false).getPath());
@@ -149,7 +149,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(vetMojo.isUseEnvVars());
     assertEquals("vet",vetMojo.getGoCommand());
     assertFalse(vetMojo.isVerbose());
-    assertFalse(vetMojo.isHideBanner());
+    assertTrue(vetMojo.isHideBanner());
     assertEqualsPath("some/sources", vetMojo.getSources(false).getPath());
     assertEqualsPath("some/root", vetMojo.getGoRoot());
     assertEqualsPath("some/path", vetMojo.findGoPath(false).getPath());
@@ -163,7 +163,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(testMojo.isUseEnvVars());
     assertEquals("test",testMojo.getGoCommand());
     assertFalse(testMojo.isVerbose());
-    assertFalse(testMojo.isHideBanner());
+    assertTrue(testMojo.isHideBanner());
     assertEqualsPath("some/sources", testMojo.getSources(false).getPath());
     assertEqualsPath("some/root", testMojo.getGoRoot());
     assertEqualsPath("some/path", testMojo.findGoPath(false).getPath());
@@ -178,7 +178,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(toolMojo.isUseEnvVars());
     assertEquals("tool",toolMojo.getGoCommand());
     assertFalse(toolMojo.isVerbose());
-    assertFalse(toolMojo.isHideBanner());
+    assertTrue(toolMojo.isHideBanner());
     assertEqualsPath("some/sources", toolMojo.getSources(false).getPath());
     assertEquals("theCommand", toolMojo.getCommand());
     assertEqualsPath("some/root", toolMojo.getGoRoot());
@@ -196,7 +196,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertNull(getMojo.getUseGoTool());
     assertTrue(getMojo.isAutoFixGitCache());
     assertFalse(getMojo.isVerbose());
-    assertFalse(getMojo.isHideBanner());
+    assertTrue(getMojo.isHideBanner());
     assertEqualsPath("some/sources", getMojo.getSources(false).getPath());
     assertEqualsPath("some/root", getMojo.getGoRoot());
     assertEqualsPath("some/path", getMojo.findGoPath(false).getPath());
@@ -218,7 +218,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("someGo.bat",buildMojo.getUseGoTool());
     assertFalse(buildMojo.isVerbose());
     assertTrue(buildMojo.isFindExecInGoPath());
-    assertTrue(buildMojo.isHideBanner());
+    assertFalse(buildMojo.isHideBanner());
     assertEqualsPath("some/sources", buildMojo.getSources(false).getPath());
     assertEqualsPath("some/root", buildMojo.getGoRoot());
     assertEqualsPath("some/path", buildMojo.findGoPath(false).getPath());

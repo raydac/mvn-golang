@@ -15,7 +15,6 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 
 import java.io.File;
 
@@ -28,6 +27,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 
 /**
  * The Mojo wraps the 'build' command.

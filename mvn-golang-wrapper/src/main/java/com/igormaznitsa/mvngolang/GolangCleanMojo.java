@@ -15,23 +15,47 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * The Mojo wraps the 'clean' command.
  */
 @Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangCleanMojo extends AbstractPackageGolangMojo {
-  
+
+  @Override
+  public boolean isSourceFolderRequired() {
+    return true;
+  }
+
   @Override
   @Nonnull
   public String getGoCommand() {
     return "clean";
   }
 
+  @Override
+  public void afterExecution(final boolean error) throws MojoFailureException {
+    if (!error) {
+      final File directory = new File(getProject().getBuild().getDirectory());
+      if (directory.isDirectory()) {
+        try {
+          getLog().info("Deleting folder : " + directory);
+          FileUtils.deleteDirectory(directory);
+        } catch (IOException ex) {
+          throw new MojoFailureException("Can't delete folder", ex);
+        }
+      }
+    }
+  }
 }

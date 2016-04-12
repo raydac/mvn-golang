@@ -10,46 +10,22 @@
   </parent>
 
   <artifactId>mvn-golang-examples-nes</artifactId>
-  <packaging>pom</packaging>
+  <packaging>mvn-golang</packaging>
 
   <name>NES emulator example</name>
   <description>Example of mvn-golang-wrapper usage to build the NES emulator project : https://github.com/fogleman/nes</description>
 
-  <properties>
-    <result.file.name>nes</result.file.name>
-  </properties>
-
-  <profiles>
-    <profile> 
-      <id>windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <properties>
-        <result.file.name>${result.file.name}.exe</result.file.name>
-      </properties>
-    </profile>
-  </profiles>
-    
   <build>
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${main-project-version}</version>
+        <extensions>true</extensions>
         <executions>
           <execution>
-            <id>golang-get</id>
-            <goals>
-              <goal>get</goal>
-            </goals>
+            <id>default-get</id>
             <configuration>
-              <echoWarn>
-                <warn>Needs native library dependencies: sudo apt-get install portaudio19-dev libgl1-mesa-dev xorg-dev</warn>
-              </echoWarn>
-              <autofixGitCache>true</autofixGitCache>
               <packages>
                 <package>github.com/gordonklaus/portaudio</package>
                 <package>github.com/fogleman/nes</package>
@@ -57,15 +33,14 @@
             </configuration>
           </execution>
           <execution>
-            <id>golang-build</id>
-            <goals>
-              <goal>build</goal>
-            </goals>
+            <id>default-build</id>
             <configuration>
+              <echoWarn>
+                <warn>If error with native parts then install them with : sudo apt-get install portaudio19-dev libgl1-mesa-dev xorg-dev</warn>
+              </echoWarn>
               <packages>
                 <package>github.com/fogleman/nes</package>
               </packages>
-              <resultName>${result.file.name}</resultName>
             </configuration>
           </execution>
         </executions>

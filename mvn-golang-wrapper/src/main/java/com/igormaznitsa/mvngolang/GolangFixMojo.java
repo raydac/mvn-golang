@@ -29,6 +29,11 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 public class GolangFixMojo extends AbstractPackageGolangMojo {
   
   @Override
+  public boolean isSourceFolderRequired() {
+    return true;
+  }
+  
+  @Override
   @Nonnull
   public String getGoCommand() {
     return "fix";

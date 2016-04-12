@@ -15,18 +15,6 @@
     <name>TermUI example</name>
     <description>Example of mvn-golang-wrapper usage to build a application with getting of some external dependency. It builds a sample from https://github.com/gizak/termui</description>
 
-    <profiles>
-      <profile>
-        <id>golang-dependencies</id>
-        <dependencies>
-          <dependency>
-            <groupId>github.com</groupId>
-            <artifactId>gizak.termui</artifactId>
-          </dependency>
-        </dependencies>
-      </profile>
-    </profiles>
-
     <build>
       <plugins>
         <plugin>
@@ -36,8 +24,17 @@
           <extensions>true</extensions>
           <configuration>
             <goVersion>${go.sdk.version}</goVersion>
-            <hideBanner>true</hideBanner>
           </configuration>
+          <executions>
+            <execution>
+              <id>default-get</id>
+              <configuration>
+                <packages>
+                  <package>github.com/gizak/termui</package>
+                </packages>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </build>
