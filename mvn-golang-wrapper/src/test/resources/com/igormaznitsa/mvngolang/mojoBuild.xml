@@ -27,7 +27,6 @@
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>
           <sources>some/sources</sources>
-          <findExecInGoPath>true</findExecInGoPath>
           <exec>gomobile</exec>
           <execSubpath>/bin/misc/</execSubpath>
           <buildFlags>

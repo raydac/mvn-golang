@@ -16,6 +16,8 @@
     <description>Example of mvn-golang-wrapper usage to build a application with getting of some external dependency. It builds a sample from https://github.com/gizak/termui</description>
 
     <build>
+      <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+      <directory>${basedir}${file.separator}bin</directory>
       <plugins>
         <plugin>
           <groupId>com.igormaznitsa</groupId>

@@ -15,9 +15,22 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -44,7 +57,42 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
   public String [] getTestFlags(){
     return this.testFlags == null ? null : this.testFlags.clone() ;
   }
-  
+
+  @Override
+  @Nonnull
+  @MustNotContainNull
+  public String[] getPackages() {
+    final String [] packages = super.getPackages();
+    final List<String> result;
+    if (packages == null || packages.length == 0){
+      result = new ArrayList<String>();
+      final File sourceFolder = new File(getProject().getBuild().getSourceDirectory());
+      final int startPos = FilenameUtils.normalizeNoEndSeparator(sourceFolder.getAbsolutePath()).length()+1;
+      
+      final Iterator<File> iterator = FileUtils.iterateFiles(sourceFolder, null, true);
+      while(iterator.hasNext()){
+        final File file = iterator.next();
+        if (file.getName().endsWith("_test.go")) {
+          final String pack = FilenameUtils.normalize(file.getParentFile().getAbsolutePath()).substring(startPos);
+          if (!result.contains(pack)){
+            getLog().info(String.format("Detected tests at package : %s",pack));
+            result.add(pack);
+          }
+        }
+      }
+      
+      Collections.sort(result, new Comparator<String>(){
+        @Override
+        public int compare(@Nonnull final String o1, @Nonnull final String o2) {
+          return o1.compareTo(o2);
+        }
+      });
+    } else {
+      result = Arrays.asList(packages);
+    }
+    return result.toArray(new String[result.size()]);
+  }
+
   @Override
   public boolean isSourceFolderRequired() {
     return true;

@@ -16,6 +16,8 @@
   <description>Example of mvn-golang-wrapper usage to build the NES emulator project : https://github.com/fogleman/nes</description>
 
   <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>

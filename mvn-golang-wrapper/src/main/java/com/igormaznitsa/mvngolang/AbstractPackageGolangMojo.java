@@ -41,7 +41,7 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getTailArguments() {
-    return GetUtils.ensureNonNull(this.packages, ArrayUtils.EMPTY_STRING_ARRAY);
+    return GetUtils.ensureNonNull(getPackages(), ArrayUtils.EMPTY_STRING_ARRAY);
   }
 
   @Override

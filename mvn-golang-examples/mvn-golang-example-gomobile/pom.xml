@@ -11,7 +11,7 @@
 
   <artifactId>mvn-golang-examples-gomobile</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>mvn-golang</packaging>
 
   <name>GoMobile example</name>
   <description>Example how to buid Android application with gomobile</description>
@@ -21,17 +21,17 @@
   </properties>
 
   <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${main-project-version}</version>
+        <extensions>true</extensions>
         <executions>
           <execution>
-            <id>golang-get</id>
-            <goals>
-              <goal>get</goal>
-            </goals>
+            <id>default-get</id>
             <configuration>
               <packages>
                 <package>golang.org/x/mobile/cmd/gomobile</package>
@@ -40,6 +40,7 @@
           </execution>
           <execution>
             <id>gomobile-init</id>
+            <phase>process-resources</phase>
             <goals>
               <goal>custom</goal>
             </goals>
@@ -48,12 +49,11 @@
                 <warn>!!!It is a very hard operation because GoMobile downloads about half gigabyte data!!!</warn>
               </echoWarn>
               <exec>gomobile</exec>
-              <findExecInGoPath>true</findExecInGoPath>
               <customCommand>init</customCommand>
             </configuration>
           </execution>
           <execution>
-            <id>gomobile-build</id>
+            <id>default-build</id>
             <goals>
               <goal>build</goal>
             </goals>

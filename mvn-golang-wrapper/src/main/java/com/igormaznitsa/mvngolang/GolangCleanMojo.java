@@ -47,7 +47,12 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
   @Override
   public void afterExecution(final boolean error) throws MojoFailureException {
     if (!error) {
-      final File directory = new File(getProject().getBuild().getDirectory());
+      final File directory;
+      if (getProject().getPackaging().equals("mvn-golang")) {
+        directory = new File(getProject().getBasedir(), "bin");
+      } else {
+        directory = new File(getProject().getBuild().getDirectory());
+      }
       if (directory.isDirectory()) {
         try {
           getLog().info("Deleting folder : " + directory);
@@ -55,6 +60,8 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
         } catch (IOException ex) {
           throw new MojoFailureException("Can't delete folder", ex);
         }
+      } else {
+        getLog().info(String.format("Folder %s is not found", directory.getAbsolutePath()));
       }
     }
   }

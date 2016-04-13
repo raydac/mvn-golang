@@ -63,10 +63,7 @@ import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 
 import org.apache.maven.project.MavenProject;
 import com.igormaznitsa.meta.common.utils.StrUtils;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static com.igormaznitsa.meta.common.utils.Assertions.*;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -91,7 +88,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;
-  
+
   /**
    * Base site for SDK download. By default it uses <a href="https://storage.googleapis.com/golang/">https://storage.googleapis.com/golang/</a>
    */
@@ -115,6 +112,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    */
   @Parameter(defaultValue = "${user.home}${file.separator}.mvnGoLang${file.separator}.go_path", name = "goPath")
   private String goPath;
+
+  /**
+   * Folder to be used as $GOBIN. NB! By default it has value "${project.build.directory}"
+   */
+  @Parameter(defaultValue = "${project.build.directory}", name = "goBin")
+  private String goBin;
 
   /**
    * The Go SDK version. It plays role if goRoot is undefined.
@@ -169,9 +172,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean disableSdkLoad;
 
   /**
-   * GoLang source directory.
+   * GoLang source directory. By default <b>${project.build.sourceDirectory}</b>
    */
-  @Parameter(defaultValue = "${basedir}${file.separator}src${file.separator}golang", name = "sources")
+  @Parameter(defaultValue = "${project.build.sourceDirectory}", name = "sources")
   private String sources;
 
   /**
@@ -265,10 +268,21 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean findExecInGoPath;
 
   @Nonnull
-  public MavenProject getProject(){
+  public String getGoBin() {
+    final String foundInEnvironment = System.getenv("GOBIN");
+    String result = assertNotNull(this.goBin);
+
+    if (foundInEnvironment != null && isUseEnvVars()) {
+      result = foundInEnvironment;
+    }
+    return result;
+  }
+
+  @Nonnull
+  public MavenProject getProject() {
     return this.project;
   }
-  
+
   @Nonnull
   public Map<?, ?> getEnv() {
     return GetUtils.ensureNonNull(this.env, Collections.EMPTY_MAP);
@@ -322,10 +336,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public boolean isDisableSdkLoad() {
     return this.disableSdkLoad;
-  }
-
-  public boolean isFindExecInGoPath() {
-    return this.findExecInGoPath;
   }
 
   @Nonnull
@@ -920,10 +930,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  public boolean isSourceFolderRequired(){
+  public boolean isSourceFolderRequired() {
     return false;
   }
-  
+
   public boolean isMojoMustNotBeExecuted() throws MojoFailureException {
     try {
       return isSourceFolderRequired() && !this.getSources(false).isDirectory();
@@ -932,7 +942,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  
   @Nonnull
   @MustNotContainNull
   public abstract String[] getTailArguments();
@@ -966,12 +975,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private static String getPathToFolder(@Nonnull final File path) {
-    String text = path.getAbsolutePath();
+  private static String getPathToFolder(@Nonnull final String path) {
+    String text = path;
     if (!text.endsWith("/") && !text.endsWith("\\")) {
       text = text + File.separatorChar;
     }
     return text;
+  }
+  
+  @Nonnull
+  private static String getPathToFolder(@Nonnull final File path) {
+    return getPathToFolder(path.getAbsolutePath());
   }
 
   @Nullable
@@ -980,21 +994,33 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
     final File detectedRoot = findGoRoot();
+    final String gobin = getGoBin();
     final File gopath = findGoPath(true);
 
     if (isMojoMustNotBeExecuted()) {
       return null;
     }
+
+    final String toolName = FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs));
+    final File executableFileInPathOrRoot = new File(getPathToFolder(detectedRoot) + toolName);
+    final File executableFileInBin = new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
+
+    final File [] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
     
-    final boolean pathInsteadRoot = this.isFindExecInGoPath();
-    if (pathInsteadRoot) {
-      getLog().warn("$GOPATH is used instead of $GOROOT as the root folder to find the go tool");
+    final File selectedExecutable = findExisting(exeVariants);
+    
+    if (selectedExecutable == null) {
+      throw new MojoFailureException("Can't find executable file : " + Arrays.toString(exeVariants));
+    } else {
+      logOptionally("Executable file detected : " + selectedExecutable);
     }
 
-    final File executableFile = new File(getPathToFolder(pathInsteadRoot ? gopath : detectedRoot) + FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs)));
-
+    if (selectedExecutable == null){
+      throw new MojoFailureException("Can't find executable file for paths : "+Arrays.toString(exeVariants));
+    }
+    
     final List<String> commandLine = new ArrayList<String>();
-    commandLine.add(executableFile.getAbsolutePath());
+    commandLine.add(selectedExecutable.getAbsolutePath());
     commandLine.add(getGoCommand());
 
     for (final String s : getCommandFlags()) {
@@ -1029,12 +1055,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     getLog().info(String.format("Prepared сommand line : %s", cli.toString()));
 
-    if (!executableFile.isFile()) {
-      throw new MojoFailureException("Can't find executable file : " + executableFile);
-    } else {
-      logOptionally("Executable file detected : " + executableFile);
-    }
-
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
     final File sourcesFile = getSources(isSourceFolderRequired());
@@ -1047,7 +1067,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     getLog().info("....Environment vars....");
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
-    addEnvVar(result, "GOPATH", gopath.getAbsolutePath());
+    addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(),removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()),getExtraPathToAddToGoPath()));
+    addEnvVar(result, "GOBIN", gobin);
 
     final String trgtOs = this.getTargetOS();
     final String trgtArch = this.getTargetArch();
@@ -1066,7 +1087,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     String thePath = GetUtils.ensureNonNullStr(System.getenv("PATH"));
-    thePath = thePath + (thePath.isEmpty() ? "" : SystemUtils.IS_OS_WINDOWS ? ";" : ":") + detectedRoot + File.separatorChar + getExecSubpath();
+    thePath = preparePath(thePath,(detectedRoot + File.separator + getExecSubpath()),gobin);
     addEnvVar(result, "PATH", thePath);
 
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
@@ -1080,4 +1101,45 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     return result;
   }
+
+  @Nullable
+  protected static File findExisting(@Nonnull @MustNotContainNull final File ... files){
+    File result = null;
+    for(final File f : files){
+      if (f.isFile()) {
+        result = f;
+        break;
+      }
+    }
+    return result;
+  }
+  
+  @Nonnull
+  protected String getExtraPathToAddToGoPath(){
+    return "";
+  }
+  
+  @Nonnull
+  private static String removeSrcFolderAtEndIfPresented(@Nonnull final String text) {
+    String result = text;
+    if (text.endsWith("/src") || text.endsWith("\\src")){
+      result = text.substring(0,text.length()-4);
+    }
+    return result;
+  }
+  
+  @Nonnull
+  private static String preparePath(@Nonnull @MustNotContainNull final String... paths) {
+    final StringBuilder result = new StringBuilder();
+    for (final String s : paths) {
+      if (!s.isEmpty()) {
+        if (result.length() > 0) {
+          result.append(SystemUtils.IS_OS_WINDOWS ? ';' : ':');
+        }
+        result.append(s);
+      }
+    }
+    return result.toString();
+  }
+
 }

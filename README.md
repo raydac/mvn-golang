@@ -7,15 +7,17 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__1.1.1-SNAPSHOT__
-- Improved CLEAN to delete the project target folder
+__2.0.0-SNAPSHOT__
+- Removed `<findExecInGoPath>` property because the logic of search executable file has been reworked
+- Added `goBin` parameter to provide $GOBIN value
+- Improved CLEAN to delete also the project target folder
 - The Banner is hidden by default
-- Project may not contain existed source folder
-- Added life-cycle for packaging `mvn-golang`, as example see adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)
+- Project may not contain source folder
+- Added life-cycle for packaging `mvn-golang` with support of the standard GoLang project hierarchy, as example see adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)
 - Improved logging of command console output, now it is split to lines and every line logged separately
-- Added support for loading of archives marked as `application/x-gzip`
+- Added support for loading of archives with Content-type `application/x-gzip`
 - Added one more integration test based on [the NES emulator project](https://github.com/fogleman/nes)
-- Integration tests moved to special profile `integration-tests`
+- Build of example application moved to the special profile `examples`
 
 __1.1.0 (05-apr-2016)__
 - Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile) 

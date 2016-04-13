@@ -1,3 +1,4 @@
+bin/
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -8,3 +9,5 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 /mvn-golang-wrapper/nbproject/
+/mvn-golang-examples/mvn-golang-example-gomobile/classes/
+/mvn-golang-examples/mvn-golang-example-gomobile/test-classes/
