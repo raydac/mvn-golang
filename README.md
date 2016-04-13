@@ -8,17 +8,17 @@
 
 # Changelog
 __2.0.0-SNAPSHOT__
-- Created maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project
+- Added maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project
 - Added mojo for `run` command.
-- Removed `<findExecInGoPath>` property because the logic of search executable file has been reworked
+- __Removed `<findExecInGoPath>` property because the logic of search executable file has been reworked__
 - Added `goBin` parameter to provide $GOBIN value
 - Improved CLEAN to delete also the project target folder
 - The Banner is hidden by default
-- Project may not contain source folder
-- Added life-cycle for packaging `mvn-golang` with support of the standard GoLang project hierarchy, as example see adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)
+- __Changed project folder structure to be closer to GoLang projects__
+- __Added life-cycle for packaging `mvn-golang` with support of the standard GoLang project hierarchy, as example see adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)__
 - Improved logging of command console output, now it is split to lines and every line logged separately
 - Added support for loading of archives with Content-type `application/x-gzip`
-- Added one more integration test based on [the NES emulator project](https://github.com/fogleman/nes)
+- Added pair of test examples
 - Build of example application moved to the special profile `examples`
 
 __1.1.0 (05-apr-2016)__
