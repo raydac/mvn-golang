@@ -358,9 +358,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getBuildFlags() {
-    return GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY);
+    return ArrayUtils.joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY),getExtraBuildFlags());
   }
 
+  @Nonnull
+  @MustNotContainNull
+  protected String [] getExtraBuildFlags(){
+    return ArrayUtils.EMPTY_STRING_ARRAY;
+  }
+  
   @Nonnull
   public File findGoPath(final boolean ensureExist) throws IOException {
     LOCKER.lock();
@@ -908,7 +914,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       for (final String str : outLog.split("\n")) {
         getLog().info(StrUtils.trimRight(str));
       }
-      getLog().info(outLog);
       getLog().info("");
     }
 

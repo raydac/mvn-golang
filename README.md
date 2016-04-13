@@ -8,6 +8,8 @@
 
 # Changelog
 __2.0.0-SNAPSHOT__
+- Created maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project
+- Added mojo for `run` command.
 - Removed `<findExecInGoPath>` property because the logic of search executable file has been reworked
 - Added `goBin` parameter to provide $GOBIN value
 - Improved CLEAN to delete also the project target folder

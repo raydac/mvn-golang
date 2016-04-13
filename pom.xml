@@ -8,6 +8,7 @@
 
   <modules>
     <module>mvn-golang-wrapper</module>
+    <module>mvn-golang-hello</module>
   </modules>
     
   <name>mvn-golang</name>

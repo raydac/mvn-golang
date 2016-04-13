@@ -28,6 +28,18 @@
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>main.go</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
