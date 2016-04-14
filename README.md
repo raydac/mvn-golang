@@ -19,7 +19,7 @@ __2.0.0-SNAPSHOT__
 - Improved logging of command console output, now it is split to lines and every line logged separately
 - Added support for loading of archives with Content-type `application/x-gzip`
 - Added pair of test examples
-- Build of example application moved to the special profile `examples`
+- Build of example applications moved to the special profile `examples`
 
 __1.1.0 (05-apr-2016)__
 - Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile) 
