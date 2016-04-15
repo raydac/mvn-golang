@@ -12,9 +12,9 @@
             <phases>
               <clean>com.igormaznitsa:mvn-golang-wrapper:clean</clean>
               <validate>com.igormaznitsa:mvn-golang-wrapper:fix</validate>
+              <initialize>com.igormaznitsa:mvn-golang-wrapper:get</initialize>
               <generate-sources>com.igormaznitsa:mvn-golang-wrapper:generate</generate-sources>
               <process-sources>com.igormaznitsa:mvn-golang-wrapper:fmt</process-sources>
-              <process-resources>com.igormaznitsa:mvn-golang-wrapper:get</process-resources>
               <compile>com.igormaznitsa:mvn-golang-wrapper:build</compile>
               <test>com.igormaznitsa:mvn-golang-wrapper:test</test>
               <deploy>com.igormaznitsa:mvn-golang-wrapper:install</deploy>

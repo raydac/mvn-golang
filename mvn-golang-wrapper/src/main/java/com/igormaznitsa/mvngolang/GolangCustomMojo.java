@@ -33,13 +33,13 @@ public class GolangCustomMojo extends AbstractPackageGolangMojo {
   /**
    * Command for Go tool to be executed
    */
-  @Parameter(name = "customCommand", required = true)
+  @Parameter(name = "customCommand")
   private String customCommand;
   
   @Override
   @Nonnull
   public String getGoCommand() {
-    return assertNotNull(this.customCommand);
+    return this.customCommand == null ? "" : this.customCommand;
   }
 
   @Override

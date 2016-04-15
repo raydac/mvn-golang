@@ -64,6 +64,7 @@ import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 import org.apache.maven.project.MavenProject;
 import com.igormaznitsa.meta.common.utils.StrUtils;
 import static com.igormaznitsa.meta.common.utils.Assertions.*;
+import com.igormaznitsa.meta.annotation.ImplementationNote;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -267,6 +268,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Parameter(name = "findExecInGoPath", defaultValue = "false")
   private boolean findExecInGoPath;
 
+  /**
+   * Allows to define folders which will be added into $GOPATH
+   *
+   * @since 2.0.0
+   */
+  @Parameter(name = "addToGoPath")
+  private String[] addToGoPath;
+
   @Nonnull
   public String getGoBin() {
     final String foundInEnvironment = System.getenv("GOBIN");
@@ -358,15 +367,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getBuildFlags() {
-    return ArrayUtils.joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY),getExtraBuildFlags());
+    return ArrayUtils.joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY), getExtraBuildFlags());
   }
 
   @Nonnull
   @MustNotContainNull
-  protected String [] getExtraBuildFlags(){
+  protected String[] getExtraBuildFlags() {
     return ArrayUtils.EMPTY_STRING_ARRAY;
   }
-  
+
   @Nonnull
   public File findGoPath(final boolean ensureExist) throws IOException {
     LOCKER.lock();
@@ -987,7 +996,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
     return text;
   }
-  
+
   @Nonnull
   private static String getPathToFolder(@Nonnull final File path) {
     return getPathToFolder(path.getAbsolutePath());
@@ -1010,23 +1019,27 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final File executableFileInPathOrRoot = new File(getPathToFolder(detectedRoot) + toolName);
     final File executableFileInBin = new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
 
-    final File [] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
-    
+    final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
+
     final File selectedExecutable = findExisting(exeVariants);
-    
+
     if (selectedExecutable == null) {
       throw new MojoFailureException("Can't find executable file : " + Arrays.toString(exeVariants));
     } else {
       logOptionally("Executable file detected : " + selectedExecutable);
     }
 
-    if (selectedExecutable == null){
-      throw new MojoFailureException("Can't find executable file for paths : "+Arrays.toString(exeVariants));
+    if (selectedExecutable == null) {
+      throw new MojoFailureException("Can't find executable file for paths : " + Arrays.toString(exeVariants));
     }
-    
+
     final List<String> commandLine = new ArrayList<String>();
     commandLine.add(selectedExecutable.getAbsolutePath());
-    commandLine.add(getGoCommand());
+
+    final String gocommand = getGoCommand();
+    if (!gocommand.isEmpty()) {
+      commandLine.add(getGoCommand());
+    }
 
     for (final String s : getCommandFlags()) {
       commandLine.add(s);
@@ -1072,7 +1085,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     getLog().info("....Environment vars....");
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
-    addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(),removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()),getExtraPathToAddToGoPath()));
+    addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(), getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd()));
     addEnvVar(result, "GOBIN", gobin);
 
     final String trgtOs = this.getTargetOS();
@@ -1092,7 +1105,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     String thePath = GetUtils.ensureNonNullStr(System.getenv("PATH"));
-    thePath = preparePath(thePath,(detectedRoot + File.separator + getExecSubpath()),gobin);
+    thePath = preparePath(thePath, (detectedRoot + File.separator + getExecSubpath()), gobin);
     addEnvVar(result, "PATH", thePath);
 
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
@@ -1108,9 +1121,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nullable
-  protected static File findExisting(@Nonnull @MustNotContainNull final File ... files){
+  protected static File findExisting(@Nonnull @MustNotContainNull final File... files) {
     File result = null;
-    for(final File f : files){
+    for (final File f : files) {
       if (f.isFile()) {
         result = f;
         break;
@@ -1118,21 +1131,30 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
     return result;
   }
-  
+
   @Nonnull
-  protected String getExtraPathToAddToGoPath(){
+  protected String getExtraPathToAddToGoPathToEnd() {
     return "";
   }
-  
+
   @Nonnull
-  private static String removeSrcFolderAtEndIfPresented(@Nonnull final String text) {
-    String result = text;
-    if (text.endsWith("/src") || text.endsWith("\\src")){
-      result = text.substring(0,text.length()-4);
+  protected String getExtraPathToAddToGoPathBeforeSources() {
+    String result = "";
+    if (this.addToGoPath != null) {
+      result = preparePath(this.addToGoPath);
     }
     return result;
   }
-  
+
+  @Nonnull
+  private static String removeSrcFolderAtEndIfPresented(@Nonnull final String text) {
+    String result = text;
+    if (text.endsWith("/src") || text.endsWith("\\src")) {
+      result = text.substring(0, text.length() - 4);
+    }
+    return result;
+  }
+
   @Nonnull
   private static String preparePath(@Nonnull @MustNotContainNull final String... paths) {
     final StringBuilder result = new StringBuilder();
