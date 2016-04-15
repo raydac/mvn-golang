@@ -36,6 +36,7 @@
   <description>Set of examples for mvn-golang-wrapper</description>
   <modules>
     <module>mvn-golang-example-helloworld</module>
+    <module>mvn-golang-example-genbindata</module>
     <module>mvn-golang-example-goexample</module>
     <module>mvn-golang-example-termui</module>
   </modules>
