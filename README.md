@@ -18,7 +18,7 @@ __2.0.0-SNAPSHOT__
 - __Added life-cycle for packaging `mvn-golang` with support of the standard GoLang project hierarchy, as example see adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)__
 - Improved logging of command console output, now it is split to lines and every line logged separately
 - Added support for loading of archives with Content-type `application/x-gzip`
-- Added pair of test examples
+- Increased number of test examples
 - Build of example applications moved to the special profile `examples`
 
 __1.1.0 (05-apr-2016)__
