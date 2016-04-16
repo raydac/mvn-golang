@@ -15,7 +15,7 @@
   <packaging>jar</packaging>
   
   <name>GoLang archetype 'Hello World!'</name>
-  <description>An archetype which contains a sample mvn-golang project</description>
+  <description>Archetype generates simple mvn-golang project</description>
   
   <profiles>
     <profile>
