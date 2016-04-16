@@ -47,7 +47,6 @@
           </execution>
         </executions>
         <configuration>
-          <hideBanner>true</hideBanner>
           <goVersion>${go.sdk.version}</goVersion>
         </configuration>
       </plugin>
