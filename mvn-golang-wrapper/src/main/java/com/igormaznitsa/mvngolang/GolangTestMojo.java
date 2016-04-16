@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -35,6 +34,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
+import com.igormaznitsa.mvngolang.utils.StringComparatorABC;
 
 /**
  * The Mojo wraps the 'test' command.
@@ -77,12 +77,7 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
         }
       }
       
-      Collections.sort(result, new Comparator<String>(){
-        @Override
-        public int compare(@Nonnull final String o1, @Nonnull final String o2) {
-          return o1.compareTo(o2);
-        }
-      });
+      Collections.sort(result, StringComparatorABC.getInstance());
     } else {
       result = Arrays.asList(packages);
     }

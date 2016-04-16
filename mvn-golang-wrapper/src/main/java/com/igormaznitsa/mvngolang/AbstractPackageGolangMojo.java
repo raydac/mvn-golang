@@ -34,7 +34,7 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   @Nullable
   @MustNotContainNull
   public String [] getPackages(){
-    return this.packages;
+    return this.packages == null ? null : this.packages.clone();
   }
   
   @Override
