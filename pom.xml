@@ -6,11 +6,6 @@
   <version>2.0.0</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>mvn-golang-wrapper</module>
-    <module>mvn-golang-hello</module>
-  </modules>
-    
   <name>mvn-golang</name>
   <description>Maven plugin to wrap main GoLang commands and provide way to build GoLang applications with Apache Maven build tool.</description>
   <url>https://github.com/raydac/mvn-golang</url>
@@ -99,6 +94,16 @@
   </dependencies>
 
   <profiles>
+    <profile>
+      <id>plugin</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>mvn-golang-wrapper</module>
+        <module>mvn-golang-hello</module>
+      </modules>
+    </profile>
     <profile>
       <id>examples</id>
       <modules>

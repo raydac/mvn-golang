@@ -110,7 +110,7 @@
   
   <profiles>
     <profile>
-      <id>prepare-distributive</id>
+      <id>publish</id>
       <build>
         <plugins>
           <plugin>
