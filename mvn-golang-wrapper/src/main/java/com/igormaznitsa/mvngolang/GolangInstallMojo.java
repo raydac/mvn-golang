@@ -25,7 +25,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * The Mojo wraps the 'install' command.
  */
-@Mojo(name = "install", defaultPhase = LifecyclePhase.INSTALL, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "install", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangInstallMojo extends AbstractPackageGolangMojo {
 
   @Override

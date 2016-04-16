@@ -32,7 +32,7 @@ import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 /**
  * The Mojo wraps the 'build' command.
  */
-@Mojo(name = "build", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "build", defaultPhase = LifecyclePhase.COMPILE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangBuildMojo extends AbstractPackageGolangMojo {
 
   /**

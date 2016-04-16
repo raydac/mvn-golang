@@ -15,11 +15,8 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import java.io.File;
-import java.io.IOException;
 import javax.annotation.Nonnull;
 
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;

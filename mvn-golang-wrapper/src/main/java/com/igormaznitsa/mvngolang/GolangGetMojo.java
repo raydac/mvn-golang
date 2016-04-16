@@ -40,7 +40,7 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
 /**
  * The Mojo wraps the 'get' command.
  */
-@Mojo(name = "get", defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
+@Mojo(name = "get", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangGetMojo extends AbstractPackageGolangMojo {
 
   private static final Pattern PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT = Pattern.compile("no\\s+submodule\\s+mapping\\s+found\\s+in\\s+.gitmodules for path\\s+\\'([\\S]+?)\\'", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);

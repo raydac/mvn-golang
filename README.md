@@ -37,19 +37,9 @@ __1.0.0 (26-mar-2016)__
 - initial version
 
 # Introduction
-I very much like Maven build tool and use it very actively in my work so that I decided to develop a small maven plug-in to provide way to build GoLang executable modules with the build tool.   
-The Plug-in is a full cycle one and allows to build a GoLang application with Maven even if there is not any installed GoLang SDK in OS, in the case the plug-in will download compatible one and unpack an SDK from GoLang page and will be using the SDK in its work.   
-Mainly all main commands of GoLang are accessible through the plug-in and their list you can see below:
-* __clean__ (by default works in maven _CLEAN_ phase)
-* __fix__ (by default works in maven _VALIDATE_ phase)
-* __generate__ (by default works in maven _GENERATE_SOURCES_ phase)
-* __fmt__ (by default works in maven _PROCESS_SOURCES_ phase)
-* __get__ (by default works in maven _GENERATE_RESOURCES_ phase)
-* __test__ (by default works in maven _TEST_ phase)
-* __build__ (by default works in maven _PACKAGE_ phase)
-* __tool__ (by default works in maven _VERIFY_ phase)
-* __vet__ (by default works in maven _VERIFY_ phase)
-* __install__ (by default works in maven _INSTALL_ phase)
+I very much like Maven build tool and use it very actively in my daily work so that I decided to develop a plug-in to provide way to automate build of GoLang applications with maven.   
+The Plug-in wraps standard GoLang commands and even can download and unpack GoLang SDK from the main site.   
+![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # How it works
 On start the plug-in makes such steps:
