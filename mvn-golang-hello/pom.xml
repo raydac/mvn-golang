@@ -14,7 +14,7 @@
   <artifactId>mvn-golang-hello</artifactId>
   <packaging>jar</packaging>
   
-  <name>GoLang archetype 'Hello World!'</name>
+  <name>Maven GoLang archetype</name>
   <description>Archetype generates simple mvn-golang project</description>
   
   <profiles>
