@@ -39,7 +39,7 @@ __1.0.0 (26-mar-2016)__
 # Introduction
 I very much like Maven build tool and use it very actively in my daily work so that I decided to develop a plug-in to provide way to automate build of GoLang applications with maven.   
 The Plug-in wraps standard GoLang commands and even can download and unpack GoLang SDK from the main site.   
-![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
+![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/doc_common.png)
 
 # How it works
 On start the plug-in makes such steps:
