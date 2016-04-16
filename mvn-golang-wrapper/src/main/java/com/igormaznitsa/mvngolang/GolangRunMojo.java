@@ -33,7 +33,7 @@ import com.igormaznitsa.meta.common.utils.ArrayUtils;
 public class GolangRunMojo extends AbstractPackageGolangMojo {
 
   /**
-   * Parameter to be with <b>-exec</b>
+   * If the parameter is defined then <b>-exec</b> will be used with the parameter value.
    * @since 2.0.0
    */
   @Parameter(name = "xprog")

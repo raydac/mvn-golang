@@ -64,7 +64,6 @@ import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 import org.apache.maven.project.MavenProject;
 import com.igormaznitsa.meta.common.utils.StrUtils;
 import static com.igormaznitsa.meta.common.utils.Assertions.*;
-import com.igormaznitsa.meta.annotation.ImplementationNote;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -1021,20 +1020,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
 
-    final File selectedExecutable = findExisting(exeVariants);
+    final File foundExecutableTool = findExisting(exeVariants);
 
-    if (selectedExecutable == null) {
+    if (foundExecutableTool == null) {
       throw new MojoFailureException("Can't find executable file : " + Arrays.toString(exeVariants));
     } else {
-      logOptionally("Executable file detected : " + selectedExecutable);
-    }
-
-    if (selectedExecutable == null) {
-      throw new MojoFailureException("Can't find executable file for paths : " + Arrays.toString(exeVariants));
+      logOptionally("Executable file detected : " + foundExecutableTool);
     }
 
     final List<String> commandLine = new ArrayList<String>();
-    commandLine.add(selectedExecutable.getAbsolutePath());
+    commandLine.add(foundExecutableTool.getAbsolutePath());
 
     final String gocommand = getGoCommand();
     if (!gocommand.isEmpty()) {
