@@ -15,7 +15,7 @@
   <packaging>jar</packaging>
   
   <name>Maven GoLang archetype</name>
-  <description>Archetype generates simple mvn-golang project</description>
+  <description>Archetype generates a sample mvn-golang project</description>
   
   <profiles>
     <profile>
