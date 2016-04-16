@@ -42,101 +42,19 @@ The Plug-in wraps standard GoLang commands and even can download and unpack GoLa
 ![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/doc_common.png)
 
 # How it works
-On start the plug-in makes such steps:
-- analyzing the current platform to generate needed distributive name
+On start the plug-in makes below steps:
+- analyzing the current platform to generate needed distributive name (it can be defined directly through properties)
 - check that such distributive already cached
   - if the distributive is not cached, then it will load the distributive list from the GoLang server and will find *.zip or *.tar.gz file and download and unpack that into cache folder of the plug-in
-- execute the go lang tool `bin/go` with needed command over the sources folder
-
-# What to do if I want to use already installed SDK?
-In the case just define `<goRoot>` in plug-in configuration
-```
-<goRoot>some/folder/where/go</goRoot>
-````
-and plug-in will be using already installed distributive
-
-# I want to use values of already defined environment variables!
-By defaut the plug-in using only parameters defined in its configuration, if you want to enable import of environment parameters $GOROOT, $GOOS, $GOARCH and $GOROOT_BOOTSTRAP (if they defined), then just add flag `<useEnvVars>`into plug-in configuration
-```
-<useEnvVars>true</useEnvVars>
-```
-
-# Example
-To Check the plugin fastly you can clone [the example "Hello World" project](https://github.com/raydac/mvn-golang-example). The Example will be working for Linux and Windows just out of the box but if you use Mac OS then you should have installed GoLang SDK and define `<goRoot>`.      
-The Part pom.xml below shows how to build 'Hello world' application with the plug-in. GoLang sources should be placed in `${basedir}/src/golang` folder.
-```
-  <properties>
-    <target.name>helloworld</target.name>
-  </properties>
-
-  <profiles>
-    <profile> 
-      <id>windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <properties>
-        <target.name>helloworld.exe</target.name>
-      </properties>
-    </profile>
-  </profiles>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.igormaznitsa</groupId>
-        <artifactId>mvn-golang-wrapper</artifactId>
-        <version>1.1.0</version>
-        <executions>
-          <execution>
-            <id>golang-build</id>
-            <goals>
-              <goal>build</goal>
-            </goals>
-            <configuration>
-              <resultName>${target.name}</resultName>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <goVersion>1.6</goVersion>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-```
+- execute needed go lang tool `bin/go` with defined command, the source folder will be set as current folder
 
 # Configuration 
 
 About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvn-golang/wiki/PluginConfigParameters).
 
-
-# How to execute command non-covered by the plug-in?
-The Plug-in covers only the main set of commands but there are another commands for Go tool and also in future their number will be increased. To cover such cases I have added the `custom` mojo into the plug-in.
-```
-<build>
-    <plugins>
-      <plugin>
-        <groupId>com.igormaznitsa</groupId>
-        <artifactId>mvn-golang-wrapper</artifactId>
-        <version>1.1.0</version>
-        <executions>
-          <execution>
-            <id>golang-build</id>
-            <goals>
-              <goal>custom</goal>
-            </goals>
-            <configuration>
-              <customCommand>run</customCommand>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <goVersion>1.6</goVersion>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-```
+# Sample use cases
+ - __[Simple "Hello world!" console application.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-helloworld)__
+ - __[Simple console application with embedded text resource prepared with the `go-bindata` utility.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-genbindata)__
+ - __[Simple console application with `termui` library (it needs installation of some native libraries!).](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)__
+ - __[NES emulator.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-nes)__
+ - __[Android application with `gomobile`.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile)__
