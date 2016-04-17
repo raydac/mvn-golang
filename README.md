@@ -1,14 +1,14 @@
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Java 6.0+](https://img.shields.io/badge/java-6.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|1.1.0|jar)
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.0.0|jar)
 [![Maven 3.0.3+](https://img.shields.io/badge/maven-3.0.3%2b-green.svg)](https://maven.apache.org/)
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-red.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
 
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__2.0.0-SNAPSHOT__
-- Added maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project
+__2.0.0 (17-apr-2016)__
+- __Added maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project__
 - Added mojo for `run` command.
 - __Removed `<findExecInGoPath>` property because the logic of search executable file has been reworked__
 - Added `goBin` parameter to provide $GOBIN value
@@ -40,6 +40,14 @@ __1.0.0 (26-mar-2016)__
 I very much like Maven build tool and use it very actively in my daily work so that I decided to develop a plug-in to provide way to automate build of GoLang applications with maven.   
 The Plug-in wraps standard GoLang commands and even can download and unpack GoLang SDK from the main site.   
 ![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/doc_common.png)
+
+# Fast start
+You can try the plug-in in work and taste of Go on your machine with just three lines
+```
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.0.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+cd ./gohello
+mvn package
+```
 
 # How it works
 On start the plug-in makes below steps:
