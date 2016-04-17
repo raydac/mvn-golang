@@ -36,17 +36,17 @@ __1.1.0 (05-apr-2016)__
 __1.0.0 (26-mar-2016)__
 - initial version
 
-# Introduction
-I very much like Maven build tool and use it very actively in my daily work so that I decided to develop a plug-in to provide way to automate build of GoLang applications with maven.   
-The Plug-in wraps standard GoLang commands and even can download and unpack GoLang SDK from the main site.   
-![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/doc_common.png)
-
-# Fast start
+# Go start!
 With the plugin you can try taste of Go on your machine in just two terminal lines
 ```
 mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.0.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello package
 ```
+
+# Introduction
+I very much like Maven build tool and use it very actively in my daily work so that I decided to develop a plug-in to provide way to automate build of GoLang applications with maven.   
+The Plug-in wraps standard GoLang commands and even can download and unpack GoLang SDK from the main site.   
+![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/doc_common.png)
 
 # How it works
 On start the plug-in makes below steps:
