@@ -31,6 +31,10 @@
             <execution>
               <id>default-get</id>
               <configuration>
+                <buildFlags>
+                  <flag>-u</flag>
+                </buildFlags>
+                <autofixGitCache>true</autofixGitCache>
                 <packages>
                   <package>github.com/gizak/termui</package>
                 </packages>

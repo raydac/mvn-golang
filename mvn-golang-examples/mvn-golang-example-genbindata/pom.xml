@@ -41,6 +41,7 @@
               <buildFlags>
                 <flag>-u</flag>
               </buildFlags>
+              <autofixGitCache>true</autofixGitCache>
               <packages>
                 <package>github.com/jteeuwen/go-bindata/...</package>
               </packages>

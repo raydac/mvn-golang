@@ -149,12 +149,14 @@
           <plugin>
             <groupId>com.igormaznitsa</groupId>
             <artifactId>uber-pom</artifactId>
-            <version>1.0.0</version>
+            <version>${uber.pom}</version>
             <configuration>
               <remove>
                 <section>parent</section>
                 <section>modules</section>
+                <section>profiles/profile/modules</section>
               </remove>
+              <removeSiblingDuplications>true</removeSiblingDuplications>
             </configuration>
             <executions>
               <execution>

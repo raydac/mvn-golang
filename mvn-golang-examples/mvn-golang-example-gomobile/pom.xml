@@ -20,6 +20,33 @@
     <target.name>helloworld</target.name>
   </properties>
 
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.igormaznitsa</groupId>
+            <artifactId>mvn-golang-wrapper</artifactId>
+            <version>${main-project-version}</version>
+            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <id>default-test</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
     <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
     <directory>${basedir}${file.separator}bin</directory>
@@ -33,6 +60,10 @@
           <execution>
             <id>default-get</id>
             <configuration>
+              <buildFlags>
+                <flag>-u</flag>
+              </buildFlags>
+              <autofixGitCache>true</autofixGitCache>
               <packages>
                 <package>golang.org/x/mobile/cmd/gomobile</package>
               </packages>
