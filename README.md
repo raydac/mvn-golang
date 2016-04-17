@@ -37,7 +37,7 @@ __1.0.0 (26-mar-2016)__
 - initial version
 
 # Go start!
-Taste Go on your machine in two commands!
+Taste Go in two commands!
 ```
 mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.0.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello package
