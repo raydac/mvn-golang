@@ -42,11 +42,10 @@ The Plug-in wraps standard GoLang commands and even can download and unpack GoLa
 ![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/doc_common.png)
 
 # Fast start
-You can try the plug-in in work and taste of Go on your machine with just three lines
+You can try the plug-in in work and taste of Go on your machine in just two CLI lines
 ```
 mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.0.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
-cd ./gohello
-mvn package
+mvn -f ./gohello package
 ```
 
 # How it works
