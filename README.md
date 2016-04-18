@@ -7,6 +7,8 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.0.1-SNAPSHOT__
+
 __2.0.0 (17-apr-2016)__
 - __Added maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project__
 - Added mojo for `run` command.
