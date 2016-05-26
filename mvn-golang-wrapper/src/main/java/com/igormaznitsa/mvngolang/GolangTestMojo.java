@@ -63,13 +63,14 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
     if (packages == null || packages.length == 0){
       result = new ArrayList<String>();
       final File sourceFolder = new File(getProject().getBuild().getSourceDirectory());
-      final int startPos = FilenameUtils.normalizeNoEndSeparator(sourceFolder.getAbsolutePath()).length()+1;
+      final String normalizedSourcePath = FilenameUtils.normalizeNoEndSeparator(sourceFolder.getAbsolutePath());
       
       final Iterator<File> iterator = FileUtils.iterateFiles(sourceFolder, null, true);
       while(iterator.hasNext()){
         final File file = iterator.next();
         if (file.getName().endsWith("_test.go")) {
-          final String pack = FilenameUtils.normalize(file.getParentFile().getAbsolutePath()).substring(startPos);
+          final String normalizedParentPath = FilenameUtils.normalize(file.getParentFile().getAbsolutePath());
+          final String pack = extractPackage(normalizedSourcePath, normalizedParentPath);
           if (!result.contains(pack)){
             getLog().info(String.format("Detected tests at package : %s",pack));
             result.add(pack);
@@ -84,6 +85,15 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
     return result.toArray(new String[result.size()]);
   }
 
+  @Nonnull
+  private static String extractPackage(@Nonnull final String basePath, @Nonnull final String packagePath) {
+    String result = packagePath.substring(basePath.length());
+    if (result.startsWith("/") || result.startsWith("\\")){
+      result = result.substring(1);
+    }
+    return result;
+  }
+  
   @Override
   public boolean isSourceFolderRequired() {
     return true;
