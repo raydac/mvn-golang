@@ -17,6 +17,7 @@
               <process-sources>com.igormaznitsa:mvn-golang-wrapper:fmt</process-sources>
               <compile>com.igormaznitsa:mvn-golang-wrapper:build</compile>
               <test>com.igormaznitsa:mvn-golang-wrapper:test</test>
+              <install>com.igormaznitsa:mvn-golang-wrapper:mvninstall</install>
               <deploy>com.igormaznitsa:mvn-golang-wrapper:install</deploy>
             </phases>
           </lifecycle>

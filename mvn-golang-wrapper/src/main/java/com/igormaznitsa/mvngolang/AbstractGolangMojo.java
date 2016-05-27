@@ -978,7 +978,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public abstract String[] getCommandFlags();
 
   private void addEnvVar(@Nonnull final ProcessExecutor executor, @Nonnull final String name, @Nonnull final String value) {
-    getLog().info(" $" + name + " = " + value);
+    logOptionally(" $" + name + " = " + value);
     executor.environment(name, value);
   }
 
@@ -1076,8 +1076,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       result.directory(sourcesFile);
     }
 
-    getLog().info("");
-    getLog().info("....Environment vars....");
+    logOptionally("");
+    logOptionally("....Environment vars....");
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
     addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(), getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd()));
@@ -1107,7 +1107,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, record.getKey().toString(), record.getValue().toString());
     }
 
-    getLog().info("........................");
+    logOptionally("........................");
 
     result.redirectOutput(this.consoleOutBuffer);
     result.redirectError(this.consoleErrBuffer);

@@ -15,10 +15,9 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,16 +25,18 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
+import javax.annotation.Nullable;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.meta.common.utils.GetUtils;
+import com.igormaznitsa.mvngolang.utils.repos.Repo;
 
 /**
  * The Mojo wraps the 'get' command.
@@ -53,8 +54,34 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "autofixGitCache", defaultValue = "false")
   private boolean autofixGitCache;
 
+  /**
+   * Branch to be activated.
+   *
+   * @since 2.1.0
+   */
+  @Parameter(name = "branch")
+  private String branch;
+
+  /**
+   * Tag to be activated.
+   *
+   * @since 2.1.0
+   */
+  @Parameter(name = "tag")
+  private String tag;
+
   public boolean isAutoFixGitCache() {
     return this.autofixGitCache;
+  }
+
+  @Nullable
+  public String getBranch() {
+    return this.branch;
+  }
+
+  @Nullable
+  public String getTag() {
+    return this.tag;
   }
 
   @Override
@@ -70,7 +97,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
   @Override
   public boolean isMojoMustNotBeExecuted() throws MojoFailureException {
-    final String [] packages = getTailArguments();
+    final String[] packages = getTailArguments();
     final boolean result;
     if (packages.length == 0) {
       getLog().info("There are not packages to get");
@@ -96,40 +123,117 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     return result;
   }
 
+  @Nonnull
+  private static String processSlashes(@Nonnull final String str) {
+    final StringBuilder result = new StringBuilder();
+    boolean check = true;
+    for (final char c : str.toCharArray()) {
+      if (check) {
+        if (c == '\\' || c == '/') {
+          continue;
+        } else {
+          check = false;
+        }
+      }
+      if (c == '\\' || c == '/') {
+        result.append(File.separatorChar);
+      } else {
+        result.append(c);
+      }
+    }
+
+    while (result.length() > 0) {
+      final char last = result.charAt(result.length() - 1);
+      if (last == '/' || last == '\\') {
+        result.deleteCharAt(result.length() - 1);
+      } else {
+        break;
+      }
+    }
+
+    return result.toString();
+  }
+
+  @Nonnull
+  private File makePathToPackage(@Nonnull final File goPath, @Nonnull final String pack) {
+    String path = pack.trim();
+
+    try {
+      final URI uri = URI.create(path);
+      path = processSlashes(uri.getPath());
+    } catch (IllegalArgumentException ex) {
+      // it is not url
+      path = processSlashes(path);
+    }
+
+    return new File(goPath, "src" + File.separatorChar + path);
+  }
+
   private boolean tryToFixGitCacheErrorsForPackages(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
     final File goPath = findGoPath(true);
 
     int fixed = 0;
 
     for (final String s : packages) {
-      final File packageFolder = new File(goPath, "src" + File.separatorChar + s);
-      if (packageFolder.isDirectory()) {
+      final File packageFolder = makePathToPackage(goPath, s);
+      final Repo repo = Repo.investigateFolder(packageFolder);
+      if (repo == Repo.GIT) {
         getLog().warn(String.format("Executing 'git rm -r --cached .' in %s", packageFolder.getAbsolutePath()));
-
-        final ProcessExecutor executor = new ProcessExecutor(adaptExecNameForOS("git"), "rm", "-r", "--cached", ".");
-        executor.directory(packageFolder);
-
-        try {
-          final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-          executor.redirectError(errorStream);
-
-          final ProcessResult result = executor.executeNoTimeout();
-          if (result.getExitValue() != 0) {
-            getLog().error(new String(errorStream.toByteArray(), Charset.defaultCharset()));
-            return false;
-          }
-        } catch (InterruptedException ex) {
-          break;
+        final int result = repo.execute(packageFolder, getLog(), "rm", "-r", "--cached", ".");
+        if (result != 0) {
+          return false;
         }
-
+        fixed++;
       } else {
-        getLog().error("Can't find folder " + packageFolder);
+        getLog().warn(String.format("Folder %s is not GIT repository", packageFolder.getAbsolutePath()));
         return false;
       }
 
       fixed++;
     }
     return fixed != 0;
+  }
+
+  private boolean changeRepoBranchAndTag(@Nonnull final File goPath, @Nullable final String branch, @Nullable final String tag) {
+    final String[] packages = this.getPackages();
+    if (packages != null && packages.length > 0) {
+      for (final String p : packages) {
+        final File packFolder = makePathToPackage(goPath, p);
+        if (!packFolder.isDirectory()) {
+          getLog().error(String.format("Can't find package '%s' at '%s'", p, packFolder.getAbsolutePath()));
+          return false;
+        } else {
+          final Repo repo = Repo.investigateFolder(packFolder);
+          
+          getLog().info(String.format("Switch branch and tag : %s => [branch = %s , tag = %s]", p, GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
+          
+          if (!repo.changeBranchAndTag(packFolder, getLog(), branch, tag)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public void afterExecution(final boolean error) throws MojoFailureException {
+    if (!error) {
+      if (this.branch != null || this.tag != null) {
+        getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch,"..."), GetUtils.ensureNonNull(this.tag,"...")));
+
+        final File goPath;
+        try {
+          goPath = findGoPath(true);
+        } catch (IOException ex) {
+          throw new MojoFailureException("Can't find $GOPATH", ex);
+        }
+
+        if (!changeRepoBranchAndTag(goPath, this.branch, this.tag)) {
+          throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
+        }
+      }
+    }
   }
 
   @Override
