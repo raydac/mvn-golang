@@ -9,6 +9,7 @@
 
 # Changelog
 __2.0.1-SNAPSHOT__
+- Fixed issue [#3 "cannot run tests"](https://github.com/raydac/mvn-golang/issues/3)
 
 __2.0.0 (17-apr-2016)__
 - __Added maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project__
