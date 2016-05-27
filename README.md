@@ -8,9 +8,12 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__2.0.1-SNAPSHOT__
+__2.1.0-SNAPSHOT__
+- Output of environment variables has been moved under the `verbose` flag
+- __Added `mvninstall` goal which processes the `install` goal and creates project artefact in local maven repository,[#2 request](https://github.com/raydac/mvn-golang/issues/2)_
+- __Added support of branch and tag by get commane for Git, Hg and SVN repositories__
 - Improved archetype template, added example of test
-- Fixed issue [#3 "cannot run tests"](https://github.com/raydac/mvn-golang/issues/3)
+- __Fixed issue [#3 "cannot run tests"](https://github.com/raydac/mvn-golang/issues/3)__
 
 __2.0.0 (17-apr-2016)__
 - __Added maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project__
