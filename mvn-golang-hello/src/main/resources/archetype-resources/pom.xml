@@ -20,7 +20,8 @@
         <version>2.1.0-SNAPSHOT</version>
         <extensions>true</extensions>
         <configuration>
-          <goVersion>1.6</goVersion>
+          <goVersion>1.6.2</goVersion>
+          <!--<verbose>true</verbose>-->
         </configuration>
         <executions>
           <execution>

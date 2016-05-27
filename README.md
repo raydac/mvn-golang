@@ -10,8 +10,8 @@
 # Changelog
 __2.1.0-SNAPSHOT__
 - Output of environment variables has been moved under the `verbose` flag
-- __Added `mvninstall` goal which processes the `install` goal and creates project artefact in local maven repository,[#2 request](https://github.com/raydac/mvn-golang/issues/2)__
-- __Added support of branch and tag by get commane for Git, Hg and SVN repositories__
+- __Added `mvninstall` goal which saves artefact into local maven repository during `install` phase,[#2 request](https://github.com/raydac/mvn-golang/issues/2)__
+- __Added support of branches and tags into `get`, it works for Git, Hg and SVN repositories__
 - Improved archetype template, added example of test
 - __Fixed issue [#3 "cannot run tests"](https://github.com/raydac/mvn-golang/issues/3)__
 
