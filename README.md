@@ -9,6 +9,7 @@
 
 # Changelog
 __2.0.1-SNAPSHOT__
+- Improved archetype template, added example of test
 - Fixed issue [#3 "cannot run tests"](https://github.com/raydac/mvn-golang/issues/3)
 
 __2.0.0 (17-apr-2016)__
