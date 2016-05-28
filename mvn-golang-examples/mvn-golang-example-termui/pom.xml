@@ -38,6 +38,7 @@
                 <packages>
                   <package>github.com/gizak/termui</package>
                 </packages>
+                <branch>v2</branch>
               </configuration>
             </execution>
           </executions>

@@ -9,14 +9,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <properties>
-    <mvn.version>3.0</mvn.version>
-  </properties>
-      
-  <prerequisites>
-    <maven>${mvn.version}</maven>
-  </prerequisites>
-    
   <artifactId>mvn-golang-wrapper</artifactId>
   <packaging>maven-plugin</packaging>
 
