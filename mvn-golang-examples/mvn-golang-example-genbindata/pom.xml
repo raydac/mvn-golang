@@ -19,6 +19,11 @@
   <build>
     <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
     <directory>${basedir}${file.separator}bin</directory>
+    <resources>
+      <resource>
+        <directory>${basedir}${file.separator}data</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>
