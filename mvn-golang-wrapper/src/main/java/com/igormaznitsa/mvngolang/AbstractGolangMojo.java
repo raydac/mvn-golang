@@ -866,6 +866,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           break;
         }
         final ProcessResult result = executor.executeNoTimeout();
+        error = result.getExitValue() != 0;
         iterations++;
 
         final String outLog = extractOutAsString();
