@@ -8,7 +8,7 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__2.1.0-SNAPSHOT__
+__2.1.0 (28-may-2016)__
 - Output of environment variables has been moved under the `verbose` flag
 - __Added `mvninstall` goal which saves artifact into local maven repository during `install` phase,[#2 request](https://github.com/raydac/mvn-golang/issues/2)__
 - __Added support of branches and tags into `get`, it works for Git, Hg and SVN repositories__
@@ -47,7 +47,7 @@ __1.0.0 (26-mar-2016)__
 # Go start!
 __Taste Go in just two commands!__
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.0.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello package
 ```
 
@@ -62,6 +62,49 @@ On start the plug-in makes below steps:
 - check that such distributive already cached
   - if the distributive is not cached, then it will load the distributive list from the GoLang server and will find *.zip or *.tar.gz file and download and unpack that into cache folder of the plug-in
 - execute needed go lang tool `bin/go` with defined command, the source folder will be set as current folder
+
+# How to work with dependencies?
+
+Unfortunately the plugin doesn't work with standard maven dependencies and to add dependencies into your project, just add special section among executions of the plugin
+```
+<execution>
+  <id>default-get</id>
+  <configuration>
+    <buildFlags>
+    <flag>-u</flag>
+    </buildFlags>
+    <packages>
+      <package>github.com/gizak/termui</package>
+    </packages>
+    <branch>v2</branch>
+  </configuration>
+</execution>
+```
+if you want to have several dependencies then take a look at the example below
+```
+<execution>
+  <id>dependency1</id>
+  <goal>get<goal>
+  <configuration>
+    <packages>
+      <package>github.com/some/framework</package>
+    </packages>
+    <tag>1.0.1<tag>
+  </configuration>
+</execution>
+<execution>
+  <id>dependency2</id>
+  <goal>get<goal>
+  <configuration>
+    <packages>
+      <package>github.com/some/another</package>
+    </packages>
+    <branch>v2</branch>
+  </configuration>
+</execution>
+```
+sometime GIT can produce cache errors and in the case you can try to turn on auto-fix of such errors with `<autofixGitCache>true</autofixGitCache>` flag.   
+Since 2.1.0 version it is possible to select `branch` and `tag` for dependencies, it works with Git and potentially work with Hg and Svn.
 
 # Configuration 
 
