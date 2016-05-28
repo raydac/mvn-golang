@@ -9,8 +9,11 @@
     <requiredProperty key="package">
       <defaultValue>main</defaultValue>
     </requiredProperty>
+    <requiredProperty key="gowrapper">
+      <defaultValue>2.1.0-SNAPSHOT</defaultValue>
+    </requiredProperty>
     <requiredProperty key="sdk">
-      <defaultValue>1.6</defaultValue>
+      <defaultValue>1.6.2</defaultValue>
     </requiredProperty>
   </requiredProperties>
   

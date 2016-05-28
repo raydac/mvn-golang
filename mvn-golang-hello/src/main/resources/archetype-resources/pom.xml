@@ -1,3 +1,4 @@
+#set($dollar = '$')
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -11,19 +12,40 @@
   <description>Simple 'Hello World!' GoLang example</description>
 
   <build>
-    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
-    <directory>${basedir}${file.separator}bin</directory>
+    <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
+    <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
+    <!-- NB! Listed resource folders will be packed into artifact!
+        <resources>
+          <resource>
+            <directory>${dollar}{basedir}${dollar}{file.separator}res</directory>
+          </resource>
+        </resources>
+    -->
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>${gowrapper}</version>
         <extensions>true</extensions>
         <configuration>
           <goVersion>1.6.2</goVersion>
-          <!--<verbose>true</verbose>-->
+          <verbose>true</verbose>
         </configuration>
         <executions>
+          <!-- Example of some dependency          
+          <execution>
+            <id>default-get</id>
+            <configuration>
+              <buildFlags>
+                <flag>-u</flag>
+              </buildFlags>
+              <packages>
+                <package>github.com/gizak/termui</package>
+              </packages>
+              <branch>v2</branch>
+            </configuration>
+          </execution>          
+          -->
           <execution>
             <id>golang-run</id>
             <goals>
