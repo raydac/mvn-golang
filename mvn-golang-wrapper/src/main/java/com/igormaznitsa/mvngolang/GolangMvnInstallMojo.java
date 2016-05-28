@@ -43,7 +43,7 @@ import org.apache.maven.project.MavenProject;
 import org.zeroturnaround.zip.ZipUtil;
 
 /**
- * The Mojo packs and install all found source and resource project folders into local maven repository.
+ * The Mojo packs all found source and resource project folders and create new artifact in the local repository.
  * 
  * @since 2.1.0
  */
@@ -64,7 +64,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
    *
    * @since 2.1.0
    */
-  @Parameter(name = "compression", defaultValue = "4")
+  @Parameter(name = "compression", defaultValue = "9")
   private int compression;
 
   @Override
@@ -145,7 +145,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
         getLog().debug(String.format("Packing folder %s to %s", folderToPack.getAbsolutePath(), resultZip.getAbsolutePath()));
       }
 
-      ZipUtil.pack(folderToPack, resultZip, this.compression);
+      ZipUtil.pack(folderToPack, resultZip, Math.min(9,Math.max(1,this.compression)));
 
     } finally {
       FileUtils.deleteQuietly(folderToPack);
