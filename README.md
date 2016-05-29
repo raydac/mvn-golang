@@ -62,6 +62,7 @@ On start the plug-in makes below steps:
 - check that such distributive already cached
   - if the distributive is not cached, then it will load the distributive list from the GoLang server and will find *.zip or *.tar.gz file and download and unpack that into cache folder of the plug-in
 - execute needed go lang tool `bin/go` with defined command, the source folder will be set as current folder
+- since 2.1.0 version, all folders of the project which are visible for maven (source folder, test folder, resource folders and test resource folders) will be zipped and saved as artifact into local maven repository as a file with mvn-golang extension
 
 # How to work with dependencies?
 
