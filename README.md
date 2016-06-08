@@ -145,10 +145,34 @@ if you want disable creation of artifact then you can use snippet
   <phase>none</phase>
 </execution>
 ```
-
 # Configuration 
 
 About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvn-golang/wiki/PluginConfigParameters).
+
+# Testing
+The Wrapper just wraps calls to Go tool and recognize the exit code, if call of `go test` is non-zero then build will be failed, it doesn't make any analysing of test reports!   
+Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconvey) tool for testing, in the case use snippet below to add dependency and make testing verbose
+```
+<execution>
+  <id>default-get</id>
+  <configuration>
+    <buildFlags>
+      <flag>-u</flag>
+    </buildFlags>
+    <packages>
+      <package>github.com/smartystreets/goconvey</package>
+    </packages>
+  </configuration>
+</execution>
+<execution>
+  <id>default-test</id>
+  <configuration>
+    <buildFlags>
+      <flag>-v</flag>
+    </buildFlags>
+  </configuration>
+</execution>                    
+```
 
 # Sample use cases
  - __[Simple "Hello world!" console application.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-helloworld)__
