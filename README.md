@@ -85,7 +85,9 @@ if you want to have several dependencies then take a look at the example below
 ```
 <execution>
   <id>dependency1</id>
-  <goal>get<goal>
+  <goals>
+    <goal>get</goal>
+  </goals>
   <configuration>
     <packages>
       <package>github.com/some/framework</package>
@@ -95,7 +97,9 @@ if you want to have several dependencies then take a look at the example below
 </execution>
 <execution>
   <id>dependency2</id>
-  <goal>get<goal>
+  <goals>
+    <goal>get</goal>
+  </goals>
   <configuration>
     <packages>
       <package>github.com/some/another</package>
@@ -106,6 +110,41 @@ if you want to have several dependencies then take a look at the example below
 ```
 sometime GIT can produce cache errors and in the case you can try to turn on auto-fix of such errors with `<autofixGitCache>true</autofixGitCache>` flag.   
 Since 2.1.0 version it is possible to select `branch` and `tag` for dependencies, it works with Git and potentially work with Hg and Svn.
+
+# How to save generated artifact in repository?
+The Wrapper during `install` phase collects all sources ande resources from folders defined in maven configuration and pack them as zip file, then the archive is saved in the local maven repository as new artifact with extension `mvn-golang`.   
+If you want to save generated artifact then you can use snippet below
+```
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-install-plugin</artifactId>
+    <version>2.5.2</version>
+    <executions>
+      <execution>
+        <id>save-result-as-artifact</id>
+        <phase>install</phase>
+        <goals>
+          <goal>install-file</goal>
+        </goals>
+        <configuration>
+          <file>${basedir}${file.separator}bin${file.separator}${project.build.finalName}</file>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>${project.artifactId}-result</artifactId>
+          <version>${project.version}</version>
+          <!-- NB! packaging allows to select extension  -->
+          <packaging>bin</packaging>
+        </configuration>
+      </execution>
+    </executions>
+</plugin>
+```
+if you want disable creation of artifact then you can use snippet
+```
+ <execution>
+  <id>default-mvninstall</id>
+  <phase>none</phase>
+</execution>
+```
 
 # Configuration 
 
