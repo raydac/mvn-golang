@@ -90,6 +90,38 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private MavenProject project;
 
   /**
+   * Ignore error exit code returned by GoLang tool and don't generate any failure.
+   * 
+   * @since 2.1.1
+   */
+  @Parameter(name = "ignoreErrorExitCode", defaultValue = "false")
+  private boolean ignoreErrorExitCode;
+  
+  /**
+   * Folder to place console logs.
+   *
+   * @since 2.1.1
+   */
+  @Parameter(name = "reportsFolder", defaultValue = "${project.build.directory}${file.separator}reports")
+  private String reportsFolder;
+
+  /**
+   * File to save console out log. If empty then will not be saved.
+   *
+   * @since 2.1.1
+   */
+  @Parameter(name = "outLogFile", defaultValue = "")
+  private String outLogFile;
+
+  /**
+   * File to save console error log. If empty then will not be saved
+   *
+   * @since 2.1.1
+   */
+  @Parameter(name = "errLogFile", defaultValue = "")
+  private String errLogFile;
+
+  /**
    * Base site for SDK download. By default it uses <a href="https://storage.googleapis.com/golang/">https://storage.googleapis.com/golang/</a>
    */
   @Parameter(name = "sdkSite", defaultValue = "https://storage.googleapis.com/golang/")
@@ -285,6 +317,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return this.project;
   }
 
+  public boolean isIgnoreErrorExitCode(){
+    return this.ignoreErrorExitCode;
+  }
+  
   @Nonnull
   public Map<?, ?> getEnv() {
     return GetUtils.ensureNonNull(this.env, Collections.EMPTY_MAP);
@@ -320,6 +356,21 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getSdkArchiveName() {
     return this.sdkArchiveName;
+  }
+
+  @Nonnull
+  public String getReportsFolder() {
+    return this.reportsFolder;
+  }
+
+  @Nonnull
+  public String getOutLogFile() {
+    return this.outLogFile;
+  }
+
+  @Nonnull
+  public String getErrLogFile() {
+    return this.errLogFile;
   }
 
   @Nonnull
@@ -374,12 +425,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     LOCKER.lock();
     try {
       final String theGoPath = getGoPath();
-      
-      if (theGoPath.contains(File.pathSeparator)){
+
+      if (theGoPath.contains(File.pathSeparator)) {
         getLog().error("Detected multiple folder items in the 'goPath' parameter but it must contain only folder!");
         throw new IOException("Detected multiple folder items in the 'goPath'");
       }
-      
+
       final File result = new File(theGoPath);
       if (ensureExist && !result.isDirectory() && !result.mkdirs()) {
         throw new IOException("Can't create folder : " + theGoPath);
@@ -866,13 +917,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           break;
         }
         final ProcessResult result = executor.executeNoTimeout();
-        error = result.getExitValue() != 0;
+        final int resultCode = result.getExitValue();
+        error = resultCode != 0 && !isIgnoreErrorExitCode();
         iterations++;
 
         final String outLog = extractOutAsString();
         final String errLog = extractErrorOutAsString();
 
-        printLogs(outLog, errLog);
+        if (this.processConsoleOut(resultCode, outLog, errLog)) {
+          printLogs(outLog, errLog);
+        }
 
         if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
           if (iterations > 10) {
@@ -880,7 +934,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           }
           getLog().warn("Make one more attempt...");
         } else {
-          assertProcessResult(result);
+          if (!isIgnoreErrorExitCode()) assertProcessResult(result);
           break;
         }
       }
@@ -894,11 +948,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  public void beforeExecution() throws MojoFailureException {
+  public void beforeExecution() throws MojoFailureException,MojoExecutionException {
 
   }
 
-  public void afterExecution(final boolean error) throws MojoFailureException {
+  public void afterExecution(final boolean error) throws MojoFailureException,MojoExecutionException {
 
   }
 
@@ -1163,6 +1217,44 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       }
     }
     return result.toString();
+  }
+  
+  protected boolean processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
+    final File reportsFolderFile = new File(this.getReportsFolder());
+    
+    final String fileOut = this.getOutLogFile();
+    final String fileErr = this.getErrLogFile();
+
+    final File fileToWriteOut = fileOut == null || fileOut.trim().isEmpty() ? null : new File(reportsFolderFile, fileOut);
+    final File fileToWriteErr = fileErr == null || fileErr.trim().isEmpty() ? null : new File(reportsFolderFile, fileErr);
+
+    if (fileToWriteOut != null) {
+      getLog().debug("Reports folder : "+reportsFolderFile);
+      if (!reportsFolderFile.isDirectory() && !reportsFolderFile.mkdirs()) {
+        throw new MojoExecutionException("Can't create folder for console logs : " + reportsFolderFile);
+      }
+      try {
+        getLog().debug("Writing out console log : " + fileToWriteErr);
+        FileUtils.write(fileToWriteOut, out, "UTF-8");
+      } catch (IOException ex) {
+        throw new MojoExecutionException("Can't save console output log into file : " + fileToWriteOut, ex);
+      }
+    }
+
+    if (fileToWriteErr != null) {
+      getLog().debug("Reports folder : " + reportsFolderFile);
+      if (!reportsFolderFile.isDirectory() && !reportsFolderFile.mkdirs()) {
+        throw new MojoExecutionException("Can't create folder for console logs : " + reportsFolderFile);
+      }
+      try {
+        getLog().debug("Writing error console log : " + fileToWriteErr);
+        FileUtils.write(fileToWriteErr, err, "UTF-8");
+      } catch (IOException ex) {
+        throw new MojoExecutionException("Can't save console error log into file : " + fileToWriteErr, ex);
+      }
+    }
+
+    return true;
   }
 
 }

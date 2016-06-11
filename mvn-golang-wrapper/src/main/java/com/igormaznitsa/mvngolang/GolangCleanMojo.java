@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nonnull;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -66,7 +67,7 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
         getLog().info("Deleting the Store Folder : " + goStoreFolder);
         FileUtils.deleteDirectory(goStoreFolder);
       } else {
-        logOptionally("The Store Folder doesn't exist : " + goStoreFolder);
+        getLog().info("The Store Folder does not found : " + goStoreFolder);
       }
     } catch (IOException ex) {
       throw new MojoFailureException("Can't delete the Store Folder", ex);
@@ -80,7 +81,7 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
         getLog().info("Cleaning the Go Path folder : " + goPathFolder);
         FileUtils.cleanDirectory(goPathFolder);
       } else {
-        logOptionally("The Go Path folder doesn't exist : " + goPathFolder);
+        getLog().info("The Go Path folder not found : " + goPathFolder);
       }
     } catch (IOException ex) {
       throw new MojoFailureException("Can't clean the Go Path folder", ex);
@@ -88,7 +89,7 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
-  public void afterExecution(final boolean error) throws MojoFailureException {
+  public void afterExecution(final boolean error) throws MojoFailureException, MojoExecutionException {
     if (!error) {
       final File directory;
       if (getProject().getPackaging().equals("mvn-golang")) {
@@ -108,6 +109,18 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
         getLog().info(String.format("Folder %s is not found", directory.getAbsolutePath()));
       }
 
+      final File reportFolderFile = new File(getReportsFolder());
+      if (reportFolderFile.isDirectory()) {
+        try{
+          getLog().info("Deleting report folder : "+reportFolderFile);
+          FileUtils.deleteDirectory(reportFolderFile);
+        }catch(IOException ex){
+          throw new MojoExecutionException("Can't delete report folder : "+reportFolderFile);
+        }
+      } else {
+        getLog().debug("There is no report folder : "+reportFolderFile);
+      }
+      
       if (this.cleanGoPath) {
         cleanGoPath();
       }
@@ -117,4 +130,11 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
       }
     }
   }
+
+  @Override
+  protected boolean processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
+    return false;
+  }
+  
+  
 }

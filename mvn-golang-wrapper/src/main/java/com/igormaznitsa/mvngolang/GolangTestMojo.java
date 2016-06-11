@@ -68,7 +68,8 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
       final Iterator<File> iterator = FileUtils.iterateFiles(sourceFolder, null, true);
       while(iterator.hasNext()){
         final File file = iterator.next();
-        if (file.getName().endsWith("_test.go")) {
+        final String fileName = file.getName();
+        if (fileName.endsWith("_test.go") && !fileName.startsWith("_") && !fileName.startsWith(".")) {
           final String normalizedParentPath = FilenameUtils.normalize(file.getParentFile().getAbsolutePath());
           final String pack = extractPackage(normalizedSourcePath, normalizedParentPath);
           if (!result.contains(pack)){
@@ -114,7 +115,7 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
 
   @Override
   public boolean enforcePrintOutput() {
-    return true;
+    return isVerbose();
   }
 
 }
