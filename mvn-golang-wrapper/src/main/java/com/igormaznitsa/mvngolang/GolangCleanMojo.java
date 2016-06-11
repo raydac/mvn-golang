@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -30,6 +31,22 @@ import org.codehaus.plexus.util.FileUtils;
  */
 @Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangCleanMojo extends AbstractPackageGolangMojo {
+
+  /**
+   * Clean the Go Path folder if it exists.
+   *
+   * @since 2.1.1
+   */
+  @Parameter(name = "cleanGoPath", defaultValue = "false")
+  private boolean cleanGoPath;
+
+  /**
+   * Delete whole the Store folder.
+   *
+   * @since 2.1.1
+   */
+  @Parameter(name = "deleteStoreFolder", defaultValue = "false")
+  private boolean deleteStoreFolder;
 
   @Override
   public boolean isSourceFolderRequired() {
@@ -42,6 +59,34 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
     return "clean";
   }
 
+  private void deleteStoreFolder() throws MojoFailureException {
+    try {
+      final File goStoreFolder = new File(getStoreFolder());
+      if (goStoreFolder.isDirectory()) {
+        getLog().info("Deleting the Store Folder : " + goStoreFolder);
+        FileUtils.deleteDirectory(goStoreFolder);
+      } else {
+        logOptionally("The Store Folder doesn't exist : " + goStoreFolder);
+      }
+    } catch (IOException ex) {
+      throw new MojoFailureException("Can't delete the Store Folder", ex);
+    }
+  }
+
+  private void cleanGoPath() throws MojoFailureException {
+    try {
+      final File goPathFolder = findGoPath(false);
+      if (goPathFolder.isDirectory()) {
+        getLog().info("Cleaning the Go Path folder : " + goPathFolder);
+        FileUtils.cleanDirectory(goPathFolder);
+      } else {
+        logOptionally("The Go Path folder doesn't exist : " + goPathFolder);
+      }
+    } catch (IOException ex) {
+      throw new MojoFailureException("Can't clean the Go Path folder", ex);
+    }
+  }
+
   @Override
   public void afterExecution(final boolean error) throws MojoFailureException {
     if (!error) {
@@ -51,6 +96,7 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
       } else {
         directory = new File(getProject().getBuild().getDirectory());
       }
+
       if (directory.isDirectory()) {
         try {
           getLog().info("Deleting folder : " + directory);
@@ -60,6 +106,14 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
         }
       } else {
         getLog().info(String.format("Folder %s is not found", directory.getAbsolutePath()));
+      }
+
+      if (this.cleanGoPath) {
+        cleanGoPath();
+      }
+
+      if (this.deleteStoreFolder) {
+        deleteStoreFolder();
       }
     }
   }

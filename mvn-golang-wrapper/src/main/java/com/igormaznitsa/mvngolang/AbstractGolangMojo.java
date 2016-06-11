@@ -262,12 +262,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean keepUnarchFolderIfError;
 
   /**
-   * Make tool finding the go tool in $GOPATH instead of $GOROOT.
-   */
-  @Parameter(name = "findExecInGoPath", defaultValue = "false")
-  private boolean findExecInGoPath;
-
-  /**
    * Allows to define folders which will be added into $GOPATH
    *
    * @since 2.0.0
@@ -380,6 +374,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     LOCKER.lock();
     try {
       final String theGoPath = getGoPath();
+      
+      if (theGoPath.contains(File.pathSeparator)){
+        getLog().error("Detected multiple folder items in the 'goPath' parameter but it must contain only folder!");
+        throw new IOException("Detected multiple folder items in the 'goPath'");
+      }
+      
       final File result = new File(theGoPath);
       if (ensureExist && !result.isDirectory() && !result.mkdirs()) {
         throw new IOException("Can't create folder : " + theGoPath);
