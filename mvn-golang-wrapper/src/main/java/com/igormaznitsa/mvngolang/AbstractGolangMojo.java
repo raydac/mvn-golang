@@ -110,7 +110,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    *
    * @since 2.1.1
    */
-  @Parameter(name = "outLogFile", defaultValue = "")
+  @Parameter(name = "outLogFile")
   private String outLogFile;
 
   /**
@@ -118,7 +118,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    *
    * @since 2.1.1
    */
-  @Parameter(name = "errLogFile", defaultValue = "")
+  @Parameter(name = "errLogFile")
   private String errLogFile;
 
   /**

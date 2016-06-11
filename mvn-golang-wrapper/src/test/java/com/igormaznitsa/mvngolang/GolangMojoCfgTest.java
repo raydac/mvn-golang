@@ -69,6 +69,10 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/path", customMojo.findGoPath(false).getPath());
     assertArrayEquals(new String[]{"one_pack","two_pack"},customMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},customMojo.getBuildFlags());
+    assertNull(customMojo.getErrLogFile());
+    assertNull(customMojo.getOutLogFile());
+    assertNotNull(customMojo.getReportsFolder());
+    assertFalse(customMojo.isIgnoreErrorExitCode());
   }
 
   @Test
@@ -170,6 +174,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertArrayEquals(new String[]{"one_pack","two_pack"},testMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},testMojo.getBuildFlags());
     assertArrayEquals(new String[]{"binFlag1","binFlag2"},testMojo.getTestFlags());
+    assertTrue(testMojo.isIgnoreErrorExitCode());
   }
 
   @Test

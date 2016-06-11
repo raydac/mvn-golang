@@ -18,6 +18,7 @@
           <goal>test</goal>
         </goals>
         <configuration>
+          <ignoreErrorExitCode>true</ignoreErrorExitCode>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>
           <sources>some/sources</sources>

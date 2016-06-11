@@ -13,6 +13,7 @@ __2.1.1 (under development)__
 - Added flag `ignoreErrorExitCode` to prevent failure for error exit code, it is useful in some test cases.
 - Added parameter `reportsFolder` to define folder where some reports will be placed.
 - Added parameters `outLogFile` and `errLogFile` to save execution console log as files in the report folder. By default such reports are not saved.
+- Console log for `test` will be shown in maven log only in verbose mode 
 
 __2.1.0 (28-may-2016)__
 - Output of environment variables has been moved under the `verbose` flag
