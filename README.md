@@ -73,7 +73,21 @@ On start the plug-in makes below steps:
 
 # How to work with dependencies?
 
-Unfortunately the plugin doesn't work with standard maven dependencies and to add dependencies into your project, just add special section among executions of the plugin
+The Plug-in doesn't work with standard maven dependencies andf they must be defined through task of the plugin, the example of easiest case of dependencies is
+```
+<execution>
+   <id>default-get</id>
+   <configuration>
+     <packages>
+       <package>github.com/gizak/termui</package>
+       <package>github.com/kataras/iris</package>
+     </packages>
+   </configuration>
+</execution> 
+```
+it will be executed as `bin/go get github.com/gizak/termui github.com/kataras/iris` 
+
+If you want work with specific branch then use below snipet
 ```
 <execution>
   <id>default-get</id>
@@ -88,7 +102,7 @@ Unfortunately the plugin doesn't work with standard maven dependencies and to ad
   </configuration>
 </execution>
 ```
-if you want to have several dependencies then take a look at the example below
+if you want to have several dependencies with different tag and branch then take a look at the snipet below
 ```
 <execution>
   <id>dependency1</id>
