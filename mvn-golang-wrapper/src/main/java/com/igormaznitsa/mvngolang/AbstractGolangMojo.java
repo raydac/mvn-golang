@@ -37,9 +37,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -64,6 +61,19 @@ import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 import org.apache.maven.project.MavenProject;
 import com.igormaznitsa.meta.common.utils.StrUtils;
 import static com.igormaznitsa.meta.common.utils.Assertions.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -561,28 +571,39 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private synchronized HttpClient getHttpClient() {
     if (this.httpClient == null) {
-      this.httpClient = new HttpClient();
+      this.httpClient = HttpClients.createDefault();
     }
     return this.httpClient;
   }
 
+  @ReturnsOriginal
+  @Nonnull
+  private RequestConfig.Builder processRequestConfig(@Nonnull final RequestConfig.Builder config) {
+    return config;
+  }
+  
   @Nonnull
   private String loadGoLangSdkList() throws IOException {
     final String sdksite = getSdkSite();
 
     getLog().warn("Loading list of available GoLang SDKs from " + sdksite);
-    final GetMethod get = new GetMethod(sdksite);
-
-    get.setRequestHeader("Accept", "application/xml");
+    final HttpGet get = new HttpGet(sdksite);
+    
+    final RequestConfig config = processRequestConfig(RequestConfig.custom()).build();
+    get.setConfig(config);
+    
+    get.addHeader("Accept", "application/xml");
+    
     try {
-      final int status = getHttpClient().executeMethod(get);
-      if (status == HttpStatus.SC_OK) {
-        final String content = get.getResponseBodyAsString();
+      final HttpResponse response = getHttpClient().execute(get);
+      final StatusLine statusLine = response.getStatusLine();
+      if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+        final String content = EntityUtils.toString(response.getEntity());
         getLog().info("GoLang SDK list has been loaded successfuly");
         getLog().debug(content);
         return content;
       } else {
-        throw new IOException("Can't load list of allowed SDKs, status code is " + status);
+        throw new IOException(String.format("Can't load list of SDKs from %s : %d %s",sdksite,statusLine.getStatusCode(),statusLine.getReasonPhrase()));
       }
     } finally {
       get.releaseConnection();
@@ -708,8 +729,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       logOptionally("Detected extension of archive : " + extension);
     }
 
-    final GetMethod methodGet = new GetMethod(linkForDownloading);
-    methodGet.setFollowRedirects(true);
+    final HttpGet methodGet = new HttpGet(linkForDownloading);
+    final RequestConfig config = processRequestConfig(RequestConfig.custom()).build();
+    methodGet.setConfig(config);
 
     boolean errorsDuringLoading = true;
 
@@ -717,17 +739,21 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (!archiveFile.isFile()) {
         getLog().warn("Loading SDK archive with URL : " + linkForDownloading);
 
-        final int status = getHttpClient().executeMethod(methodGet);
-        if (status != HttpStatus.SC_OK) {
-          throw new IOException("Can't load SDK archive for URL : " + linkForDownloading + " [" + status + ']');
+        final HttpResponse response = getHttpClient().execute(methodGet);
+        final StatusLine statusLine = response.getStatusLine();
+        
+        if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+          throw new IOException(String.format("Can't load SDK archive from %s : %d %s",linkForDownloading,statusLine.getStatusCode(),statusLine.getReasonPhrase()));
         }
-        final String contentType = methodGet.getResponseHeader("Content-Type").getValue();
+        
+        final HttpEntity entity = response.getEntity();
+        final Header contentType = entity.getContentType();
 
-        if (!ALLOWED_SDKARCHIVE_CONTENT_TYPE.contains(contentType)) {
-          throw new IOException("Unsupported content type : " + contentType);
+        if (!ALLOWED_SDKARCHIVE_CONTENT_TYPE.contains(contentType.getValue())) {
+          throw new IOException("Unsupported content type : " + contentType.getValue());
         }
 
-        final InputStream inStream = methodGet.getResponseBodyAsStream();
+        final InputStream inStream = entity.getContent();
         getLog().info("Downloading SDK archive into file : " + archiveFile);
         FileUtils.copyInputStreamToFile(inStream, archiveFile);
 

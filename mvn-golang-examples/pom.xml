@@ -27,7 +27,8 @@
       </activation>
       <modules>
         <module>mvn-golang-example-nes</module>
-        <module>mvn-golang-example-gomobile</module>
+        <!--Disabled because gomobile is still under construction-->
+        <!--<module>mvn-golang-example-gomobile</module>-->
       </modules>
     </profile>
   </profiles>
