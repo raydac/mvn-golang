@@ -9,6 +9,7 @@
 
 # Changelog
 __2.1.1 (under development)__
+- Added support of proxy server [#8](https://github.com/raydac/mvn-golang/issues/8), added flag `useMavenProxy` to use proxy server defined in maven or proxy can be defined through `proxySettings` section of the plugin.
 - Improved `clean` mojo, added flags to clean Go path folder defined through `goPath` parameter, and added flag to delete whole `storeFolder`
 - Added flag `ignoreErrorExitCode` to prevent failure for error exit code, it is useful in some test cases.
 - Added parameter `reportsFolder` to define folder where some reports will be placed.

@@ -18,6 +18,13 @@
           <goal>get</goal>
         </goals>
         <configuration>
+          <proxySettings>
+            <scheme>https</scheme>
+            <host>127.33.44.55</host>
+            <port>999</port>
+            <authName>some user</authName>
+            <authPassword>verysecretpassword</authPassword>
+          </proxySettings>
           <autofixGitCache>true</autofixGitCache>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>
