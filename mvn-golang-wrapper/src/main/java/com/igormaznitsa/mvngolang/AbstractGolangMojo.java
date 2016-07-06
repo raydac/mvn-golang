@@ -609,7 +609,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if (this.httpClient == null) {
       final HttpClientBuilder builder = HttpClients.custom();
       if (this.useMavenProxy) {
-        final Proxy mavenProxy = this.settings.getActiveProxy();
+        final Proxy mavenProxy = this.settings == null ? null : this.settings.getActiveProxy();
 
         if (mavenProxy != null) {
           getLog().debug(String.format("Detected defined maven proxy : %s://%s:%d",mavenProxy.getProtocol(),mavenProxy.getHost(),mavenProxy.getPort()));
@@ -653,7 +653,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private RequestConfig.Builder processRequestConfig(@Nonnull final RequestConfig.Builder config) {
     if (this.useMavenProxy) {
-      final Proxy proxy = this.settings.getActiveProxy();
+      final Proxy proxy = this.settings == null ? null : this.settings.getActiveProxy();
       if (proxy != null) {
         final HttpHost proxyHost = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
         config.setProxy(proxyHost);
