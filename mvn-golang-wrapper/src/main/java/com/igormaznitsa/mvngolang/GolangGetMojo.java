@@ -36,7 +36,7 @@ import org.zeroturnaround.exec.ProcessResult;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
-import com.igormaznitsa.mvngolang.utils.repos.Repo;
+import com.igormaznitsa.mvngolang.cvs.CVSType;
 
 /**
  * The Mojo wraps the 'get' command.
@@ -70,8 +70,21 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "tag")
   private String tag;
 
+  /**
+   * Revision to be activated.
+   *
+   * @since 2.1.1
+   */
+  @Parameter(name = "revision")
+  private String revision;
+
   public boolean isAutoFixGitCache() {
     return this.autofixGitCache;
+  }
+
+  @Nullable
+  public String getRevision() {
+    return this.revision;
   }
 
   @Nullable
@@ -176,10 +189,10 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
     for (final String s : packages) {
       final File packageFolder = makePathToPackage(goPath, s);
-      final Repo repo = Repo.investigateFolder(packageFolder);
-      if (repo == Repo.GIT) {
+      final CVSType repo = CVSType.investigateFolder(packageFolder);
+      if (repo == CVSType.GIT) {
         getLog().warn(String.format("Executing 'git rm -r --cached .' in %s", packageFolder.getAbsolutePath()));
-        final int result = repo.execute(packageFolder, getLog(), "rm", "-r", "--cached", ".");
+        final int result = repo.getProcessor().execute(getLog(), packageFolder, "rm", "-r", "--cached", ".");
         if (result != 0) {
           return false;
         }
@@ -194,7 +207,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     return fixed != 0;
   }
 
-  private boolean changeRepoBranchAndTag(@Nonnull final File goPath, @Nullable final String branch, @Nullable final String tag) {
+  private boolean processCVS(@Nonnull final File goPath) {
     final String[] packages = this.getPackages();
     if (packages != null && packages.length > 0) {
       for (final String p : packages) {
@@ -203,12 +216,27 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
           getLog().error(String.format("Can't find package '%s' at '%s'", p, packFolder.getAbsolutePath()));
           return false;
         } else {
-          final Repo repo = Repo.investigateFolder(packFolder);
-          
-          getLog().info(String.format("Switch branch and tag : %s => [branch = %s , tag = %s]", p, GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
-          
-          if (!repo.changeBranchAndTag(packFolder, getLog(), branch, tag)) {
-            return false;
+          final CVSType repo = CVSType.investigateFolder(packFolder);
+
+          if (this.branch != null) {
+            getLog().info(String.format("Updating %s to branch %s", p, this.branch));
+            if (!repo.getProcessor().upToBranch(getLog(), packFolder, this.branch)) {
+              return false;
+            }
+          }
+
+          if (this.tag != null) {
+            getLog().info(String.format("Updating %s to tag %s", p, this.tag));
+            if (!repo.getProcessor().upToTag(getLog(), packFolder, this.tag)) {
+              return false;
+            }
+          }
+
+          if (this.revision != null) {
+            getLog().info(String.format("Updating %s to revision %s", p, this.revision));
+            if (!repo.getProcessor().upToRevision(getLog(), packFolder, this.tag)) {
+              return false;
+            }
           }
         }
       }
@@ -220,7 +248,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   public void afterExecution(final boolean error) throws MojoFailureException {
     if (!error) {
       if (this.branch != null || this.tag != null) {
-        getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch,"..."), GetUtils.ensureNonNull(this.tag,"...")));
+        getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
 
         final File goPath;
         try {
@@ -229,7 +257,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
           throw new MojoFailureException("Can't find $GOPATH", ex);
         }
 
-        if (!changeRepoBranchAndTag(goPath, this.branch, this.tag)) {
+        if (!processCVS(goPath)) {
           throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
         }
       }
