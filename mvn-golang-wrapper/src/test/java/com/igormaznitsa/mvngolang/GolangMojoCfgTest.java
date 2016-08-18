@@ -63,6 +63,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertNull(customMojo.getProxySettings());
     assertNull(customMojo.getTargetArch());
     assertNull(customMojo.getTargetOS());
+    assertNull(customMojo.getTargetArm());
     assertFalse(customMojo.isUseEnvVars());
     assertEquals("someCustomCommand",customMojo.getGoCommand());
     assertFalse(customMojo.isVerbose());
@@ -85,6 +86,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertNull(cleanMojo.getProxySettings());
     assertNull(cleanMojo.getTargetArch());
     assertNull(cleanMojo.getTargetOS());
+    assertNull(cleanMojo.getTargetArm());
     assertFalse(cleanMojo.isUseEnvVars());
     assertEquals("clean",cleanMojo.getGoCommand());
     assertFalse(cleanMojo.isVerbose());
@@ -102,6 +104,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(fixMojo.isUseMavenProxy());
     assertNull(fixMojo.getProxySettings());
     assertFalse(fixMojo.isUseEnvVars());
+    assertNull(fixMojo.getTargetArm());
     assertEquals("fix",fixMojo.getGoCommand());
     assertFalse(fixMojo.isVerbose());
     assertTrue(fixMojo.isHideBanner());
@@ -118,6 +121,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(fmtMojo.isUseMavenProxy());
     assertNull(fmtMojo.getProxySettings());
     assertFalse(fmtMojo.isUseEnvVars());
+    assertNull(fmtMojo.getTargetArm());
     assertEquals("fmt",fmtMojo.getGoCommand());
     assertFalse(fmtMojo.isVerbose());
     assertTrue(fmtMojo.isHideBanner());
@@ -134,6 +138,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(genMojo.isUseMavenProxy());
     assertNull(genMojo.getProxySettings());
     assertFalse(genMojo.isUseEnvVars());
+    assertNull(genMojo.getTargetArm());
     assertEquals("generate",genMojo.getGoCommand());
     assertFalse(genMojo.isVerbose());
     assertTrue(genMojo.isHideBanner());
@@ -150,6 +155,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(instMojo.isUseMavenProxy());
     assertNull(instMojo.getProxySettings());    
     assertFalse(instMojo.isUseEnvVars());
+    assertNull(instMojo.getTargetArm());
     assertEquals("install",instMojo.getGoCommand());
     assertFalse(instMojo.isVerbose());
     assertTrue(instMojo.isHideBanner());
@@ -166,6 +172,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(vetMojo.isUseMavenProxy());
     assertNull(vetMojo.getProxySettings());
     assertFalse(vetMojo.isUseEnvVars());
+    assertNull(vetMojo.getTargetArm());
     assertEquals("vet",vetMojo.getGoCommand());
     assertFalse(vetMojo.isVerbose());
     assertTrue(vetMojo.isHideBanner());
@@ -182,6 +189,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(testMojo.isUseMavenProxy());
     assertNull(testMojo.getProxySettings());
     assertFalse(testMojo.isUseEnvVars());
+    assertNull(testMojo.getTargetArm());
     assertEquals("test",testMojo.getGoCommand());
     assertFalse(testMojo.isVerbose());
     assertTrue(testMojo.isHideBanner());
@@ -200,6 +208,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(toolMojo.isUseMavenProxy());
     assertNull(toolMojo.getProxySettings());
     assertFalse(toolMojo.isUseEnvVars());
+    assertNull(toolMojo.getTargetArm());
     assertEquals("tool",toolMojo.getGoCommand());
     assertFalse(toolMojo.isVerbose());
     assertTrue(toolMojo.isHideBanner());
@@ -228,6 +237,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(getMojo.isUseEnvVars());
     assertEquals("get",getMojo.getGoCommand());
     assertNull(getMojo.getUseGoTool());
+    assertNull(getMojo.getTargetArm());
     assertTrue(getMojo.isAutoFixGitCache());
     assertFalse(getMojo.isVerbose());
     assertTrue(getMojo.isHideBanner());
@@ -248,6 +258,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertNotNull(buildMojo);
     assertEquals("somearch",buildMojo.getTargetArch());
     assertEquals("someos",buildMojo.getTargetOS());
+    assertEquals("5566677",buildMojo.getTargetArm());
     assertFalse(buildMojo.isUseEnvVars());
     assertEquals("build", buildMojo.getGoCommand());
     assertEquals("someGo.bat",buildMojo.getUseGoTool());

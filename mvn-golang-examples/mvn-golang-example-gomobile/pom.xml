@@ -56,6 +56,9 @@
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${main-project-version}</version>
         <extensions>true</extensions>
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+        </configuration>
         <executions>
           <execution>
             <id>default-get</id>
@@ -94,16 +97,10 @@
               <buildFlags>
                 <flag>-target=android</flag>
               </buildFlags>
-              <env>
-                <GOARM>7</GOARM>
-              </env>
               <resultName>example.apk</resultName>
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <goVersion>${go.sdk.version}</goVersion>
-        </configuration>
       </plugin>
     </plugins>
   </build>

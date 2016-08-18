@@ -183,6 +183,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String goPath;
 
   /**
+   * Folder to be used as $GOARM. NB! By default it has value "${user.home}${file.separator}.mvnGoLang${file.separator}.go_arm"
+   * @since 2.1.1
+   */
+  @Parameter(name = "targetArm")
+  private String targetArm;
+
+  /**
    * Folder to be used as $GOBIN. NB! By default it has value "${project.build.directory}"
    */
   @Parameter(defaultValue = "${project.build.directory}", name = "goBin")
@@ -529,6 +536,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (foundInEnvironment != null && isUseEnvVars()) {
       result = foundInEnvironment;
+    }
+    return result;
+  }
+
+  @Nullable
+  public String getTargetArm() {
+    String result = this.targetArm;
+    if (isSafeEmpty(result) && isUseEnvVars()) {
+      result = System.getenv("GOARM");
     }
     return result;
   }
@@ -1253,11 +1269,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final String trgtOs = this.getTargetOS();
     final String trgtArch = this.getTargetArch();
+    final String trgtArm = this.getTargetArm();
 
     if (trgtOs != null) {
       addEnvVar(result, "GOOS", trgtOs);
     }
 
+    if (trgtArm != null){
+      addEnvVar(result, "GOARM", trgtArm);
+    }
+    
     if (trgtArch != null) {
       addEnvVar(result, "GOARCH", trgtArch);
     }

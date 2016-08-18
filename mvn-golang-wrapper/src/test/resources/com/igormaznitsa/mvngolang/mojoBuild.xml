@@ -21,6 +21,7 @@
           <useMavenProxy>true</useMavenProxy>
           <targetOs>someos</targetOs>
           <targetArch>somearch</targetArch>
+          <targetArm>5566677</targetArm>
           <useGoTool>someGo.bat</useGoTool>
           <resultFolder>target/place</resultFolder>
           <resultName>targetName</resultName>
