@@ -219,21 +219,21 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
           final CVSType repo = CVSType.investigateFolder(packFolder);
 
           if (this.branch != null) {
-            getLog().info(String.format("Updating %s to branch %s", p, this.branch));
+            getLog().info(String.format("Switch '%s' to branch '%s'", p, this.branch));
             if (!repo.getProcessor().upToBranch(getLog(), packFolder, this.branch)) {
               return false;
             }
           }
 
           if (this.tag != null) {
-            getLog().info(String.format("Updating %s to tag %s", p, this.tag));
+            getLog().info(String.format("Switch '%s' to tag '%s'", p, this.tag));
             if (!repo.getProcessor().upToTag(getLog(), packFolder, this.tag)) {
               return false;
             }
           }
 
           if (this.revision != null) {
-            getLog().info(String.format("Updating %s to revision %s", p, this.revision));
+            getLog().info(String.format("Switch '%s' to revision '%s'", p, this.revision));
             if (!repo.getProcessor().upToRevision(getLog(), packFolder, this.tag)) {
               return false;
             }
