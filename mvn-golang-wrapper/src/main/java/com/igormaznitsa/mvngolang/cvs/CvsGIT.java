@@ -32,7 +32,7 @@ class CvsGIT extends AbstractRepo {
 
   @Override
   public boolean upToBranch(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
-    return checkResult(logger, execute(logger, cvsFolder, "checkout","-b",branchId));
+    return checkResult(logger, execute(logger, cvsFolder, "checkout","-B",branchId));
   }
 
   @Override
