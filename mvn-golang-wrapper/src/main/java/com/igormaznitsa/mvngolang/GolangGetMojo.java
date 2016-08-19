@@ -78,6 +78,14 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "revision")
   private String revision;
 
+  /**
+   * Custom executable file to be executed for branch, tag and revision operations.
+   *
+   * @since 2.1.1
+   */
+  @Parameter(name = "cvsExe")
+  private String cvsExe;
+
   public boolean isAutoFixGitCache() {
     return this.autofixGitCache;
   }
@@ -95,6 +103,11 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Nullable
   public String getTag() {
     return this.tag;
+  }
+
+  @Nullable
+  public String getCvsExe() {
+    return this.cvsExe;
   }
 
   @Override
@@ -192,7 +205,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
       final CVSType repo = CVSType.investigateFolder(packageFolder);
       if (repo == CVSType.GIT) {
         getLog().warn(String.format("Executing 'git rm -r --cached .' in %s", packageFolder.getAbsolutePath()));
-        final int result = repo.getProcessor().execute(getLog(), packageFolder, "rm", "-r", "--cached", ".");
+        final int result = repo.getProcessor().execute(getCvsExe(), getLog(), packageFolder, "rm", "-r", "--cached", ".");
         if (result != 0) {
           return false;
         }
@@ -220,21 +233,21 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
           if (this.branch != null) {
             getLog().info(String.format("Switch '%s' to branch '%s'", p, this.branch));
-            if (!repo.getProcessor().upToBranch(getLog(), packFolder, this.branch)) {
+            if (!repo.getProcessor().upToBranch(getLog(), getCvsExe(), packFolder, this.branch)) {
               return false;
             }
           }
 
           if (this.tag != null) {
             getLog().info(String.format("Switch '%s' to tag '%s'", p, this.tag));
-            if (!repo.getProcessor().upToTag(getLog(), packFolder, this.tag)) {
+            if (!repo.getProcessor().upToTag(getLog(), getCvsExe(), packFolder, this.tag)) {
               return false;
             }
           }
 
           if (this.revision != null) {
             getLog().info(String.format("Switch '%s' to revision '%s'", p, this.revision));
-            if (!repo.getProcessor().upToRevision(getLog(), packFolder, this.tag)) {
+            if (!repo.getProcessor().upToRevision(getLog(), getCvsExe(), packFolder, this.tag)) {
               return false;
             }
           }
