@@ -17,6 +17,7 @@ package com.igormaznitsa.mvngolang.cvs;
 
 import java.io.File;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.maven.plugin.logging.Log;
 
 class CvsGIT extends AbstractRepo {
@@ -31,18 +32,18 @@ class CvsGIT extends AbstractRepo {
   }
 
   @Override
-  public boolean upToBranch(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
-    return checkResult(logger, execute(logger, cvsFolder, "checkout", branchId));
+  public boolean upToBranch(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
+    return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", branchId));
   }
 
   @Override
-  public boolean upToTag(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
-    return checkResult(logger, execute(logger, cvsFolder, "checkout", "tags/"+tagId));
+  public boolean upToTag(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
+    return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", "tags/"+tagId));
   }
 
   @Override
-  public boolean upToRevision(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
-    return checkResult(logger, execute(logger, cvsFolder, "checkout", revisionId));
+  public boolean upToRevision(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
+    return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", revisionId));
   }
   
 }

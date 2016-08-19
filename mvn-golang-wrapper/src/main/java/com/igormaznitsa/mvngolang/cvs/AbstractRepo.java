@@ -21,11 +21,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.meta.common.utils.GetUtils;
 
 public abstract class AbstractRepo {
   
@@ -40,9 +42,9 @@ public abstract class AbstractRepo {
     return this.command;
   }
   
-  public int execute(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull @MustNotContainNull final String... args) {
+  public int execute(@Nullable String customCommand, @Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull @MustNotContainNull final String... args) {
     final List<String> cli = new ArrayList<String>();
-    cli.add(this.command);
+    cli.add(GetUtils.findFirstNonNull(customCommand,this.command));
     for (final String s : args) {
       cli.add(s);
     }
@@ -84,7 +86,7 @@ public abstract class AbstractRepo {
   }
   
   public abstract boolean doesContainCVS(@Nonnull File folder);
-  public abstract boolean upToBranch(@Nonnull final Log logger, @Nonnull File cvsFolder, @Nonnull String branchId);
-  public abstract boolean upToTag(@Nonnull final Log logger, @Nonnull File cvsFolder, @Nonnull String tagId);
-  public abstract boolean upToRevision(@Nonnull final Log logger, @Nonnull File cvsFolder, @Nonnull String revisionId);
+  public abstract boolean upToBranch(@Nonnull Log logger, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String branchId);
+  public abstract boolean upToTag(@Nonnull Log logger, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String tagId);
+  public abstract boolean upToRevision(@Nonnull Log logger, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String revisionId);
 }

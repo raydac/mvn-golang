@@ -17,6 +17,7 @@ package com.igormaznitsa.mvngolang.cvs;
 
 import java.io.File;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.maven.plugin.logging.Log;
 
 class CvsNone extends AbstractRepo {
@@ -31,17 +32,17 @@ class CvsNone extends AbstractRepo {
   }
 
   @Override
-  public boolean upToBranch(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
+  public boolean upToBranch(@Nonnull  final Log logger, @Nullable  final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
     return false;
   }
 
   @Override
-  public boolean upToTag(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
+  public boolean upToTag(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
     return false;
   }
 
   @Override
-  public boolean upToRevision(@Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
+  public boolean upToRevision(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
     return false;
   }
   
