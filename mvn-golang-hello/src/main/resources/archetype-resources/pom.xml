@@ -28,7 +28,7 @@
         <version>${gowrapper}</version>
         <extensions>true</extensions>
         <configuration>
-          <goVersion>1.6.2</goVersion>
+          <goVersion>1.7</goVersion>
           <verbose>true</verbose>
         </configuration>
         <executions>

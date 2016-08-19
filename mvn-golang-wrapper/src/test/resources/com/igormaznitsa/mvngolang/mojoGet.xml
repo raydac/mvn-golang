@@ -25,6 +25,7 @@
             <authName>some user</authName>
             <authPassword>verysecretpassword</authPassword>
           </proxySettings>
+          <cvsExe>some/custom/exe.exe</cvsExe>
           <autofixGitCache>true</autofixGitCache>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>

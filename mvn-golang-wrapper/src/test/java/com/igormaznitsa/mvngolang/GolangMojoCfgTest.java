@@ -233,6 +233,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("some user",proxy.authName);
     assertEquals("verysecretpassword",proxy.authPassword);
     
+    assertEquals("some/custom/exe.exe",getMojo.getCvsExe());
     assertFalse(getMojo.isUseMavenProxy());
     assertFalse(getMojo.isUseEnvVars());
     assertEquals("get",getMojo.getGoCommand());
