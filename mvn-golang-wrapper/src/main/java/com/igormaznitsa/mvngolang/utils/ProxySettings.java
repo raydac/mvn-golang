@@ -16,42 +16,64 @@
 package com.igormaznitsa.mvngolang.utils;
 
 import javax.annotation.Nonnull;
+import org.apache.maven.settings.Proxy;
 
 /**
  * Class container for proxy server parameter.
  *
- * @since 6.1.1
+ * @since 2.1.1
  */
 public class ProxySettings {
 
   /**
-   * Host.
+   * The proxy host.
    */
   public String host = "127.0.0.1";
   
   /**
-   * Scheme.
+   * The proxy protocol.
    */
-  public String scheme = "http";
+  public String protocol = "http";
   
   /**
-   * Port.
+   * The proxy port.
    */
   public int port = 80;
   
   /**
-   * Authentication name.
+   * The proxy user.
    */
-  public String authName;
+  public String username;
   
   /**
-   * Authentication password.
+   * The proxy password.
    */
-  public String authPassword = "";
+  public String password = "";
 
+  /**
+   * The list of non-proxied hosts (delimited by |).
+   */
+  public String nonProxyHosts;
+  
+  public ProxySettings(){
+  }
+
+  public ProxySettings(@Nonnull final Proxy mavenProxy){
+    this.protocol = mavenProxy.getProtocol();
+    this.host = mavenProxy.getHost();
+    this.port = mavenProxy.getPort();
+    this.username = mavenProxy.getUsername();
+    this.password = mavenProxy.getPassword();
+    this.nonProxyHosts = mavenProxy.getNonProxyHosts();
+  }
+
+  public boolean hasCredentials(){
+    return this.username!=null && this.password!=null;
+  }
+  
   @Override
   @Nonnull
   public String toString() {
-    return this.scheme + "://" + this.host + ":" + this.port;
+    return this.protocol + "://" + this.host + ":" + this.port;
   }
 }

@@ -37,6 +37,7 @@ import org.zeroturnaround.exec.ProcessResult;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.cvs.CVSType;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 /**
  * The Mojo wraps the 'get' command.
@@ -220,7 +221,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     return fixed != 0;
   }
 
-  private boolean processCVS(@Nonnull final File goPath) {
+  private boolean processCVS(@Nullable final ProxySettings proxySettings, @Nonnull final File goPath) {
     final String[] packages = this.getPackages();
     if (packages != null && packages.length > 0) {
       for (final String p : packages) {
@@ -233,21 +234,21 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
           if (this.branch != null) {
             getLog().info(String.format("Switch '%s' to branch '%s'", p, this.branch));
-            if (!repo.getProcessor().upToBranch(getLog(), getCvsExe(), packFolder, this.branch)) {
+            if (!repo.getProcessor().upToBranch(getLog(), proxySettings, getCvsExe(), packFolder, this.branch)) {
               return false;
             }
           }
 
           if (this.tag != null) {
             getLog().info(String.format("Switch '%s' to tag '%s'", p, this.tag));
-            if (!repo.getProcessor().upToTag(getLog(), getCvsExe(), packFolder, this.tag)) {
+            if (!repo.getProcessor().upToTag(getLog(), proxySettings, getCvsExe(), packFolder, this.tag)) {
               return false;
             }
           }
 
           if (this.revision != null) {
             getLog().info(String.format("Switch '%s' to revision '%s'", p, this.revision));
-            if (!repo.getProcessor().upToRevision(getLog(), getCvsExe(), packFolder, this.tag)) {
+            if (!repo.getProcessor().upToRevision(getLog(), proxySettings, getCvsExe(), packFolder, this.tag)) {
               return false;
             }
           }
@@ -258,7 +259,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
-  public void afterExecution(final boolean error) throws MojoFailureException {
+  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException {
     if (!error) {
       if (this.branch != null || this.tag != null) {
         getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
@@ -270,7 +271,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
           throw new MojoFailureException("Can't find $GOPATH", ex);
         }
 
-        if (!processCVS(goPath)) {
+        if (!processCVS(proxySettings, goPath)) {
           throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
         }
       }

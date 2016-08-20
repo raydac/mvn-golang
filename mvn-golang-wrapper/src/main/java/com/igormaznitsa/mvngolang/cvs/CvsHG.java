@@ -19,6 +19,7 @@ import java.io.File;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.maven.plugin.logging.Log;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 class CvsHG extends AbstractRepo {
 
@@ -32,17 +33,17 @@ class CvsHG extends AbstractRepo {
   }
 
   @Override
-  public boolean upToBranch(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
+  public boolean upToBranch(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
     return checkResult(logger, execute(customCommand, logger, cvsFolder, "update", "--clean", branchId));
   }
 
   @Override
-  public boolean upToTag(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
+  public boolean upToTag(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
     return checkResult(logger, execute(customCommand, logger, cvsFolder, "update", "--clean", tagId));
   }
 
   @Override
-  public boolean upToRevision(@Nonnull final Log logger, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
+  public boolean upToRevision(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
     return checkResult(logger, execute(customCommand, logger, cvsFolder, "update", "--clean", "--rev",revisionId));
   }
   

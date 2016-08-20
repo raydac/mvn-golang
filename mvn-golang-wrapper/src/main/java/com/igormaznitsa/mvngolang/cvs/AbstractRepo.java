@@ -28,6 +28,7 @@ import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 public abstract class AbstractRepo {
   
@@ -86,7 +87,7 @@ public abstract class AbstractRepo {
   }
   
   public abstract boolean doesContainCVS(@Nonnull File folder);
-  public abstract boolean upToBranch(@Nonnull Log logger, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String branchId);
-  public abstract boolean upToTag(@Nonnull Log logger, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String tagId);
-  public abstract boolean upToRevision(@Nonnull Log logger, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String revisionId);
+  public abstract boolean upToBranch(@Nonnull Log logger, @Nullable final ProxySettings proxy, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String branchId);
+  public abstract boolean upToTag(@Nonnull Log logger, @Nullable final ProxySettings proxy, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String tagId);
+  public abstract boolean upToRevision(@Nonnull Log logger, @Nullable final ProxySettings proxy, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String revisionId);
 }

@@ -28,6 +28,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import javax.annotation.Nullable;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 /**
  * The Mojo wraps the 'build' command.
@@ -70,7 +72,7 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
-  public void beforeExecution() throws MojoFailureException {
+  public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException {
     final File folder = new File(getResultFolder());
     if (!folder.isDirectory() && !folder.mkdirs()) {
       throw new MojoFailureException("Can't create folder : "+folder);
@@ -78,7 +80,7 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
-  public void afterExecution(final boolean error) throws MojoFailureException {
+  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException {
     if (!error){
       final File resultFile = getResultFile();
       // check that it exists

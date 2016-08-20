@@ -63,7 +63,9 @@ import com.igormaznitsa.meta.common.utils.StrUtils;
 import static com.igormaznitsa.meta.common.utils.Assertions.*;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -73,15 +75,20 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
 import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
+import com.igormaznitsa.mvngolang.utils.WildCardMatcher;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -120,12 +127,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   /**
    * Parameters of proxy server to be used to estabilish connection to SDK server.
-   * 
-   * @since 6.1.1
+   *
+   * @since 2.1.1
    */
-  @Parameter(name = "proxySettings")
-  private ProxySettings proxySettings;
-  
+  @Parameter(name = "proxy")
+  private ProxySettings proxy;
+
   /**
    * Ignore error exit code returned by GoLang tool and don't generate any failure.
    *
@@ -184,6 +191,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   /**
    * Folder to be used as $GOARM. NB! By default it has value "${user.home}${file.separator}.mvnGoLang${file.separator}.go_arm"
+   *
    * @since 2.1.1
    */
   @Parameter(name = "targetArm")
@@ -567,15 +575,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return result;
   }
 
-  public boolean isUseMavenProxy(){
+  public boolean isUseMavenProxy() {
     return this.useMavenProxy;
   }
-  
+
   @Nullable
-  public ProxySettings getProxySettings(){
-    return this.proxySettings;
+  public ProxySettings getProxy() {
+    return this.proxy;
   }
-  
+
   @Nullable
   public String getOSXVersion() {
     return this.osxVersion;
@@ -621,82 +629,91 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private CloseableHttpClient httpClient;
 
   @Nonnull
-  private synchronized HttpClient getHttpClient() {
+  private synchronized HttpClient getHttpClient(@Nullable final ProxySettings proxy) {
     if (this.httpClient == null) {
       final HttpClientBuilder builder = HttpClients.custom();
-      if (this.useMavenProxy) {
-        final Proxy mavenProxy = this.settings == null ? null : this.settings.getActiveProxy();
 
-        if (mavenProxy != null) {
-          getLog().debug(String.format("Detected defined maven proxy : %s://%s:%d",mavenProxy.getProtocol(),mavenProxy.getHost(),mavenProxy.getPort()));
-
-          final String userName = mavenProxy.getUsername();
-          final String userPassword = mavenProxy.getPassword();
-          if (userName != null && userName.isEmpty()) {
-            getLog().debug("Detected name and password for maven proxy, creating credentials provider");
-
-            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(new AuthScope(mavenProxy.getHost(), mavenProxy.getPort()), new UsernamePasswordCredentials(userName, userPassword));
-            
-            builder.setDefaultCredentialsProvider(credentialsProvider);
-          }
-        } else {
-          getLog().warn("Maven proxy server is not defined!");
+      if (proxy != null) {
+        if (proxy.hasCredentials()) {
+          final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+          credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port), new UsernamePasswordCredentials(proxy.username, proxy.password));
+          builder.setDefaultCredentialsProvider(credentialsProvider);
+          getLog().debug(String.format("Credentials provider has been created for proxy (username : %s): %s", proxy.username, proxy.toString()));
         }
-      } else {
-        if (this.proxySettings!=null){
-          final String userName = this.proxySettings.authName;
-          final String userPassword = this.proxySettings.authPassword;
-          if (userName != null && userName.isEmpty()) {
-            getLog().debug("Detected name and password for proxy, creating credentials provider");
-
-            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(new AuthScope(this.proxySettings.host, this.proxySettings.port), new UsernamePasswordCredentials(userName, userPassword));
-
-            builder.setDefaultCredentialsProvider(credentialsProvider);
+        
+        final String [] ignoreForAddresses = proxy.nonProxyHosts == null ? new String[0] : proxy.nonProxyHosts.split("\\|");
+        if (ignoreForAddresses.length>0){
+          final WildCardMatcher [] matchers = new WildCardMatcher[ignoreForAddresses.length];
+          for(int i=0;i<ignoreForAddresses.length;i++){
+            matchers[i] = new WildCardMatcher(ignoreForAddresses[i]);
           }
+          
+          final HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(new HttpHost(proxy.host, proxy.port, proxy.protocol)){
+            @Override
+            @Nonnull
+            public HttpRoute determineRoute(@Nonnull final HttpHost host, @Nonnull final HttpRequest request, @Nonnull final HttpContext context) throws HttpException {
+              final String hostName = host.getHostName();
+              for (final WildCardMatcher m : matchers) {
+                if (m.match(hostName)) {
+                  getLog().debug("Ignoring proxy for host : "+hostName);
+                  return new HttpRoute(host);
+                }
+              }
+              return super.determineRoute(host, request, context);
+            }
+          };
+          builder.setRoutePlanner(routePlanner);
+          getLog().debug("Route planner tuned to ignore proxy for addresses : "+Arrays.toString(matchers));
         }
       }
-      
+
       builder.setUserAgent("mvn-golang-wrapper-agent/1.0");
-      
       this.httpClient = builder.build();
+      
     }
     return this.httpClient;
   }
 
+  @Nullable
+  private ProxySettings extractProxySettings() {
+    final ProxySettings result;
+    if (this.isUseMavenProxy()) {
+      final Proxy activeMavenProxy = this.settings == null ? null : this.settings.getActiveProxy();
+      result = activeMavenProxy == null ? null : new ProxySettings(activeMavenProxy);
+      getLog().debug("Detected maven proxy : " + result);
+    } else {
+      result = this.proxy;
+      if (result != null) {
+        getLog().debug("Defined proxy : " + result);
+      }
+    }
+    return result;
+  }
+
   @ReturnsOriginal
   @Nonnull
-  private RequestConfig.Builder processRequestConfig(@Nonnull final RequestConfig.Builder config) {
-    if (this.useMavenProxy) {
-      final Proxy proxy = this.settings == null ? null : this.settings.getActiveProxy();
-      if (proxy != null) {
-        final HttpHost proxyHost = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
-        config.setProxy(proxyHost);
-        getLog().debug(String.format("Proxy provided by Maven has been defined to make connection : %s://%s:%d", proxy.getProtocol(), proxy.getHost(), proxy.getPort()));
-      }
-    } else if (this.proxySettings!=null){
-      final HttpHost proxyHost = new HttpHost(this.proxySettings.host, this.proxySettings.port, this.proxySettings.scheme);
+  private RequestConfig.Builder processRequestConfig(@Nullable final ProxySettings proxySettings, @Nonnull final RequestConfig.Builder config) {
+    if (proxySettings != null) {
+      final HttpHost proxyHost = new HttpHost(proxySettings.host, proxySettings.port, proxySettings.protocol);
       config.setProxy(proxyHost);
-      getLog().debug("Custom proxy has been defined for connections : "+this.proxySettings);
     }
     return config;
   }
 
   @Nonnull
-  private String loadGoLangSdkList() throws IOException {
+  private String loadGoLangSdkList(@Nullable final ProxySettings proxySettings) throws IOException {
     final String sdksite = getSdkSite();
 
     getLog().warn("Loading list of available GoLang SDKs from " + sdksite);
     final HttpGet get = new HttpGet(sdksite);
 
-    final RequestConfig config = processRequestConfig(RequestConfig.custom()).build();
+    final RequestConfig config = processRequestConfig(proxySettings, RequestConfig.custom()).build();
     get.setConfig(config);
 
     get.addHeader("Accept", "application/xml");
 
     try {
-      final HttpResponse response = getHttpClient().execute(get);
+      final HttpResponse response = getHttpClient(proxySettings).execute(get);
       final StatusLine statusLine = response.getStatusLine();
       if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
         final String content = EntityUtils.toString(response.getEntity());
@@ -809,7 +826,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private File loadSDKAndUnpackIntoCache(@Nonnull final File cacheFolder, @Nonnull final String baseSdkName) throws IOException {
+  private File loadSDKAndUnpackIntoCache(@Nullable final ProxySettings proxySettings, @Nonnull final File cacheFolder, @Nonnull final String baseSdkName) throws IOException {
     final File sdkFolder = new File(cacheFolder, baseSdkName);
 
     final String predefinedLink = getSdkDownloadUrl();
@@ -819,7 +836,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (isSafeEmpty(predefinedLink)) {
       logOptionally("There is not any predefined SDK URL");
-      final String sdkFileName = findSdkArchiveFileName(baseSdkName);
+      final String sdkFileName = findSdkArchiveFileName(proxySettings, baseSdkName);
       archiveFile = new File(cacheFolder, sdkFileName);
       linkForDownloading = getSdkSite() + sdkFileName;
     } else {
@@ -831,7 +848,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     final HttpGet methodGet = new HttpGet(linkForDownloading);
-    final RequestConfig config = processRequestConfig(RequestConfig.custom()).build();
+    final RequestConfig config = processRequestConfig(proxySettings, RequestConfig.custom()).build();
     methodGet.setConfig(config);
 
     boolean errorsDuringLoading = true;
@@ -840,7 +857,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (!archiveFile.isFile()) {
         getLog().warn("Loading SDK archive with URL : " + linkForDownloading);
 
-        final HttpResponse response = getHttpClient().execute(methodGet);
+        final HttpResponse response = getHttpClient(proxySettings).execute(methodGet);
         final StatusLine statusLine = response.getStatusLine();
 
         if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
@@ -921,10 +938,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private String findSdkArchiveFileName(@Nonnull final String sdkBaseName) throws IOException {
+  private String findSdkArchiveFileName(@Nullable final ProxySettings proxySettings, @Nonnull final String sdkBaseName) throws IOException {
     String result = getSdkArchiveName();
     if (isSafeEmpty(result)) {
-      final Document parsed = convertSdkListToDocument(loadGoLangSdkList());
+      final Document parsed = convertSdkListToDocument(loadGoLangSdkList(proxySettings));
       result = extractSDKFileName(parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
     } else {
       getLog().info("SDK archive name is predefined : " + result);
@@ -946,7 +963,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private File findGoRoot() throws IOException, MojoFailureException {
+  private File findGoRoot(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException {
     final File result;
     LOCKER.lock();
     try {
@@ -981,7 +998,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           if (this.disableSdkLoad) {
             throw new MojoFailureException("Can't find " + sdkBaseName + " in the cache but loading is directly disabled");
           }
-          result = loadSDKAndUnpackIntoCache(cacheFolder, sdkBaseName);
+          result = loadSDKAndUnpackIntoCache(proxySettings, cacheFolder, sdkBaseName);
         }
       } else {
         logOptionally("Detected predefined SDK root folder : " + predefinedGoRoot);
@@ -1031,14 +1048,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     printEcho();
 
-    beforeExecution();
+    final ProxySettings proxySettings = extractProxySettings();
+    beforeExecution(proxySettings);
 
     boolean error = false;
     try {
       int iterations = 0;
 
       while (true) {
-        final ProcessExecutor executor = prepareExecutor();
+        final ProcessExecutor executor = prepareExecutor(proxySettings);
         if (executor == null) {
           logOptionally("The Mojo should not be executed");
           break;
@@ -1073,15 +1091,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     } catch (InterruptedException ex) {
       error = true;
     } finally {
-      afterExecution(error);
+      afterExecution(null, error);
     }
   }
 
-  public void beforeExecution() throws MojoFailureException, MojoExecutionException {
+  public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
 
   }
 
-  public void afterExecution(final boolean error) throws MojoFailureException, MojoExecutionException {
+  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
 
   }
 
@@ -1186,11 +1204,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nullable
-  private ProcessExecutor prepareExecutor() throws IOException, MojoFailureException {
+  private ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException {
     initConsoleBuffers();
 
     final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
-    final File detectedRoot = findGoRoot();
+    final File detectedRoot = findGoRoot(proxySettings);
     final String gobin = getGoBin();
     final File gopath = findGoPath(true);
 
@@ -1275,10 +1293,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, "GOOS", trgtOs);
     }
 
-    if (trgtArm != null){
+    if (trgtArm != null) {
       addEnvVar(result, "GOARM", trgtArm);
     }
-    
+
     if (trgtArch != null) {
       addEnvVar(result, "GOARCH", trgtArch);
     }

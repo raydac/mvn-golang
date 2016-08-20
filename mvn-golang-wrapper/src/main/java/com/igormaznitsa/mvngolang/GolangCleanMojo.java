@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nonnull;
 
+import javax.annotation.Nullable;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -26,6 +27,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.plexus.util.FileUtils;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 /**
  * The Mojo wraps the 'clean' command.
@@ -89,7 +91,7 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
-  public void afterExecution(final boolean error) throws MojoFailureException, MojoExecutionException {
+  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
     if (!error) {
       final File directory;
       if (getProject().getPackaging().equals("mvn-golang")) {

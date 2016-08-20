@@ -18,13 +18,14 @@
           <goal>get</goal>
         </goals>
         <configuration>
-          <proxySettings>
-            <scheme>https</scheme>
+          <proxy>
+            <protocol>https</protocol>
             <host>127.33.44.55</host>
             <port>999</port>
-            <authName>some user</authName>
-            <authPassword>verysecretpassword</authPassword>
-          </proxySettings>
+            <username>some user</username>
+            <password>verysecretpassword</password>
+            <nonProxyHosts>127.0.0.1|127.0.0.2|127.0.0.3</nonProxyHosts>
+          </proxy>
           <cvsExe>some/custom/exe.exe</cvsExe>
           <autofixGitCache>true</autofixGitCache>
           <goRoot>some/root</goRoot>
