@@ -225,31 +225,38 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     final String[] packages = this.getPackages();
     if (packages != null && packages.length > 0) {
       for (final String p : packages) {
-        final File packFolder = makePathToPackage(goPath, p);
-        if (!packFolder.isDirectory()) {
-          getLog().error(String.format("Can't find package '%s' at '%s'", p, packFolder.getAbsolutePath()));
+        final File packageFolder = makePathToPackage(goPath, p);
+        if (!packageFolder.isDirectory()) {
+          getLog().error(String.format("Can't find package '%s' at '%s'", p, packageFolder.getAbsolutePath()));
           return false;
         } else {
-          final CVSType repo = CVSType.investigateFolder(packFolder);
+          final CVSType repo = CVSType.investigateFolder(packageFolder);
 
-          if (this.branch != null) {
-            getLog().info(String.format("Switch '%s' to branch '%s'", p, this.branch));
-            if (!repo.getProcessor().upToBranch(getLog(), proxySettings, getCvsExe(), packFolder, this.branch)) {
+          if (this.branch != null || this.tag != null || this.revision != null) {
+
+            if (!repo.getProcessor().prepareFolder(getLog(), proxySettings, getCvsExe(), packageFolder)){
               return false;
             }
-          }
-
-          if (this.tag != null) {
-            getLog().info(String.format("Switch '%s' to tag '%s'", p, this.tag));
-            if (!repo.getProcessor().upToTag(getLog(), proxySettings, getCvsExe(), packFolder, this.tag)) {
-              return false;
+            
+            if (this.branch != null) {
+              getLog().info(String.format("Switch '%s' to branch '%s'", p, this.branch));
+              if (!repo.getProcessor().upToBranch(getLog(), proxySettings, getCvsExe(), packageFolder, this.branch)) {
+                return false;
+              }
             }
-          }
 
-          if (this.revision != null) {
-            getLog().info(String.format("Switch '%s' to revision '%s'", p, this.revision));
-            if (!repo.getProcessor().upToRevision(getLog(), proxySettings, getCvsExe(), packFolder, this.tag)) {
-              return false;
+            if (this.tag != null) {
+              getLog().info(String.format("Switch '%s' to tag '%s'", p, this.tag));
+              if (!repo.getProcessor().upToTag(getLog(), proxySettings, getCvsExe(), packageFolder, this.tag)) {
+                return false;
+              }
+            }
+
+            if (this.revision != null) {
+              getLog().info(String.format("Switch '%s' to revision '%s'", p, this.revision));
+              if (!repo.getProcessor().upToRevision(getLog(), proxySettings, getCvsExe(), packageFolder, this.tag)) {
+                return false;
+              }
             }
           }
         }
