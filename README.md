@@ -24,52 +24,23 @@ __2.1.0 (28-may-2016)__
 - Improved archetype template, added example of test
 - __Fixed issue [#3 "cannot run tests"](https://github.com/raydac/mvn-golang/issues/3)__
 
-__2.0.0 (17-apr-2016)__
-- __Added maven archetype `mvn-golang-hello` to generate minimal GoLang "Hello World!" project__
-- Added mojo for `run` command.
-- __Removed `<findExecInGoPath>` property because the logic of search executable file has been reworked__
-- Added `goBin` parameter to provide $GOBIN value
-- Improved CLEAN to delete also the project target folder
-- The Banner is hidden by default
-- __Changed project folder structure to be closer to GoLang projects__
-- __Added life-cycle for packaging `mvn-golang` with support of the standard GoLang project hierarchy, as example see adapted [the Hello world example for the case](https://github.com/raydac/mvn-golang/blob/master/mvn-golang-examples/mvn-golang-example-helloworld/pom.xml)__
-- Improved logging of command console output, now it is split to lines and every line logged separately
-- Added support for loading of archives with Content-type `application/x-gzip`
-- Increased number of test examples
-- Build of example applications moved to the special profile `examples`
 
-__1.1.0 (05-apr-2016)__
-- Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile) 
-- Added `<findExecInGoPath>`, it allows to find golang tool in $GOPATH instead of $GOROOT (by default `false`)
-- Added `<echo>` and `<echoWarn>` to print echo messages into maven log
-- Added `<exec>` parameter to define gotool name (by default `go`)
-- Added `<execSubpath>` parameter to provide sub-path in SDK root to find golang tool (by default `bin`)
-- Renamed parameter `<name>` to `<resultName>` and `<target>` to `<resultFolder>` for `build`
-- Fixed racing issue for the maven `-T4` flag
-- Fixed "Truncated TAR archive exception" for Mac OS tar.gz archive
-- Removed predefined values for `<goVersion>` and `<osx>`
-- Minor refactoring
-
-__1.0.0 (26-mar-2016)__
-- initial version
-
-# Go start!
+# GO start!
 __Taste Go in just two commands!__
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.1 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello package
 ```
 
 # Introduction
-I very much like Maven build tool and use it very actively in my daily work so that I decided to develop a plug-in to provide way to automate build of GoLang applications with maven.   
-The Plug-in wraps standard GoLang commands and even can download and unpack GoLang SDK from the main site.   
+The Plug-in just wraps Golang tool-chain and allows to use strong maven based infrastructure to build Golang projects. It also can automatically download needed Golang SDK from the main server and tune needed version of packets for their branch, tag or revisions.
+Because a Golang project in the case is formed as just maven project, it is possible to work with it in any Java IDE which supports Maven.
 ![mvn-golang-wrapper](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/doc_common.png)
 
 # How it works
 On start the plug-in makes below steps:
 - analyzing the current platform to generate needed distributive name (it can be defined directly through properties)
-- check that such distributive already cached
-  - if the distributive is not cached, then it will load the distributive list from the GoLang server and will find *.zip or *.tar.gz file and download and unpack that into cache folder of the plug-in
+- check that needed Golang SDK is already cached, if it is not cached then needed SDK will be loaded and unpacked from the main Golang SDK site
 - execute needed go lang tool `bin/go` with defined command, the source folder will be set as current folder
 - since 2.1.0 version, all folders of the project which are visible for maven (source folder, test folder, resource folders and test resource folders) will be zipped and saved as artifact into local maven repository as a file with mvn-golang extension
 
@@ -132,7 +103,6 @@ if you want to have several dependencies with different tag and branch then take
 </execution>
 ```
 sometime GIT can produce cache errors and in the case you can try to turn on auto-fix of such errors with `<autofixGitCache>true</autofixGitCache>` flag.   
-Since 2.1.0 version it is possible to select `branch` and `tag` for dependencies, it works with Git and potentially work with Hg and Svn.
 
 # How to save generated artifact in repository?
 The Wrapper during `install` phase collects all sources ande resources from folders defined in maven configuration and pack them as zip file, then the archive is saved in the local maven repository as new artifact with extension `mvn-golang`.   
