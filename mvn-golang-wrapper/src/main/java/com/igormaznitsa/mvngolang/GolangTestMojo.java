@@ -41,6 +41,8 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
   private String[] testFlags;
 
   @Override
+  @Nullable
+  @MustNotContainNull
   protected String[] getDefaultPackages() {
     return new String[]{'.' + File.separator + "..."};
   }

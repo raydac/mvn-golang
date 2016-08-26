@@ -18,9 +18,11 @@ package com.igormaznitsa.mvngolang;
 import java.io.File;
 import javax.annotation.Nonnull;
 
+import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
 
 /**
  * The Mojo wraps the 'vet' command.
@@ -29,6 +31,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 public class GolangVetMojo extends AbstractPackageGolangMojo {
 
   @Override
+  @Nullable
+  @MustNotContainNull
   protected String[] getDefaultPackages() {
     return new String[]{'.'+File.separator+"..."};
   }
