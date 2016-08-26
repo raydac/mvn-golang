@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import java.io.File;
 import javax.annotation.Nonnull;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -32,6 +33,11 @@ public class GolangGenerateMojo extends AbstractPackageGolangMojo {
   @Nonnull
   public String getGoCommand() {
     return "generate";
+  }
+
+  @Override
+  protected String[] getDefaultPackages() {
+    return new String[]{'.' + File.separator + "..."};
   }
 
   @Override

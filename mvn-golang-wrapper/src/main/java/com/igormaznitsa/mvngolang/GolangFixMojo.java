@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import java.io.File;
 import javax.annotation.Nonnull;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -31,6 +32,11 @@ public class GolangFixMojo extends AbstractPackageGolangMojo {
   @Override
   public boolean isSourceFolderRequired() {
     return true;
+  }
+
+  @Override
+  protected String[] getDefaultPackages() {
+    return new String[]{'.' + File.separator + "..."};
   }
   
   @Override

@@ -48,51 +48,15 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "testFlags")
   private String[] testFlags;
 
+  @Override
+  protected String[] getDefaultPackages() {
+    return new String[]{'.' + File.separator + "..."};
+  }
+
   @Nullable
   @MustNotContainNull
   public String[] getTestFlags() {
     return this.testFlags == null ? null : this.testFlags.clone();
-  }
-
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  public String[] getPackages() {
-    final String[] packages = super.getPackages();
-    final List<String> result;
-    if (packages == null || packages.length == 0) {
-      result = new ArrayList<String>();
-      final File sourceFolder = new File(getProject().getBuild().getSourceDirectory());
-      final String normalizedSourcePath = FilenameUtils.normalizeNoEndSeparator(sourceFolder.getAbsolutePath());
-
-      final Iterator<File> iterator = FileUtils.iterateFiles(sourceFolder, null, true);
-      while (iterator.hasNext()) {
-        final File file = iterator.next();
-        final String fileName = file.getName();
-        if (fileName.endsWith("_test.go") && !fileName.startsWith("_") && !fileName.startsWith(".")) {
-          final String normalizedParentPath = FilenameUtils.normalize(file.getParentFile().getAbsolutePath());
-          final String pack = extractPackage(normalizedSourcePath, normalizedParentPath);
-          if (!result.contains(pack)) {
-            getLog().info(String.format("Detected tests at package : %s", pack));
-            result.add(pack);
-          }
-        }
-      }
-
-      Collections.sort(result, StringComparatorABC.getInstance());
-    } else {
-      result = Arrays.asList(packages);
-    }
-    return result.toArray(new String[result.size()]);
-  }
-
-  @Nonnull
-  private static String extractPackage(@Nonnull final String basePath, @Nonnull final String packagePath) {
-    String result = packagePath.substring(basePath.length());
-    if (result.startsWith("/") || result.startsWith("\\")) {
-      result = result.substring(1);
-    }
-    return result;
   }
 
   @Override

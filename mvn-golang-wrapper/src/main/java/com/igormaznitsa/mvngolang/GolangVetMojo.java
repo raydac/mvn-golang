@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import java.io.File;
 import javax.annotation.Nonnull;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -26,6 +27,11 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  */
 @Mojo(name = "vet", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangVetMojo extends AbstractPackageGolangMojo {
+
+  @Override
+  protected String[] getDefaultPackages() {
+    return new String[]{'.'+File.separator+"..."};
+  }
   
   @Override
   @Nonnull
