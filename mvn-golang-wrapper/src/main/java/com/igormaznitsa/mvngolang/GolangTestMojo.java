@@ -79,7 +79,7 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
 
   @Override
   public boolean enforcePrintOutput() {
-    return isVerbose();
+    return true;
   }
 
 }
