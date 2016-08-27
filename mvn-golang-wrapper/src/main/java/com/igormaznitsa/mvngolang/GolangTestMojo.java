@@ -16,6 +16,8 @@
 package com.igormaznitsa.mvngolang;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -40,11 +42,38 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "testFlags")
   private String[] testFlags;
 
+  private String ensureGoExtension(final String name){
+    return name.endsWith(".go") ? name : name+".go";
+  }
+  
   @Override
   @Nullable
   @MustNotContainNull
   protected String[] getDefaultPackages() {
-    return new String[]{'.' + File.separator + "..."};
+    final String definedTest = System.getProperty("test");
+    if (definedTest != null){
+      final int index = definedTest.indexOf('#');
+      final String [] name;
+      if (index>=0){
+        name = new String[]{definedTest.substring(0,index),definedTest.substring(index+1)};
+      }else{
+        name = new String[]{definedTest};
+      }
+      final List<String> result = new ArrayList<String>();
+      result.add(ensureGoExtension(name[0]));
+      if (definedTest.length()>1){
+        result.add("-run");
+        result.add(name[1]);
+      }
+      return result.toArray(new String[result.size()]);
+    }else{
+      return new String[]{'.' + File.separator + "..."};
+    }
+  }
+
+  @Override
+  public boolean isIgnoreErrorExitCode() {
+    return Boolean.parseBoolean(System.getProperty("maven.test.failure.ignore")) || super.isIgnoreErrorExitCode();
   }
 
   @Nullable
