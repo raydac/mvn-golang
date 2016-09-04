@@ -42,7 +42,8 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "testFlags")
   private String[] testFlags;
 
-  private String ensureGoExtension(final String name){
+  @Nonnull
+  private String ensureGoExtension(@Nonnull final String name){
     return name.endsWith(".go") ? name : name+".go";
   }
   

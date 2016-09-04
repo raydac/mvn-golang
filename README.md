@@ -9,6 +9,7 @@
 
 # Changelog
 __2.1.2 (under development)__
+- changed maven phase for build from `compile` to `package` (to prevent build start before tests)
 - enforced console output for `test` even in non-verbose mode
 - added default packages `./...` for `fmt`,`vet`,`fix` and `test` tasks
 - added `maven.test.failure.ignore` and `test` properties processing into `test` goal, also allowed method regex template after `#` like in surefire
