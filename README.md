@@ -9,6 +9,7 @@
 
 # Changelog
 __2.1.2 (under development)__
+- [#10](https://github.com/raydac/mvn-golang/issues/10), added way to disable providing of $GOBIN through pseudo-path __NONE__
 - changed maven phase for build from `compile` to `package` (to prevent build start before tests)
 - enforced console output for `test` even in non-verbose mode
 - added default packages `./...` for `fmt`,`vet`,`fix` and `test` tasks
