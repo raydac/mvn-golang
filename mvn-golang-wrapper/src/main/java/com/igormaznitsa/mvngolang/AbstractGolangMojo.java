@@ -86,6 +86,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
+import com.igormaznitsa.meta.annotation.MayContainNull;
 import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import com.igormaznitsa.mvngolang.utils.WildCardMatcher;
@@ -198,7 +199,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String targetArm;
 
   /**
-   * Folder to be used as $GOBIN. NB! By default it has value "${project.build.directory}"
+   * Folder to be used as $GOBIN. NB! By default it has value "${project.build.directory}". It is possible to disable usage of GOBIN in process through value <b>NONE</b>
    */
   @Parameter(defaultValue = "${project.build.directory}", name = "goBin")
   private String goBin;
@@ -353,13 +354,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Parameter(name = "addToGoPath")
   private String[] addToGoPath;
 
-  @Nonnull
+  @Nullable
   public String getGoBin() {
     final String foundInEnvironment = System.getenv("GOBIN");
     String result = assertNotNull(this.goBin);
 
-    if (foundInEnvironment != null && isUseEnvVars()) {
+    if ("NONE".equals(result.trim())) {
+      result = null;
+    }
+    else {
+      if (foundInEnvironment != null && isUseEnvVars()) {
       result = foundInEnvironment;
+      }
     }
     return result;
   }
@@ -1218,7 +1224,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final String toolName = FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs));
     final File executableFileInPathOrRoot = new File(getPathToFolder(detectedRoot) + toolName);
-    final File executableFileInBin = new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
+
+    final File executableFileInBin = gobin == null ? null : new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
 
     final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
 
@@ -1283,7 +1290,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
     addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(), getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd()));
-    addEnvVar(result, "GOBIN", gobin);
+
+    if (gobin == null)
+      getLog().warn("GOBIN is disabled by direct order");
+    else
+      addEnvVar(result, "GOBIN", gobin);
+
 
     final String trgtOs = this.getTargetOS();
     final String trgtArch = this.getTargetArch();
@@ -1323,10 +1335,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nullable
-  protected static File findExisting(@Nonnull @MustNotContainNull final File... files) {
+  protected static File findExisting(@Nonnull @MayContainNull final File... files) {
     File result = null;
     for (final File f : files) {
-      if (f.isFile()) {
+      if (f != null && f.isFile()) {
         result = f;
         break;
       }
@@ -1358,10 +1370,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private static String preparePath(@Nonnull @MustNotContainNull final String... paths) {
+  private static String preparePath(@Nonnull @MayContainNull final String... paths) {
     final StringBuilder result = new StringBuilder();
     for (final String s : paths) {
-      if (!s.isEmpty()) {
+      if (s != null && !s.isEmpty()) {
         if (result.length() > 0) {
           result.append(SystemUtils.IS_OS_WINDOWS ? ';' : ':');
         }
