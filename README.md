@@ -181,3 +181,21 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
  - __[Simple console application with `termui` library (it needs installation of some native libraries!).](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)__
  - __[NES emulator.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-nes)__
  - __[Android application with `gomobile`.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile)__
+
+# Public snapshot repository for the plugin
+To make accessible the snapshot version of the plugin during development, I have tuned public maven snapshot repository which can be added into project with snippet
+```xml
+<repositories>
+ <repository>
+  <id>coldcore.ru-snapshots</id>
+  <name>ColdCore.RU Mvn Snapshots</name>
+  <url>http://coldcore.ru/m2</url>
+  <snapshots>
+   <enabled>true</enabled>
+  </snapshots>
+  <releases>
+   <enabled>false</enabled>
+  </releases>
+ </repository>
+</repositories>
+```
