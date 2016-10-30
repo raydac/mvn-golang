@@ -18,6 +18,7 @@
           <goal>build</goal>
         </goals>
         <configuration>
+          <skip>true</skip>
           <useMavenProxy>true</useMavenProxy>
           <targetOs>someos</targetOs>
           <targetArch>somearch</targetArch>

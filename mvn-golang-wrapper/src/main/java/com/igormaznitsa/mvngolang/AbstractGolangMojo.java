@@ -135,6 +135,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private ProxySettings proxy;
 
   /**
+   * Skip execution of the mojo.
+   *
+   * @since 2.1.2
+   */
+  @Parameter(name = "skip", defaultValue = "false")
+  private boolean skip;
+
+  /**
    * Ignore error exit code returned by GoLang tool and don't generate any failure.
    *
    * @since 2.1.1
@@ -368,6 +376,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       }
     }
     return result;
+  }
+
+  public boolean isSkip() {
+    return this.skip;
   }
 
   @Nonnull
@@ -1047,57 +1059,65 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
-
-    if (!isHideBanner()) {
-      printBanner();
+    if (this.isSkip()) {
+      getLog().info("Execution is skipped by flag");
     }
+    else {
+      if (!isHideBanner()) {
+        printBanner();
+      }
 
-    printEcho();
+      printEcho();
 
-    final ProxySettings proxySettings = extractProxySettings();
-    beforeExecution(proxySettings);
+      final ProxySettings proxySettings = extractProxySettings();
+      beforeExecution(proxySettings);
 
-    boolean error = false;
-    try {
-      int iterations = 0;
+      boolean error = false;
+      try {
+        int iterations = 0;
 
-      while (true) {
-        final ProcessExecutor executor = prepareExecutor(proxySettings);
-        if (executor == null) {
-          logOptionally("The Mojo should not be executed");
-          break;
-        }
-        final ProcessResult result = executor.executeNoTimeout();
-        final int resultCode = result.getExitValue();
-        error = resultCode != 0 && !isIgnoreErrorExitCode();
-        iterations++;
-
-        final String outLog = extractOutAsString();
-        final String errLog = extractErrorOutAsString();
-
-        if (this.processConsoleOut(resultCode, outLog, errLog)) {
-          printLogs(outLog, errLog);
-        }
-
-        if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
-          if (iterations > 10) {
-            throw new MojoExecutionException("Too many iterations detected, may be some loop and bug at mojo " + this.getClass().getName());
+        while (true) {
+          final ProcessExecutor executor = prepareExecutor(proxySettings);
+          if (executor == null) {
+            logOptionally("The Mojo should not be executed");
+            break;
           }
-          getLog().warn("Make one more attempt...");
-        } else {
-          if (!isIgnoreErrorExitCode()) {
-            assertProcessResult(result);
+          final ProcessResult result = executor.executeNoTimeout();
+          final int resultCode = result.getExitValue();
+          error = resultCode != 0 && !isIgnoreErrorExitCode();
+          iterations++;
+
+          final String outLog = extractOutAsString();
+          final String errLog = extractErrorOutAsString();
+
+          if (this.processConsoleOut(resultCode, outLog, errLog)) {
+            printLogs(outLog, errLog);
           }
-          break;
+
+          if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
+            if (iterations > 10) {
+              throw new MojoExecutionException("Too many iterations detected, may be some loop and bug at mojo " + this.getClass().getName());
+            }
+            getLog().warn("Make one more attempt...");
+          }
+          else {
+            if (!isIgnoreErrorExitCode()) {
+              assertProcessResult(result);
+            }
+            break;
+          }
         }
       }
-    } catch (IOException ex) {
-      error = true;
-      throw new MojoExecutionException(ex.getMessage(), ex);
-    } catch (InterruptedException ex) {
-      error = true;
-    } finally {
-      afterExecution(null, error);
+      catch (IOException ex) {
+        error = true;
+        throw new MojoExecutionException(ex.getMessage(), ex);
+      }
+      catch (InterruptedException ex) {
+        error = true;
+      }
+      finally {
+        afterExecution(null, error);
+      }
     }
   }
 
@@ -1275,7 +1295,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       index++;
     }
 
-    getLog().info(String.format("Prepared сommand line : %s", cli.toString()));
+    getLog().info(String.format("Prepared command line : %s", cli.toString()));
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
