@@ -1,3 +1,11 @@
+# 2.1.2 (under development)
+- added `skip` attribute to skip execution of mojo
+- [#10](https://github.com/raydac/mvn-golang/issues/10), added way to disable providing of $GOBIN through pseudo-path __NONE__
+- changed maven phase for build from `compile` to `package` (to prevent build start before tests)
+- enforced console output for `test` even in non-verbose mode
+- added default packages `./...` for `fmt`,`vet`,`fix` and `test` tasks
+- added `maven.test.failure.ignore` and `test` properties processing into `test` goal, also allowed method regex template after `#` like in surefire
+
 # 2.1.1 (21-aug-2016)
 - [#9](https://github.com/raydac/mvn-golang/issues/9), Added attribute `targetArm` to provide $GOARM value
 - Added support of proxy server [#8](https://github.com/raydac/mvn-golang/issues/8), added flag `useMavenProxy` to use proxy server defined either through maven settings.xml file or the `proxy` configuration section of the plugin.
