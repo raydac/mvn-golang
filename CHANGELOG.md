@@ -1,4 +1,4 @@
-# 2.1.2 (under development)
+# 2.1.2 (07-nov-2016)
 - added `skip` attribute to skip execution of mojo
 - [#10](https://github.com/raydac/mvn-golang/issues/10), added way to disable providing of $GOBIN through pseudo-path __NONE__
 - changed maven phase for build from `compile` to `package` (to prevent build start before tests)
