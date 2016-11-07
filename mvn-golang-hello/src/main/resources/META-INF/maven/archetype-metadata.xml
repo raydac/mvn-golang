@@ -10,7 +10,7 @@
       <defaultValue>main</defaultValue>
     </requiredProperty>
     <requiredProperty key="gowrapper">
-      <defaultValue>2.1.2</defaultValue>
+      <defaultValue>2.1.3-SNAPSHOT</defaultValue>
     </requiredProperty>
     <requiredProperty key="sdk">
       <defaultValue>1.7.3</defaultValue>

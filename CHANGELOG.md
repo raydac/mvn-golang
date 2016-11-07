@@ -1,3 +1,6 @@
+# 2.1.3 (under development)
+-
+
 # 2.1.2 (07-nov-2016)
 - added `skip` attribute to skip execution of mojo
 - [#10](https://github.com/raydac/mvn-golang/issues/10), added way to disable providing of $GOBIN through pseudo-path __NONE__
