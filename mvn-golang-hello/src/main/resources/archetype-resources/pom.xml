@@ -28,11 +28,11 @@
         <version>${gowrapper}</version>
         <extensions>true</extensions>
         <configuration>
-          <goVersion>1.7</goVersion>
+          <goVersion>${sdk}</goVersion>
           <verbose>true</verbose>
         </configuration>
         <executions>
-          <!-- Example of some dependency          
+          <!-- Example of dependency          
           <execution>
             <id>default-get</id>
             <configuration>
