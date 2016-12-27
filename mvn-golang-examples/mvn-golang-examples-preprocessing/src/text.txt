@@ -1,0 +1,3 @@
+The Text is defined in
+external text UTF8 resource file!
+Он содержит и странные русские буквы (для непосвященных) и даже Ё!
