@@ -19,7 +19,7 @@ func main() {
 	}
 	var imageConfig, errDecode = png.DecodeConfig(bytes.NewBuffer(imageArray))
 	if errDecode != nil {
-		log.Fatal(err)
+		log.Fatal(errDecode)
 	}
 
 	fmt.Printf("Embedded image has size %dx%d\n", imageConfig.Width, imageConfig.Height)
