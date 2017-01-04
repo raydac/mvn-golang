@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <properties>
+    <xunit.report>${project.build.directory}${file.separator}reports${file.separator}xunit.xml</xunit.report>
+  </properties>
+
+  <artifactId>mvn-golang-examples-testing</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>mvn-golang</packaging>
+
+  <name>Example of Testing</name>
+  <description>Example of usage of mvn-golang-wrapper for testing Golang project and XUnit report producing.</description>
+  
+  <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+        </configuration>
+        <executions>
+          <!-- Get all dependencies for test cases -->
+          <execution>
+            <id>getTestDependencies</id>
+            <goals>
+              <goal>get</goal>
+            </goals>
+            <configuration>
+              <buildFlags>
+                <flag>-t</flag>
+              </buildFlags>
+              <packages>
+                <package>./...</package>
+              </packages>
+            </configuration>
+          </execution>
+
+          <!-- Get xunit generator -->
+          <execution>
+            <id>default-get</id>
+            <configuration>
+              <packages>
+                <package>github.com/tebeka/go2xunit</package>
+              </packages>
+            </configuration>
+          </execution> 
+
+          <!-- Check all tests with producing report file in Golang format -->
+          <execution>
+            <id>default-test</id>
+            <configuration>
+              <buildFlags>
+                <flag>-v</flag>
+              </buildFlags>
+              <outLogFile>test-out-verbose.log</outLogFile>
+              <ignoreErrorExitCode>true</ignoreErrorExitCode>
+            </configuration>
+          </execution>
+
+          <!-- Convert generated test report into xunit format and save as file -->
+          <execution>
+            <id>makeXUnitReport</id>
+            <phase>test</phase>
+            <goals>
+              <goal>custom</goal>
+            </goals>
+            <configuration>
+              <exec>go2xunit</exec>
+              <customCommand>-fail</customCommand>
+              <buildFlags>
+                <flag>-input</flag>
+                <flag>${project.build.directory}${file.separator}reports${file.separator}test-out-verbose.log</flag>
+                <flag>-output</flag>
+                <flag>${xunit.report}</flag>
+              </buildFlags>
+              <echo>
+                <info>XUnit report saved as ${xunit.report}</info>
+              </echo>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
