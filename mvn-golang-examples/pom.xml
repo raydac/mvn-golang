@@ -28,6 +28,7 @@
       <modules>
         <module>mvn-golang-example-nes</module>
         <module>mvn-golang-example-gui</module>
+        <module>mvn-golang-example-gui-nuklear</module>
         <!--Disabled because gomobile is still under construction-->
         <module>mvn-golang-example-gomobile</module>
       </modules>

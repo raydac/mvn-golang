@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>mvn-golang-examples-gui-nuklear</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>mvn-golang</packaging>
+
+  <name>Nuklear GUI example</name>
+  <description>Example of GUI application based on Nuklear library.</description>
+  <url>https://github.com/golang-ui/nuklear</url>
+  
+  <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
+    <resources>
+      <resource>
+        <directory>${basedir}${file.separator}resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <extensions>true</extensions>
+
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+        </configuration>
+        
+        <executions>
+          <execution>
+            <id>default-get</id>
+            <configuration>
+              <packages>
+                <package>github.com/go-gl/gl/v3.2-core/gl</package>
+                <package>github.com/go-gl/glfw/v3.2/glfw</package>
+                <package>github.com/golang-ui/nuklear/nk</package>
+                <package>github.com/xlab/closer</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
