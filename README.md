@@ -181,8 +181,7 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
  - __[Simple console application with embedded text resource prepared with the `go-bindata` utility.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-genbindata)__
  - __[Simple console application with `termui` library (it needs installation of some native libraries!).](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)__
  - __[NES emulator.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-nes)__
- - __[Android application with `gomobile`.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile)__
-
+ 
 # Public snapshot repository for the plugin
 To make accessible the snapshot version of the plugin during development, I have tuned public maven snapshot repository which can be added into project with snippet
 ```xml
