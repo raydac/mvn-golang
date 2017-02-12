@@ -1,4 +1,6 @@
-bin/
+**/bin/
+**/.preprocessed_src/
+**/pkg/
 target/
 pom.xml.tag
 pom.xml.releaseBackup
