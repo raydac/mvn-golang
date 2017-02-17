@@ -40,6 +40,7 @@
     <module>mvn-golang-example-genbindata</module>
     <module>mvn-golang-example-goexample</module>
     <module>mvn-golang-example-termui</module>
+    <module>mvn-golang-example-goterm</module>
     <module>mvn-golang-example-multimodule</module>
     <module>mvn-golang-examples-preprocessing</module>
     <module>mvn-golang-example-testing</module>
