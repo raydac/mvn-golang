@@ -44,6 +44,8 @@
     <module>mvn-golang-example-multimodule</module>
     <module>mvn-golang-examples-preprocessing</module>
     <module>mvn-golang-example-testing</module>
+    <module>mvn-golang-example-gocui</module>
+    <module>mvn-golang-example-termboxgo</module>
   </modules>
   
   <build>
