@@ -15,7 +15,6 @@
  */
 package com.igormaznitsa.mvngolang;
 
-
 import java.io.File;
 
 import javax.annotation.Nonnull;
@@ -28,7 +27,10 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
+import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 /**
@@ -44,17 +46,34 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   private String resultFolder;
 
   /**
-   * Name of the result file. NB! Keep in mind that in the case of gomobile you must define right extension!
+   * Name of the result file. NB! Keep in mind that in the case of gomobile you
+   * must define right extension!
    * <b>By default it uses ${project.build.finalName}</b>
    */
   @Parameter(name = "resultName", defaultValue = "${project.build.finalName}")
   private String resultName;
-  
+
+  /**
+   * Build mode indicates which kind of object file is to be built.
+   * @since 2.1.3
+   */
+  @Parameter(name = "buildMode", defaultValue = "default")
+  private String buildMode;
+
   @Nonnull
-  private File getResultFile(){
-    return new File(getResultFolder(),this.resultName);
+  public String getBuildMode() {
+    return this.buildMode;
   }
-  
+
+  public void setBuildode(@Nullable final String buildMode) {
+    this.buildMode = GetUtils.ensureNonNull(buildMode, "default");
+  }
+
+  @Nonnull
+  private File getResultFile() {
+    return new File(getResultFolder(), this.resultName);
+  }
+
   @Nonnull
   public String getResultFolder() {
     return assertNotNull(this.resultFolder);
@@ -75,25 +94,30 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException {
     final File folder = new File(getResultFolder());
     if (!folder.isDirectory() && !folder.mkdirs()) {
-      throw new MojoFailureException("Can't create folder : "+folder);
+      throw new MojoFailureException("Can't create folder : " + folder);
+    }
+    
+    if (isVerbose() || !"default".equals(this.buildMode)) {
+      getLog().info("Build mode : "+this.buildMode);
     }
   }
 
   @Override
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException {
-    if (!error){
+    if (!error) {
       final File resultFile = getResultFile();
       // check that it exists
       if (!resultFile.isFile()) {
-        throw new MojoFailureException("Can't find generated target file : "+resultFile);
+        throw new MojoFailureException("Can't find generated target file : " + resultFile);
       }
       // softly try to make it executable
-      try{
+      try {
         resultFile.setExecutable(true);
-      }catch(SecurityException ex){
-        getLog().warn("Security exception during setting executable flag : "+resultFile);
       }
-      
+      catch (SecurityException ex) {
+        getLog().warn("Security exception during setting executable flag : " + resultFile);
+      }
+
       getLog().info("The Result file has been successfuly created : " + resultFile);
     }
   }
@@ -102,7 +126,13 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getCommandFlags() {
-    return new String[]{"-o", getResultFile().getAbsolutePath()};
+    final List<String> flags = new ArrayList<String>();
+ 
+    flags.add("-buildmode="+this.buildMode);
+    flags.add("-o");
+    flags.add(getResultFile().getAbsolutePath());
+    
+    return flags.toArray(new String[flags.size()]);
   }
-  
+
 }
