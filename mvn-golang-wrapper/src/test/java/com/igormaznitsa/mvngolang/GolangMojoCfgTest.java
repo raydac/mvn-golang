@@ -279,6 +279,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertFalse(buildMojo.isVerbose());
     assertFalse(buildMojo.isHideBanner());
     assertEquals("plugin",buildMojo.getBuildMode());
+    assertTrue(buildMojo.isStrip());
     assertEqualsPath("some/sources", buildMojo.getSources(false).getPath());
     assertEqualsPath("some/root", buildMojo.getGoRoot());
     assertEqualsPath("some/path", buildMojo.findGoPath(false).getPath());

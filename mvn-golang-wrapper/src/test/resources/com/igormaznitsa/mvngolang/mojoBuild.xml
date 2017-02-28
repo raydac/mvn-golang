@@ -33,6 +33,7 @@
           <exec>gomobile</exec>
           <execSubpath>/bin/misc/</execSubpath>
           <buildMode>plugin</buildMode>
+          <strip>true</strip>
           <buildFlags>
             <flag>flag1</flag>
             <flag>flag2</flag>

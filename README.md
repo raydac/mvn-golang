@@ -9,6 +9,7 @@
 
 # Changelog
 __2.1.3-SNAPSHOT (under development)__
+ - Added boolean flag `skip` for `buildMojo` to remove symbol table and DWARF from the result file.
  - Added parameter `buildMode` for `buildMojo` to define [Go build mode](https://golang.org/cmd/go/#hdr-Description_of_build_modes)
 
 __2.1.2 (07-nov-2016)__

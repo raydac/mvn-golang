@@ -60,6 +60,21 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "buildMode", defaultValue = "default")
   private String buildMode;
 
+  /**
+   * Strip result file. Symbol table and DWARF will be removed from the result file.
+   * @since 2.1.3
+   */
+  @Parameter(name="strip", defaultValue = "false")
+  private boolean strip;
+  
+  public boolean isStrip() {
+    return this.strip;
+  }
+  
+  public void setStrip(final boolean flag) {
+    this.strip = flag;
+  }
+  
   @Nonnull
   public String getBuildMode() {
     return this.buildMode;
@@ -129,6 +144,12 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
     final List<String> flags = new ArrayList<String>();
  
     flags.add("-buildmode="+this.buildMode);
+ 
+    if (this.strip) {
+      flags.add("-ldflags");
+      flags.add("-s -w");
+    }
+    
     flags.add("-o");
     flags.add(getResultFile().getAbsolutePath());
     
