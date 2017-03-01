@@ -287,6 +287,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("targetName", buildMojo.getResultName());
     assertArrayEquals(new String[]{"one_pack","two_pack"},buildMojo.getTailArguments());
     assertArrayEquals(new String[]{"flag1","flag2"},buildMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"-extldflags","\"-static\""}, buildMojo.getLdflagsAsList().toArray());
     assertEquals(1,buildMojo.getEnv().size());
     assertEquals("somevalue",buildMojo.getEnv().get("somekey"));
     assertEquals("bin/misc", buildMojo.getExecSubpath());

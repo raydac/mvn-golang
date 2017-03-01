@@ -28,6 +28,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.igormaznitsa.meta.common.utils.GetUtils;
@@ -55,26 +56,43 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
 
   /**
    * Build mode indicates which kind of object file is to be built.
+   *
    * @since 2.1.3
    */
   @Parameter(name = "buildMode", defaultValue = "default")
   private String buildMode;
 
   /**
-   * Strip result file. Symbol table and DWARF will be removed from the result file.
+   * Strip result file. Symbol table and DWARF will be removed from the result
+   * file.
+   *
    * @since 2.1.3
    */
-  @Parameter(name="strip", defaultValue = "false")
+  @Parameter(name = "strip", defaultValue = "false")
   private boolean strip;
-  
+
+  /**
+   * List of linker flags.
+   *
+   * @since 2.1.3
+   */
+  @Parameter(name = "ldFlags")
+  private String[] ldFlags;
+
+  @MustNotContainNull
+  @Nonnull
+  public List<String> getLdflagsAsList() {
+    return this.ldFlags == null ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(this.ldFlags));
+  }
+
   public boolean isStrip() {
     return this.strip;
   }
-  
+
   public void setStrip(final boolean flag) {
     this.strip = flag;
   }
-  
+
   @Nonnull
   public String getBuildMode() {
     return this.buildMode;
@@ -111,9 +129,9 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
     if (!folder.isDirectory() && !folder.mkdirs()) {
       throw new MojoFailureException("Can't create folder : " + folder);
     }
-    
+
     if (isVerbose() || !"default".equals(this.buildMode)) {
-      getLog().info("Build mode : "+this.buildMode);
+      getLog().info("Build mode : " + this.buildMode);
     }
   }
 
@@ -142,17 +160,35 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   @MustNotContainNull
   public String[] getCommandFlags() {
     final List<String> flags = new ArrayList<String>();
- 
-    flags.add("-buildmode="+this.buildMode);
- 
+
+    flags.add("-buildmode=" + this.buildMode);
+
+    final List<String> linkerflags = this.getLdflagsAsList();
+
     if (this.strip) {
-      flags.add("-ldflags");
-      flags.add("-s -w");
+      if (!linkerflags.contains("-s")) {
+        linkerflags.add("-s");
+      }
+      if (!linkerflags.contains("-w")) {
+        linkerflags.add("-w");
+      }
     }
-    
+
+    if (!linkerflags.isEmpty()) {
+      flags.add("-ldflags");
+      final StringBuilder buffer = new StringBuilder();
+      for (final String s : linkerflags) {
+        if (buffer.length() > 0) {
+          buffer.append(' ');
+        }
+        buffer.append(s);
+      }
+      flags.add(buffer.toString());
+    }
+
     flags.add("-o");
     flags.add(getResultFile().getAbsolutePath());
-    
+
     return flags.toArray(new String[flags.size()]);
   }
 

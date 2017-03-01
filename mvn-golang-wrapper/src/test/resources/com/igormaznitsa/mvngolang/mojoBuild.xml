@@ -34,6 +34,10 @@
           <execSubpath>/bin/misc/</execSubpath>
           <buildMode>plugin</buildMode>
           <strip>true</strip>
+          <ldFlags>
+            <flag>-extldflags</flag>
+            <flag>"-static"</flag>
+          </ldFlags>
           <buildFlags>
             <flag>flag1</flag>
             <flag>flag2</flag>

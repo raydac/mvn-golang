@@ -1,4 +1,5 @@
 # 2.1.3 (under development)
+- Added list parameter `ldFlags` for `buildMojo` to define linker flags.
 - Added boolean flag `skip` for `buildMojo` to remove symbol table and DWARF from the result file.
 - Added parameter `buildMode` for `buildMojo` to define [Go build mode](https://golang.org/cmd/go/#hdr-Description_of_build_modes)
 
