@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>mvn-golang-examples-clui</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>mvn-golang</packaging>
+
+  <name>CLUI example</name>
+  <description>Example of usage CLUI library for GUI (https://github.com/VladimirMarkelov/clui).</description>
+  
+  <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
+    <resources>
+      <resource>
+        <directory>${basedir}${file.separator}res</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}${file.separator}res</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <id>get-dependencies</id>
+            <goals>
+              <goal>get</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>github.com/nsf/termbox-go</package>
+                <package>github.com/VladimirMarkelov/clui</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

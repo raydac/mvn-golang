@@ -1,0 +1,93 @@
+﻿//----------------- Theme properties -----------------
+title=TurboVision
+author=Vladimir Markelov
+version=1.0 (2016-01-04)
+parent=default
+
+
+//----------------- Colors -----------------
+
+// View colors - internal area and border
+ViewBack = white
+ViewText = white bold
+
+// general colors
+Back         = white
+Text         = black
+DisabledText = white
+DisabledBack = black bold
+
+// editable & listbox-like controls (interactive ones)
+EditBack       = blue
+EditText       = yellow
+EditActiveBack = blue bold
+EditActiveText = yellow bold
+SelectionText  = yellow bold
+SelectionBack  = cyan bold
+
+// scroll control
+ScrollText = white bold
+ScrollBack = white
+ThumbText  = white bold
+ThumbBack  = white
+
+// window-like controls (checkbox, radiogroup...)
+ControlText         = black
+ControlBack         = cyan bold
+ControlActiveBack   = cyan bold
+ControlActiveText   = yellow bold
+ControlDisabledBack = cyan bold
+ControlDisabledText = black bold
+ControlShadow       = black
+
+// progressbar control
+ProgressBack       = blue
+ProgressText       = yellow
+ProgressActiveBack = blue bold
+ProgressActiveText = yellow bold
+
+// button control
+ButtonBack=green bold
+ButtonText=black
+ButtonActiveBack=green bold
+ButtonActiveText=white bold
+ButtonShadowBack=black
+ButtonDisabledText=black bold
+ButtonDisabledBack=white
+
+// bar chart control
+BarChartBack=black
+BarChartText=white
+
+// spark chart
+SparkChartBack=black
+SparkChartText=white
+SparkChartBarBack=black
+SparkChartBarText=cyan
+SparkChartMaxBack=black
+SparkChartMaxText=cyan bold
+
+// table view
+TableText=white
+TableBack=black
+TableSelectedText=white
+TableSelectedBack=black bold
+TableActiveCellText=white bold
+TableActiveCellBack=black bold
+TableLineText=white
+TableHeaderText=white
+TableHeaderBack=black
+
+//----------------- Objects -----------------
+SingleBorder=─│┌┐└┘
+DoubleBorder=═║╔╗╚╝
+Edit=←→V
+ScrollBar=░■▲▼◄►
+ViewButtons=^↓○[]
+CheckBox=[] X?
+Radio=() *
+ProgressBar=░▒
+BarChart=█─│┌┐└┘┬┴├┤┼
+SparkChart=█
+TableView=─│┼▼▲
+

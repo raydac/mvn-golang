@@ -46,6 +46,7 @@
     <module>mvn-golang-examples-preprocessing</module>
     <module>mvn-golang-example-testing</module>
     <module>mvn-golang-example-gocui</module>
+    <module>mvn-golang-example-clui</module>
     <module>mvn-golang-example-termboxgo</module>
   </modules>
   
