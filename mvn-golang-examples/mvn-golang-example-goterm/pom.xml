@@ -9,7 +9,7 @@
       <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mvn-golang-examples-goterm</artifactId>
+    <artifactId>mvn-golang-example-goterm</artifactId>
     <packaging>mvn-golang</packaging>
 
     <name>GoTerm example</name>

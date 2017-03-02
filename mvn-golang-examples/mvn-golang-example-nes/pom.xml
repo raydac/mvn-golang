@@ -9,7 +9,7 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mvn-golang-examples-nes</artifactId>
+  <artifactId>mvn-golang-example-nes</artifactId>
   <packaging>mvn-golang</packaging>
 
   <name>NES emulator example</name>

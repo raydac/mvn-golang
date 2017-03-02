@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>mvn-golang-example-antlr</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>mvn-golang</packaging>
+
+  <name>ANTLR example</name>
+  <description>Example of ANTLR usage (https://github.com/antlr/antlr4/)</description>
+
+  <properties>
+    <generated.dir>${basedir}${file.separator}generated</generated.dir>
+  </properties>
+  
+  <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>${generated.dir}</directory>
+      </resource>
+    </resources>
+    <directory>${basedir}${file.separator}bin</directory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <followSymLinks>false</followSymLinks>
+          <excludeDefaultDirectories>true</excludeDefaultDirectories>
+          <filesets>
+            <fileset>
+              <directory>${generated.dir}</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>4.6</version>
+        <executions>
+          <execution>
+            <id>antlr</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${basedir}${file.separator}antlr4</sourceDirectory>
+              <outputDirectory>${generated.dir}${file.separator}src${file.separator}parser</outputDirectory>
+              <arguments>
+                <argument>-Dlanguage=Go</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>      
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <extensions>true</extensions>
+        <configuration> 
+          <goVersion>${go.sdk.version}</goVersion>
+          <addToGoPath>
+            <path>${generated.dir}</path>
+          </addToGoPath>
+        </configuration>
+        <executions>
+          <execution>
+            <id>get-dependencies</id>
+            <goals>
+              <goal>get</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>github.com/antlr/antlr4/runtime/Go/antlr</package>
+              </packages>
+            </configuration>
+          </execution>
+          <execution>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>main.go</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

@@ -4,7 +4,7 @@
 
   <parent>
     <groupId>com.igormaznitsa</groupId>
-    <artifactId>mvngolang-multimodule-example</artifactId>
+    <artifactId>mvn-golang-example-multimodule</artifactId>
     <version>1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>

@@ -9,7 +9,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>mvn-golang-examples-preprocessing</artifactId>
+  <artifactId>mvn-golang-example-preprocessing</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>mvn-golang</packaging>
 

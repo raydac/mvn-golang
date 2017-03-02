@@ -9,7 +9,7 @@
       <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mvn-golang-examples-gocui</artifactId>
+    <artifactId>mvn-golang-example-gocui</artifactId>
     <packaging>mvn-golang</packaging>
 
     <name>GOCUI example</name>

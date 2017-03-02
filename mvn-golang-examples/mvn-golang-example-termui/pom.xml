@@ -9,7 +9,7 @@
       <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mvn-golang-examples-termui</artifactId>
+    <artifactId>mvn-golang-example-termui</artifactId>
     <packaging>mvn-golang</packaging>
 
     <name>TermUI example</name>

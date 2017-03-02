@@ -9,7 +9,7 @@
       <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mvn-golang-examples-termboxgo</artifactId>
+    <artifactId>mvn-golang-example-termboxgo</artifactId>
     <packaging>mvn-golang</packaging>
 
     <name>TERMBOX-GO example</name>
