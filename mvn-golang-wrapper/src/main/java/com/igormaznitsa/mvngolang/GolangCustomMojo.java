@@ -24,7 +24,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 
 /**
- * The Mojo allows to process commands which are not covered by mojes of the plug-in.
+ * The Mojo allows to process commands which are not covered by MOJOs of the plug-in.
  */
 @Mojo(name = "custom", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangCustomMojo extends AbstractPackageGolangMojo {
