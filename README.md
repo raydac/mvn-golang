@@ -58,6 +58,16 @@ On start the plug-in makes below steps:
 - execute needed go lang tool `bin/go` with defined command, the source folder will be set as current folder
 - since 2.1.0 version, all folders of the project which are visible for maven (source folder, test folder, resource folders and test resource folders) will be zipped and saved as artifact into local maven repository as a file with mvn-golang extension
 
+# How to build
+Because it is maven plugin, to build the plugin just use
+```
+mvn clean install
+```
+To save time, examples excluded from the main build process and activated through special profile
+```
+mvn clean install -Pexamples
+```
+
 # How to work with dependencies?
 
 The Plug-in doesn't work with standard maven dependencies andf they must be defined through task of the plugin, the example of easiest case of dependencies is
@@ -181,11 +191,14 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
 </execution>                    
 ```
 
-# Sample use cases
- - __[Simple "Hello world!" console application.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-helloworld)__
- - __[Simple console application with embedded text resource prepared with the `go-bindata` utility.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-genbindata)__
- - __[Simple console application with `termui` library (it needs installation of some native libraries!).](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)__
+# Some Examples
+ - __["Hello world!" console application.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-helloworld)__
+ - __[Console application with embedded text resource prepared with the `go-bindata` utility.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-genbindata)__
+ - __[Console application with `termui` library (it needs installation of some native libraries!).](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)__
  - __[NES emulator.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-nes)__
+ - __[ANTLR usage.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-antlr)__
+ - __[Multimodule project.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-multimodule)__
+ - __[Preprocessing.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-preprocessing)__
  
 # Public snapshot repository for the plugin
 To make accessible the snapshot version of the plugin during development, I have tuned public maven snapshot repository which can be added into project with snippet
