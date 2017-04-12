@@ -13,11 +13,14 @@
   
   <name>Hello GoLang</name>
   <description>Simple 'Hello World!' GoLang example</description>
+  <url>https://github.com/raydac/mvn-golang</url>
 
   <properties>
     <go.sdk.version>${gosdk}</go.sdk.version>
     <go.wrapper.plugin.version>${gowrapper}</go.wrapper.plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+    <mvn.version>3.0</mvn.version>
   </properties>
 
   <inceptionYear>${year}</inceptionYear>
@@ -30,7 +33,12 @@
     </license>
   </licenses>
 
+  <prerequisites>
+    <maven>${dollar}{mvn.version}</maven>
+  </prerequisites>
+
   <build>
+    <finalName>${dollar}{artifactId}-${dollar}{maven.build.timestamp}</finalName>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
     <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
       <resources>
@@ -46,7 +54,9 @@
         <extensions>true</extensions>
         <configuration>
           <goVersion>${dollar}{go.sdk.version}</goVersion>
-          <verbose>true</verbose>
+          <goPath>${dollar}{basedir}</goPath>
+          <enforceGoPathToEnd>true</enforceGoPathToEnd>
+          <!--<verbose>true</verbose>-->
         </configuration>
         <executions>
           <!-- Example of dependency          
@@ -64,7 +74,16 @@
           </execution>          
           -->
           <execution>
+            <id>default-build</id>
+            <configuration>
+              <packages>
+                <main>hello.go</main>
+              </packages>
+            </configuration>
+          </execution>
+          <execution>
             <id>golang-run</id>
+            <phase>verify</phase>
             <goals>
               <goal>run</goal>
             </goals>

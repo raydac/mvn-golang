@@ -31,9 +31,6 @@
       </includes>
     </fileSet>
     <fileSet filtered="true" packaged="false">
-      <directory>src/vendor</directory>
-    </fileSet>
-    <fileSet filtered="true" packaged="false">
       <directory></directory>
       <includes>
         <include>*.iml</include>
