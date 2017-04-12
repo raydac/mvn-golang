@@ -231,6 +231,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String goRootBootstrap;
 
   /**
+   * Make GOPATH value as the last one in new generated GOPATH chain.
+   * @since 2.1.3
+   */
+  @Parameter(name = "enforceGoPathToEnd", defaultValue = "false")
+  private boolean enforceGoPathToEnd;
+  
+  /**
    * Sub-path to executing go tool in SDK folder.
    *
    * @since 1.1.0
@@ -382,6 +389,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return this.skip;
   }
 
+  public boolean isEnforceGoPathToEnd() {
+    return this.enforceGoPathToEnd;
+  }
+  
   @Nonnull
   public MavenProject getProject() {
     return this.project;
@@ -1309,7 +1320,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     logOptionally("....Environment vars....");
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
-    addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(), getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd()));
+    
+    if (isEnforceGoPathToEnd()){
+      addEnvVar(result, "GOPATH", preparePath(getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd(), gopath.getAbsolutePath()));
+    } else {
+      addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(), getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd()));
+    }
+    
 
     if (gobin == null)
       getLog().warn("GOBIN is disabled by direct order");
@@ -1392,12 +1409,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private static String preparePath(@Nonnull @MayContainNull final String... paths) {
     final StringBuilder result = new StringBuilder();
+    final Set<String> alreadyAdded = new HashSet<String>();
+    
     for (final String s : paths) {
       if (s != null && !s.isEmpty()) {
-        if (result.length() > 0) {
-          result.append(SystemUtils.IS_OS_WINDOWS ? ';' : ':');
+        if (!alreadyAdded.contains(s)) {
+          if (result.length() > 0) {
+            result.append(SystemUtils.IS_OS_WINDOWS ? ';' : ':');
+          }
+          result.append(s);
+          alreadyAdded.add(s);
         }
-        result.append(s);
       }
     }
     return result.toString();

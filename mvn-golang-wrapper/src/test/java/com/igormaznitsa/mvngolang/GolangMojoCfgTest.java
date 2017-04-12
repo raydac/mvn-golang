@@ -65,6 +65,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertNull(customMojo.getProxy());
     assertNull(customMojo.getTargetArch());
     assertNull(customMojo.getTargetOS());
+    assertFalse(customMojo.isEnforceGoPathToEnd());
     assertNull(customMojo.getTargetArm());
     assertFalse(customMojo.isUseEnvVars());
     assertEquals("someCustomCommand",customMojo.getGoCommand());
@@ -270,6 +271,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertNull(buildMojo.getProxy());
     assertNotNull(buildMojo);
     assertTrue(buildMojo.isSkip());
+    assertTrue(buildMojo.isEnforceGoPathToEnd());
     assertEquals("somearch",buildMojo.getTargetArch());
     assertEquals("someos",buildMojo.getTargetOS());
     assertEquals("5566677",buildMojo.getTargetArm());
