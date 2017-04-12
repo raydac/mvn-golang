@@ -11,7 +11,7 @@ import (
 
 func main() {
 	//#+
-	var imageArray = []uint8{/*$binfile("./image.png","uint8[]")$*/}
+	var imageArray = []uint8{/*$binfile("./image.png","uint8[]s")$*/}
 	var imageConfig, errDecode = png.DecodeConfig(bytes.NewBuffer(imageArray))
 	if errDecode != nil {
 		log.Fatal(errDecode)
