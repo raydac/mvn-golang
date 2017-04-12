@@ -9,6 +9,8 @@
 
 # Changelog
 __2.1.3-SNAPSHOT (under development)__
+ - Improved `go-hello-test` archetype to generate [Intellij Idea Go plugin project structure](https://plugins.jetbrains.com/plugin/5047-go-language-golang-org-support-plugin)
+ - Added flag `enforceGoPathToEnd` to enforce changing of folder list order in new generated GOPATH
  - Added list parameter `ldFlags` for `buildMojo` to define linker flags.
  - Added boolean flag `skip` for `buildMojo` to remove symbol table and DWARF from the result file.
  - Added parameter `buildMode` for `buildMojo` to define [Go build mode](https://golang.org/cmd/go/#hdr-Description_of_build_modes)
