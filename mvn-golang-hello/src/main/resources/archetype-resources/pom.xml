@@ -37,15 +37,47 @@
     <maven>${dollar}{mvn.version}</maven>
   </prerequisites>
 
+  <profiles>
+    <!-- The Profile allows to remove all IDE specific data from project folder -->
+    <profile>
+      <id>clean-ide-config</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <followSymLinks>false</followSymLinks>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>${dollar}{basedir}${dollar}{file.separator}.idea</directory>
+                </fileset>
+                <fileset>
+                  <directory>${dollar}{basedir}</directory>
+                  <includes>
+                    <include>*.iml</include>
+                    <include>nbactions.xml</include>
+                  </includes>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
-    <finalName>${dollar}{artifactId}-${dollar}{maven.build.timestamp}</finalName>
+    <finalName>${dollar}{project.artifactId}-${dollar}{maven.build.timestamp}</finalName>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
     <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
-      <resources>
-        <resource>
-          <directory>${dollar}{basedir}${dollar}{file.separator}res</directory>
-        </resource>
-      </resources>
+    <resources>
+      <resource>
+        <directory>${dollar}{basedir}${dollar}{file.separator}res</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>
