@@ -56,7 +56,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
   @Component
   protected ArtifactInstaller installer;
 
-  @Component
+  @Parameter(readonly = true, defaultValue = "${project}")
   private MavenProject project;
 
   /**
