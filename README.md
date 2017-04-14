@@ -46,6 +46,7 @@ __Taste Go in just two commands!__
 mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.3 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello/pom.xml package
 ```
+it will generate a maven project with extra configuration files to make the project compatible with NetBeans IDE and Intellij IDEA Golang plugin, they can be removed with `mvn clean -Pclean-ide-config`    
 [Also you can take a look at the example `Hello world` project using the plugin](https://github.com/raydac/mvn-golang-example)
 
 # Introduction
