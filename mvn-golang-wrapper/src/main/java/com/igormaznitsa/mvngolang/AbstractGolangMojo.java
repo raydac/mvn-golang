@@ -97,6 +97,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   private static final ReentrantLock LOCKER = new ReentrantLock();
 
+  protected final Set<String> buildFlagsToIgnore = new HashSet<String>();
+  
   private static final String[] BANNER = new String[]{"______  ___             _________     ______",
     "___   |/  /__   __________  ____/________  / ______ ______________ _",
     "__  /|_/ /__ | / /_  __ \\  / __ _  __ \\_  /  _  __ `/_  __ \\_  __ `/",
@@ -444,12 +446,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return this.reportsFolder;
   }
 
-  @Nonnull
+  @Nullable
   public String getOutLogFile() {
     return this.outLogFile;
   }
 
-  @Nonnull
+  @Nullable
   public String getErrLogFile() {
     return this.errLogFile;
   }
@@ -492,7 +494,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getBuildFlags() {
-    return ArrayUtils.joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY), getExtraBuildFlags());
+    final List<String> result = new ArrayList<String>();
+    for(final String s : ArrayUtils.joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY), getExtraBuildFlags())) {
+      if (!this.buildFlagsToIgnore.contains(s)) {
+        result.add(s);
+      }
+    }
+    
+    return result.toArray(new String[result.size()]);
   }
 
   @Nonnull

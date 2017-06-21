@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -345,25 +346,35 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     }
     
     if (this.branch != null || this.tag != null || this.revision != null) {
-      getLog().info("(!) Get initial version of package repository before CVS operations");
-      try{
-        final boolean error = this.doMainBusiness(proxySettings, 10);
-        if (error) throw new Exception("error as result of GET operation");
-      }catch(Exception ex){
-        throw new MojoExecutionException("Can't get packages",ex);
-      }
-      
-      getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
-
-      final File goPath;
+      this.buildFlagsToIgnore.add("-u");
       try {
-        goPath = findGoPath(true);
-      } catch (IOException ex) {
-        throw new MojoFailureException("Can't find $GOPATH", ex);
-      }
+        getLog().info("(!) Get initial version of package repository before CVS operations");
+        try {
+          final boolean error = this.doMainBusiness(proxySettings, 10);
+          if (error) {
+            throw new Exception("error as result of 'get' operation during initial loading for packages "+Arrays.toString(this.getPackages()));
+          }
+        }
+        catch (Exception ex) {
+          throw new MojoExecutionException("Can't get packages", ex);
+        }
 
-      if (!processCVS(proxySettings, goPath)) {
-        throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
+        getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
+
+        final File goPath;
+        try {
+          goPath = findGoPath(true);
+        }
+        catch (IOException ex) {
+          throw new MojoFailureException("Can't find $GOPATH", ex);
+        }
+
+        if (!processCVS(proxySettings, goPath)) {
+          throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
+        }
+      }
+      finally {
+        this.buildFlagsToIgnore.clear();
       }
     }
   }
