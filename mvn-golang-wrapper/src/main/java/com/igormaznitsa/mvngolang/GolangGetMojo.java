@@ -346,35 +346,33 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     }
     
     if (this.branch != null || this.tag != null || this.revision != null) {
+      final File goPath;
+      try {
+        goPath = findGoPath(true);
+      }
+      catch (IOException ex) {
+        throw new MojoFailureException("Can't find $GOPATH", ex);
+      }
+
+      getLog().info("(!) Get initial version of package repository before CVS operations");
       this.buildFlagsToIgnore.add("-u");
       try {
-        getLog().info("(!) Get initial version of package repository before CVS operations");
-        try {
-          final boolean error = this.doMainBusiness(proxySettings, 10);
-          if (error) {
-            throw new Exception("error as result of 'get' operation during initial loading for packages "+Arrays.toString(this.getPackages()));
-          }
+        final boolean error = this.doMainBusiness(proxySettings, 10);
+        if (error) {
+          throw new Exception("error as result of 'get' operation during initial loading of packages " + Arrays.toString(this.getPackages()));
         }
-        catch (Exception ex) {
-          throw new MojoExecutionException("Can't get packages", ex);
-        }
-
-        getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
-
-        final File goPath;
-        try {
-          goPath = findGoPath(true);
-        }
-        catch (IOException ex) {
-          throw new MojoFailureException("Can't find $GOPATH", ex);
-        }
-
-        if (!processCVS(proxySettings, goPath)) {
-          throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
-        }
+      }
+      catch (Exception ex) {
+        throw new MojoExecutionException("Can't get packages", ex);
       }
       finally {
         this.buildFlagsToIgnore.clear();
+      }
+
+      getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
+
+      if (!processCVS(proxySettings, goPath)) {
+        throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
       }
     }
   }

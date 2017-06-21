@@ -97,6 +97,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   private static final ReentrantLock LOCKER = new ReentrantLock();
 
+  /**
+   * set of flags to be ignored among build and extra build flags, for inside use
+   */
   protected final Set<String> buildFlagsToIgnore = new HashSet<String>();
   
   private static final String[] BANNER = new String[]{"______  ___             _________     ______",
