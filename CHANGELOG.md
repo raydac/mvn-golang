@@ -1,5 +1,5 @@
 # 2.1.4 (under development)
--
+- fixed processing of `revision` parameter for CVS
 
 # 2.1.3 (14-apr-2017)
 - Improved `go-hello-test` archetype to generate [Intellij Idea Go plugin project structure](https://plugins.jetbrains.com/plugin/5047-go-language-golang-org-support-plugin)
