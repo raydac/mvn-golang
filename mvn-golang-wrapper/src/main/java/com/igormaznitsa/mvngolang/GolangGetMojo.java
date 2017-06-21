@@ -235,6 +235,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
           if (this.branch != null || this.tag != null || this.revision != null) {
 
             if (!repo.getProcessor().prepareFolder(getLog(), proxySettings, getCvsExe(), packageFolder)){
+              getLog().debug("Can't prepare folder : "+packageFolder);
               return false;
             }
             
@@ -254,7 +255,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
             if (this.revision != null) {
               getLog().info(String.format("Switch '%s' to revision '%s'", p, this.revision));
-              if (!repo.getProcessor().upToRevision(getLog(), proxySettings, getCvsExe(), packageFolder, this.tag)) {
+              if (!repo.getProcessor().upToRevision(getLog(), proxySettings, getCvsExe(), packageFolder, this.revision)) {
                 return false;
               }
             }
@@ -268,7 +269,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Override
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException {
     if (!error) {
-      if (this.branch != null || this.tag != null) {
+      if (this.branch != null || this.tag != null || this.revision != null) {
         getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
 
         final File goPath;
