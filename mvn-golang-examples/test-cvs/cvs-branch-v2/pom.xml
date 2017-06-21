@@ -43,7 +43,6 @@
               <packages>
                 <package>github.com/raydac/mvn-golang-cvs-test</package>
               </packages>
-              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
               <branch>v2</branch>
             </configuration>
           </execution>
