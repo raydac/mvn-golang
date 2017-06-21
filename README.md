@@ -9,6 +9,8 @@
 
 # Changelog
 __2.1.4 (SNAPSHOT)__
+ - fixed order of processing of CVS branch, tag and revision in `get` mojo
+ - added `enforceDeletePackageFiles` flag into `get` mojo to enforce deletion of package sources and compiled version in local repository
  - fixed processing of `revision` for CVS
 
 __2.1.3 (14-apr-2017)__
