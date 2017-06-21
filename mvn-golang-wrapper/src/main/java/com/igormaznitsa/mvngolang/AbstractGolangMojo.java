@@ -1068,6 +1068,45 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return false;
   }
 
+  protected boolean doMainBusiness(@Nullable final ProxySettings proxySettings, final int maxAttempts) throws InterruptedException,MojoFailureException,MojoExecutionException,IOException {
+    int iterations = 0;
+
+    boolean error = false;
+
+    while (true) {
+      final ProcessExecutor executor = prepareExecutor(proxySettings);
+      if (executor == null) {
+        logOptionally("The Mojo should not be executed");
+        break;
+      }
+      final ProcessResult result = executor.executeNoTimeout();
+      final int resultCode = result.getExitValue();
+      error = resultCode != 0 && !isIgnoreErrorExitCode();
+      iterations++;
+
+      final String outLog = extractOutAsString();
+      final String errLog = extractErrorOutAsString();
+
+      if (this.processConsoleOut(resultCode, outLog, errLog)) {
+        printLogs(outLog, errLog);
+      }
+
+      if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
+        if (iterations > maxAttempts) {
+          throw new MojoExecutionException("Too many iterations detected, may be some loop and bug at mojo " + this.getClass().getName());
+        }
+        getLog().warn("Make one more attempt...");
+      } else {
+        if (!isIgnoreErrorExitCode()) {
+          assertProcessResult(result);
+        }
+        break;
+      }
+    }
+
+    return error;
+  }
+  
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
     if (this.isSkip()) {
@@ -1085,39 +1124,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
       boolean error = false;
       try {
-        int iterations = 0;
-
-        while (true) {
-          final ProcessExecutor executor = prepareExecutor(proxySettings);
-          if (executor == null) {
-            logOptionally("The Mojo should not be executed");
-            break;
-          }
-          final ProcessResult result = executor.executeNoTimeout();
-          final int resultCode = result.getExitValue();
-          error = resultCode != 0 && !isIgnoreErrorExitCode();
-          iterations++;
-
-          final String outLog = extractOutAsString();
-          final String errLog = extractErrorOutAsString();
-
-          if (this.processConsoleOut(resultCode, outLog, errLog)) {
-            printLogs(outLog, errLog);
-          }
-
-          if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
-            if (iterations > 10) {
-              throw new MojoExecutionException("Too many iterations detected, may be some loop and bug at mojo " + this.getClass().getName());
-            }
-            getLog().warn("Make one more attempt...");
-          }
-          else {
-            if (!isIgnoreErrorExitCode()) {
-              assertProcessResult(result);
-            }
-            break;
-          }
-        }
+        error = doMainBusiness(proxySettings, 10);
       }
       catch (IOException ex) {
         error = true;

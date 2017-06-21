@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import javax.annotation.Nullable;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -87,10 +88,22 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "cvsExe")
   private String cvsExe;
 
+  /**
+   * Search sources for package and its compiled version, enforce delete of found source folder and compiled '.a' file.
+   * 
+   * @since 2.1.4
+   */
+  @Parameter(name = "enforceDeletePackageFiles")
+  private boolean enforceDeletePackageFiles;
+  
   public boolean isAutoFixGitCache() {
     return this.autofixGitCache;
   }
 
+  public boolean isEnforceDeletePackageFiles() {
+    return this.enforceDeletePackageFiles;
+  }
+  
   @Nullable
   public String getRevision() {
     return this.revision;
@@ -182,7 +195,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   }
 
   @Nonnull
-  private File makePathToPackage(@Nonnull final File goPath, @Nonnull final String pack) {
+  private File makePathToPackageSources(@Nonnull final File goPath, @Nonnull final String pack) {
     String path = pack.trim();
 
     try {
@@ -196,13 +209,28 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     return new File(goPath, "src" + File.separatorChar + path);
   }
 
+  @Nonnull
+  private File makePathToPackageCompiled(@Nonnull final File goPath, @Nonnull final String pack) {
+    String path = pack.trim();
+
+    try {
+      final URI uri = URI.create(path);
+      path = processSlashes(uri.getPath());
+    } catch (IllegalArgumentException ex) {
+      // it is not url
+      path = processSlashes(path);
+    }
+
+    return new File(goPath, "pkg" + File.separatorChar + this.getOs()+'_'+this.getArch()+ File.separatorChar + path);
+  }
+
   private boolean tryToFixGitCacheErrorsForPackages(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
     final File goPath = findGoPath(true);
 
     int fixed = 0;
 
     for (final String s : packages) {
-      final File packageFolder = makePathToPackage(goPath, s);
+      final File packageFolder = makePathToPackageSources(goPath, s);
       final CVSType repo = CVSType.investigateFolder(packageFolder);
       if (repo == CVSType.GIT) {
         getLog().warn(String.format("Executing 'git rm -r --cached .' in %s", packageFolder.getAbsolutePath()));
@@ -225,7 +253,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     final String[] packages = this.getPackages();
     if (packages != null && packages.length > 0) {
       for (final String p : packages) {
-        final File packageFolder = makePathToPackage(goPath, p);
+        final File packageFolder = makePathToPackageSources(goPath, p);
         if (!packageFolder.isDirectory()) {
           getLog().error(String.format("Can't find package '%s' at '%s'", p, packageFolder.getAbsolutePath()));
           return false;
@@ -267,11 +295,11 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
-  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException {
-    if (!error) {
-      if (this.branch != null || this.tag != null || this.revision != null) {
-        getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
-
+  public void beforeExecution(@Nonnull final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
+    if (isEnforceDeletePackageFiles()) {
+      getLog().debug("Detected request to delete both package source and binary folders if they are presented");
+      
+      final String[] packages = this.getPackages();
         final File goPath;
         try {
           goPath = findGoPath(true);
@@ -279,13 +307,67 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
           throw new MojoFailureException("Can't find $GOPATH", ex);
         }
 
-        if (!processCVS(proxySettings, goPath)) {
-          throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
+      for (final String p : packages) {
+        getLog().info("Removing binary and source folders for package '"+p+'\'');
+
+        final File pkgSources = this.makePathToPackageSources(goPath, p);
+        final File pkgBinary = this.makePathToPackageCompiled(goPath, p);
+
+        getLog().debug("Src folder : "+pkgSources);
+        getLog().debug("Pkg folder : "+pkgBinary);
+        
+        if (pkgSources.isDirectory()){
+          try{
+            FileUtils.deleteDirectory(pkgSources);
+          }catch(IOException ex){
+            throw new MojoExecutionException("Can't delete source folder : "+pkgSources, ex);
+          }
+          getLog().info("\tDeleted source folder : "+pkgSources);
+        }
+
+        if (pkgBinary.isDirectory()){
+          try{
+            FileUtils.deleteDirectory(pkgBinary);
+          }catch(IOException ex){
+            throw new MojoExecutionException("Can't delete binary folder : "+pkgBinary, ex);
+          }
+          getLog().info("\tDeleted binary folder : "+pkgBinary);
+        } else {
+          final File compiled = new File(pkgBinary.getAbsolutePath() + ".a");
+          if (compiled.isFile()) {
+            if (!compiled.delete()) {
+              throw new MojoExecutionException("Can't delete compiled file : " + compiled);
+            }
+            getLog().info("\tDeleted compiled file : " + compiled);
+          }
         }
       }
     }
-  }
+    
+    if (this.branch != null || this.tag != null || this.revision != null) {
+      getLog().info("(!) Get initial version of package repository before CVS operations");
+      try{
+        final boolean error = this.doMainBusiness(proxySettings, 10);
+        if (error) throw new Exception("error as result of GET operation");
+      }catch(Exception ex){
+        throw new MojoExecutionException("Can't get packages",ex);
+      }
+      
+      getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
 
+      final File goPath;
+      try {
+        goPath = findGoPath(true);
+      } catch (IOException ex) {
+        throw new MojoFailureException("Can't find $GOPATH", ex);
+      }
+
+      if (!processCVS(proxySettings, goPath)) {
+        throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
+      }
+    }
+  }
+  
   @Override
   protected boolean doesNeedOneMoreAttempt(@Nonnull final ProcessResult processResult, @Nonnull final String consoleOut, @Nonnull final String consoleErr) throws IOException, MojoExecutionException {
     boolean result = false;

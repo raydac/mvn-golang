@@ -246,6 +246,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("127.0.0.1|127.0.0.2|127.0.0.3",proxy.nonProxyHosts);
     
     assertEquals("some/custom/exe.exe",getMojo.getCvsExe());
+    assertTrue(getMojo.isEnforceDeletePackageFiles());
     assertFalse(getMojo.isUseMavenProxy());
     assertFalse(getMojo.isSkip());
     assertFalse(getMojo.isUseEnvVars());

@@ -31,6 +31,7 @@
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>
           <sources>some/sources</sources>
+          <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
           <buildFlags>
             <flag>flag1</flag>
             <flag>flag2</flag>
