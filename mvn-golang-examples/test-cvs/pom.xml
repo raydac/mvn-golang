@@ -17,6 +17,7 @@
       <module>cvs-branch-v2</module>
       <module>cvs-revision</module>
       <module>cvs-branch-master</module>
+      <module>cvs-master-tag</module>
     </modules>
 
 </project>

@@ -9,11 +9,11 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>cvs-revision</artifactId>
+  <artifactId>cvs-master-tag</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>mvn-golang</packaging>
 
-  <description>Test of loading revision</description>
+  <description>Test of loading main branch with tag</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,7 +43,8 @@
               <packages>
                 <package>github.com/raydac/mvn-golang-cvs-test</package>
               </packages>
-              <revision>53dca7f87202ae2c34b897b80e5f7c1a9bed12ad</revision>
+	      <branch>master</branch>
+	      <tag>master_tag1</tag>
             </configuration>
           </execution>
           <execution>
