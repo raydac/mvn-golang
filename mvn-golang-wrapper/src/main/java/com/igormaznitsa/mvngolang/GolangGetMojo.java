@@ -268,23 +268,9 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
               return false;
             }
             
-            if (this.branch != null) {
-              getLog().info(String.format("Switch '%s' to branch '%s'", p, this.branch));
-              if (!repo.getProcessor().upToBranch(getLog(), proxySettings, getCvsExe(), packageFolder, this.branch)) {
-                return false;
-              }
-            }
-
-            if (this.tag != null) {
-              getLog().info(String.format("Switch '%s' to tag '%s'", p, this.tag));
-              if (!repo.getProcessor().upToTag(getLog(), proxySettings, getCvsExe(), packageFolder, this.tag)) {
-                return false;
-              }
-            }
-
-            if (this.revision != null) {
-              getLog().info(String.format("Switch '%s' to revision '%s'", p, this.revision));
-              if (!repo.getProcessor().upToRevision(getLog(), proxySettings, getCvsExe(), packageFolder, this.revision)) {
+            if (this.branch != null || this.tag != null || this.revision != null) {
+              getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(this.branch,"<NOT_DEFINED>"),GetUtils.ensureNonNull(this.tag,"<NOT_DEFINED>"),GetUtils.ensureNonNull(this.revision,"<NOT_DEFINED>")));
+              if (!repo.getProcessor().processCVSRequisites(getLog(), proxySettings, getCvsExe(), packageFolder, this.branch, this.tag, this.revision)) {
                 return false;
               }
             }

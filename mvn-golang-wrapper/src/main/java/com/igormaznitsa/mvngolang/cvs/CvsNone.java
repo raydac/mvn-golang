@@ -28,23 +28,20 @@ class CvsNone extends AbstractRepo {
   }
 
   @Override
-  public boolean doesContainCVS(@Nonnull final File folder) {
+  public boolean processCVSRequisites(
+      @Nonnull final Log logger, 
+      @Nullable final ProxySettings proxy, 
+      @Nullable final String customCommand, 
+      @Nonnull final File cvsFolder, 
+      @Nullable final String branchId, 
+      @Nullable final String tagId, 
+      @Nullable final String revisionId
+  ){
     return false;
   }
 
   @Override
-  public boolean upToBranch(@Nonnull  final Log logger, @Nullable final ProxySettings proxy, @Nullable  final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
+  public boolean doesContainCVS(@Nonnull File folder) {
     return false;
   }
-
-  @Override
-  public boolean upToTag(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
-    return false;
-  }
-
-  @Override
-  public boolean upToRevision(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
-    return false;
-  }
-  
 }

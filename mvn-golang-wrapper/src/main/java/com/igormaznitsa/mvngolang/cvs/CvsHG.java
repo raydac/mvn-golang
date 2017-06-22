@@ -33,17 +33,45 @@ class CvsHG extends AbstractRepo {
   }
 
   @Override
-  public boolean upToBranch(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
+  public boolean processCVSRequisites(
+      @Nonnull final Log logger, 
+      @Nullable final ProxySettings proxy, 
+      @Nullable final String customCommand, 
+      @Nonnull final File cvsFolder, 
+      @Nullable final String branchId, 
+      @Nullable final String tagId, 
+      @Nullable final String revisionId
+  ) {
+    boolean noError = true;
+
+    if (branchId!=null) {
+      noError &= upToBranch(logger, proxy, customCommand, cvsFolder, branchId);
+    }
+    
+    if (noError && tagId!=null) {
+      noError &= upToTag(logger, proxy, customCommand, cvsFolder, tagId);
+    }
+    
+    if (noError && revisionId!=null) {
+      noError &= upToRevision(logger, proxy, customCommand, cvsFolder, revisionId);
+    }
+
+    return noError;
+  }
+  
+  
+  private boolean upToBranch(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
+    logger.debug("upToBranch: "+branchId);
     return checkResult(logger, execute(customCommand, logger, cvsFolder, "update", "--clean", branchId));
   }
 
-  @Override
-  public boolean upToTag(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
+  private boolean upToTag(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
+    logger.debug("upToTag: "+tagId);
     return checkResult(logger, execute(customCommand, logger, cvsFolder, "update", "--clean", tagId));
   }
 
-  @Override
-  public boolean upToRevision(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
+  private boolean upToRevision(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
+    logger.debug("upToRevision: "+revisionId);
     return checkResult(logger, execute(customCommand, logger, cvsFolder, "update", "--clean", "--rev",revisionId));
   }
   

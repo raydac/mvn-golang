@@ -90,7 +90,14 @@ public abstract class AbstractRepo {
   public boolean prepareFolder(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customExe, @Nonnull final File cvsFolder){
     return true;
   }
-  public abstract boolean upToBranch(@Nonnull Log logger, @Nullable ProxySettings proxy, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String branchId);
-  public abstract boolean upToTag(@Nonnull Log logger, @Nullable ProxySettings proxy, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String tagId);
-  public abstract boolean upToRevision(@Nonnull Log logger, @Nullable ProxySettings proxy, @Nullable String customExe, @Nonnull File cvsFolder, @Nonnull String revisionId);
+  
+  public abstract boolean processCVSRequisites(
+      @Nonnull final Log logger, 
+      @Nullable final ProxySettings proxy, 
+      @Nullable final String customCommand, 
+      @Nonnull final File cvsFolder, 
+      @Nullable final String branchId, 
+      @Nullable final String tagId, 
+      @Nullable final String revisionId
+  );
 }
