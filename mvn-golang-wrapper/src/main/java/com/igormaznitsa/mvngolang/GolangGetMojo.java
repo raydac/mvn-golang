@@ -269,7 +269,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
             }
             
             if (this.branch != null || this.tag != null || this.revision != null) {
-              getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(this.branch,"<NOT_DEFINED>"),GetUtils.ensureNonNull(this.tag,"<NOT_DEFINED>"),GetUtils.ensureNonNull(this.revision,"<NOT_DEFINED>")));
+              getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(this.branch,"_"),GetUtils.ensureNonNull(this.tag,"_"),GetUtils.ensureNonNull(this.revision,"_")));
               if (!repo.getProcessor().processCVSRequisites(getLog(), proxySettings, getCvsExe(), packageFolder, this.branch, this.tag, this.revision)) {
                 return false;
               }
