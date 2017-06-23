@@ -23,7 +23,8 @@ public enum CVSType {
   UNKNOWN(new CvsNone()),
   GIT(new CvsGIT()),
   HG(new CvsHG()),
-  SVN(new CvsSVN());
+  SVN(new CvsSVN()),
+  BAZAAR(new CvsBZR());
 
   private final AbstractRepo processor;
 
