@@ -49,7 +49,8 @@
     <module>mvn-golang-example-clui</module>
     <module>mvn-golang-example-termboxgo</module>
     <module>mvn-golang-example-antlr</module>
-    <module>test-cvs</module>
+    <module>test-git-cvs</module>
+    <module>test-hg-cvs</module>
   </modules>
   
   <build>

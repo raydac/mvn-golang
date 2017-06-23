@@ -4,16 +4,16 @@
 
   <parent>
     <groupId>com.igormaznitsa</groupId>
-    <artifactId>test-cvs</artifactId>
+    <artifactId>test-hg-cvs</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>cvs-branch-v2</artifactId>
+  <artifactId>cvs-hg-master-tag</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>mvn-golang</packaging>
 
-  <description>Test of loading non-main branch</description>
+  <description>Test of loading main branch with tag</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,10 +41,10 @@
             <id>default-get</id>
             <configuration>
               <packages>
-                <package>github.com/raydac/mvn-golang-cvs-test</package>
+                <package>bitbucket.org/raydac/mvn-plugin-cvs-hg-test</package>
               </packages>
-              <branch>v2</branch>
-              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
+	      <branch>default</branch>
+	      <tag>tag1</tag>
             </configuration>
           </execution>
           <execution>
@@ -61,6 +61,4 @@
       </plugin>
     </plugins>
   </build>
-
-
 </project>

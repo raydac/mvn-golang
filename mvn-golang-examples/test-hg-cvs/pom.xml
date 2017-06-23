@@ -8,16 +8,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     
-    <artifactId>test-cvs</artifactId>
+    <artifactId>test-hg-cvs</artifactId>
     <packaging>pom</packaging>
 
-    <description>Test of 'get' for different identifiers</description>
+    <description>Test of 'get' for different identifiers in HG repository</description>
 
     <modules>
-      <module>cvs-branch-v2</module>
-      <module>cvs-revision</module>
-      <module>cvs-branch-master</module>
-      <module>cvs-master-tag</module>
+      <module>cvs-hg-branch-v2</module>
+      <module>cvs-hg-revision</module>
+      <module>cvs-hg-branch-master</module>
+      <module>cvs-hg-master-tag</module>
     </modules>
-
 </project>

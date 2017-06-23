@@ -4,16 +4,16 @@
 
   <parent>
     <groupId>com.igormaznitsa</groupId>
-    <artifactId>test-cvs</artifactId>
+    <artifactId>test-git-cvs</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>cvs-branch-master</artifactId>
+  <artifactId>cvs-git-revision</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>mvn-golang</packaging>
 
-  <description>Test of loading main branch</description>
+  <description>Test of loading revision</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,7 +43,7 @@
               <packages>
                 <package>github.com/raydac/mvn-golang-cvs-test</package>
               </packages>
-              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
+              <revision>53dca7f87202ae2c34b897b80e5f7c1a9bed12ad</revision>
             </configuration>
           </execution>
           <execution>
@@ -60,6 +60,4 @@
       </plugin>
     </plugins>
   </build>
-
-
 </project>
