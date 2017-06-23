@@ -1,4 +1,5 @@
 # 2.1.4 (under development)
+- added support of BAZAAR CVS (experimental)
 - fixed order of processing of CVS branch, tag and revision in `get` mojo
 - added `enforceDeletePackageFiles` flag into `get` mojo to enforce deletion of package sources and compiled version in local repository
 - fixed processing of `revision` for CVS
