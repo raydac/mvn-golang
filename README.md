@@ -8,7 +8,7 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__2.1.4 (SNAPSHOT)__
+__2.1.4 (24-jun-2017)__
  - added support of BAZAAR CVS (experimental)
  - fixed order of processing of CVS branch, tag and revision in `get` mojo
  - added `enforceDeletePackageFiles` flag into `get` mojo to enforce deletion of package sources and compiled version in local repository
