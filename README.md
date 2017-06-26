@@ -70,11 +70,44 @@ On start the plug-in makes below steps:
 # How to build
 Because it is maven plugin, to build the plugin just use
 ```
-mvn clean install
+mvn clean install -Pplugin
 ```
 To save time, examples excluded from the main build process and activated through special profile
 ```
 mvn clean install -Pexamples
+```
+
+# How to add the plugin into maven project?
+Below described build section for simple golang project which keeps source in `src` forlder and result should be placed into `bin` folder. Because it is golang project and mvn-golang plugin provides its own lifecycle, packaging for the project should be `<packaging>mvn-golang</packaging>`
+
+```
+<build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>2.1.4</version>
+        <extensions>true</extensions>
+        <configuration>
+          <goVersion>1.8.3</goVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>main.go</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+</build>
 ```
 
 # How to work with dependencies?
