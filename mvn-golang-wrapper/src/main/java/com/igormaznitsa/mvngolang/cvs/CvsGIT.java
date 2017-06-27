@@ -19,8 +19,6 @@ import java.io.File;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.maven.plugin.logging.Log;
-import com.igormaznitsa.meta.common.utils.Assertions;
-import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 class CvsGIT extends AbstractRepo {

@@ -28,6 +28,8 @@
           </proxy>
           <cvsExe>some/custom/exe.exe</cvsExe>
           <autofixGitCache>true</autofixGitCache>
+          <relativePathToCvsFolder>some/relative/path</relativePathToCvsFolder>
+          <disableCvsAutosearch>true</disableCvsAutosearch>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>
           <sources>some/sources</sources>

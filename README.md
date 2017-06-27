@@ -8,6 +8,10 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+# 2.1.5 (SNAPSHOT)
+ - improved `get` mojo, added auto-search of CVS folder in package folder hierarchy, it can be disabled with `<disableCvsAutosearch>true</disableCvsAutosearch>`, [#23](https://github.com/raydac/mvn-golang/issues/23)
+ - improved `get` mojo, added way to define relative path to CVS folder in `src` folder through `<relativePathToCvsFolder>`, by default the path extracted from package name
+
 __2.1.4 (24-jun-2017)__
  - added support of BAZAAR CVS (experimental)
  - fixed order of processing of CVS branch, tag and revision in `get` mojo

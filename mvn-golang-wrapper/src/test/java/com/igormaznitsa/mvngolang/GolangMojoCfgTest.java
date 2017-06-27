@@ -245,6 +245,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("verysecretpassword",proxy.password);
     assertEquals("127.0.0.1|127.0.0.2|127.0.0.3",proxy.nonProxyHosts);
     
+    assertTrue(getMojo.isDisableCvsAutosearch());
+    assertEquals("some/relative/path",getMojo.getRelativePathToCvsFolder());
+          
     assertEquals("some/custom/exe.exe",getMojo.getCvsExe());
     assertTrue(getMojo.isEnforceDeletePackageFiles());
     assertFalse(getMojo.isUseMavenProxy());

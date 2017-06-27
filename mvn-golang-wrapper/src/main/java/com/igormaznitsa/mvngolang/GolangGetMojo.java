@@ -97,6 +97,31 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Parameter(name = "enforceDeletePackageFiles")
   private boolean enforceDeletePackageFiles;
   
+  /**
+   * Allows directly define relative path to the package containing CVS data inside 'src' folder for package, by default the folder is the same as package.
+   * 
+   * @since 2.1.5
+   */
+  @Parameter(name = "relativePathToCvsFolder")
+  private String relativePathToCvsFolder;
+
+  /**
+   * Disable auto-search for CVS folder in package folder hierarchy, it works only if CVS folder is not defined directly.
+   * 
+   * @since 2.1.5
+   */
+  @Parameter(name = "disableCvsAutosearch", defaultValue = "false")
+  private boolean disableCvsAutosearch;
+  
+  public boolean isDisableCvsAutosearch(){
+    return this.disableCvsAutosearch;
+  }
+  
+  @Nullable
+  public String getRelativePathToCvsFolder(){
+    return this.relativePathToCvsFolder;
+  }
+  
   public boolean isAutoFixGitCache() {
     return this.autofixGitCache;
   }
@@ -195,19 +220,49 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     return result.toString();
   }
 
+  @Nullable
+  private File findRootCvsFolderForPackageSources(@Nonnull final File goPath, @Nullable final File packageSourceFolder) {
+    File foundFile = null;
+    if (packageSourceFolder != null) {
+      final File srcFolder = getSrcFolder(goPath);
+      
+      File current = packageSourceFolder;
+
+      while (!srcFolder.equals(current)) {
+        if (CVSType.investigateFolder(current) != CVSType.UNKNOWN) {
+          foundFile = current;
+          break;
+        }
+        current = current.getParentFile();
+      }
+    }
+    return foundFile;
+  }
+
+  @Nonnull
+  private File getSrcFolder(@Nonnull final File goPath) {
+    return new File(goPath, "src");
+  }
+  
   @Nonnull
   private File makePathToPackageSources(@Nonnull final File goPath, @Nonnull final String pack) {
     String path = pack.trim();
-
-    try {
-      final URI uri = URI.create(path);
-      path = processSlashes(uri.getPath());
-    } catch (IllegalArgumentException ex) {
-      // it is not url
-      path = processSlashes(path);
+    final String predefinedCvsPath = getRelativePathToCvsFolder();
+    
+    if (predefinedCvsPath != null) {
+      path = processSlashes(predefinedCvsPath);
+    } else {
+      try {
+        final URI uri = URI.create(path);
+        path = processSlashes(uri.getPath());
+      }
+      catch (IllegalArgumentException ex) {
+        // it is not url
+        path = processSlashes(path);
+      }
     }
-
-    return new File(goPath, "src" + File.separatorChar + path);
+    
+    return new File(getSrcFolder(goPath),path);
   }
 
   @Nonnull
@@ -252,25 +307,44 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
   private boolean processCVS(@Nullable final ProxySettings proxySettings, @Nonnull final File goPath) {
     final String[] packages = this.getPackages();
+    
     if (packages != null && packages.length > 0) {
       for (final String p : packages) {
-        final File packageFolder = makePathToPackageSources(goPath, p);
-        if (!packageFolder.isDirectory()) {
-          getLog().error(String.format("Can't find package '%s' at '%s'", p, packageFolder.getAbsolutePath()));
+        File rootCvsFolder = makePathToPackageSources(goPath, p);
+        
+        if (getRelativePathToCvsFolder()==null){
+          rootCvsFolder = isDisableCvsAutosearch() ? rootCvsFolder : findRootCvsFolderForPackageSources(goPath, rootCvsFolder);
+        }
+        
+        if (rootCvsFolder == null){
+          getLog().error("Can't find CVS folder in hierarchy for package '"+p+"' ["+rootCvsFolder+']');
+          return false;
+        }
+      
+        getLog().info("CVS folder for processing is : "+rootCvsFolder);
+        
+        if (!rootCvsFolder.isDirectory()) {
+          getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
           return false;
         } else {
-          final CVSType repo = CVSType.investigateFolder(packageFolder);
+          final CVSType repo = CVSType.investigateFolder(rootCvsFolder);
 
+          if (repo == CVSType.UNKNOWN){
+            getLog().error("Can't recognize CVS in the folder : "+rootCvsFolder+" (for package '"+p+"')");
+            getLog().error("May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
+            return false;
+          }
+          
           if (this.branch != null || this.tag != null || this.revision != null) {
 
-            if (!repo.getProcessor().prepareFolder(getLog(), proxySettings, getCvsExe(), packageFolder)){
-              getLog().debug("Can't prepare folder : "+packageFolder);
+            if (!repo.getProcessor().prepareFolder(getLog(), proxySettings, getCvsExe(), rootCvsFolder)){
+              getLog().debug("Can't prepare folder : "+rootCvsFolder);
               return false;
             }
             
             if (this.branch != null || this.tag != null || this.revision != null) {
               getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(this.branch,"_"),GetUtils.ensureNonNull(this.tag,"_"),GetUtils.ensureNonNull(this.revision,"_")));
-              if (!repo.getProcessor().processCVSRequisites(getLog(), proxySettings, getCvsExe(), packageFolder, this.branch, this.tag, this.revision)) {
+              if (!repo.getProcessor().processCVSRequisites(getLog(), proxySettings, getCvsExe(), rootCvsFolder, this.branch, this.tag, this.revision)) {
                 return false;
               }
             }
