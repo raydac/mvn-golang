@@ -34,6 +34,14 @@
         </configuration>
         <executions>
           <execution>
+            <id>default-build</id>
+            <configuration>
+              <buildFlags>
+                <flag>-a</flag>
+              </buildFlags>
+            </configuration>
+          </execution>
+          <execution>
             <id>default-fix</id>
             <phase>initialize</phase>
           </execution>
@@ -43,7 +51,7 @@
               <packages>
                 <package>bitbucket.org/raydac/mvn-plugin-cvs-hg-test</package>
               </packages>
-              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
+              <branch>default</branch>
             </configuration>
           </execution>
           <execution>

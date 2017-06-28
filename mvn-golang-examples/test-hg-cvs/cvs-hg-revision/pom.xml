@@ -34,6 +34,14 @@
         </configuration>
         <executions>
           <execution>
+            <id>default-build</id>
+            <configuration>
+              <buildFlags>
+                <flag>-a</flag>
+              </buildFlags>
+            </configuration>
+          </execution>
+          <execution>
             <id>default-fix</id>
             <phase>initialize</phase>
           </execution>
