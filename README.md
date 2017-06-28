@@ -245,6 +245,7 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
  - __[ANTLR usage.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-antlr)__
  - __[Multimodule project.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-multimodule)__
  - __[Preprocessing.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-preprocessing)__
+ - __[Versioning of dependencies](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/test-git-cvs)__
  
 # Public snapshot repository for the plugin
 To make accessible the snapshot version of the plugin during development, I have tuned public maven snapshot repository which can be added into project with snippet
