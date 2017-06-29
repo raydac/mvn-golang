@@ -58,7 +58,7 @@ public class CvsBZR extends AbstractRepo {
 
     return noError;
   }
-  
+
   private boolean upToBranch(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
     logger.debug("upToBranch : "+branchId);
     return checkResult(logger, execute(customCommand, logger, cvsFolder, "switch", "--force", branchId));

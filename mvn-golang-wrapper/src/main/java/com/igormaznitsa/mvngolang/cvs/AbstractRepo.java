@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,21 +32,21 @@ import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 
 public abstract class AbstractRepo {
-  
+
   private final String command;
-  
-  public AbstractRepo(@Nonnull final String command){
-    this.command = SystemUtils.IS_OS_WINDOWS ? command+".exe" : command;
+
+  public AbstractRepo(@Nonnull final String command) {
+    this.command = SystemUtils.IS_OS_WINDOWS ? command + ".exe" : command;
   }
-  
+
   @Nonnull
-  public String getCommand(){
+  public String getCommand() {
     return this.command;
   }
-  
+
   public int execute(@Nullable String customCommand, @Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull @MustNotContainNull final String... args) {
     final List<String> cli = new ArrayList<String>();
-    cli.add(GetUtils.findFirstNonNull(customCommand,this.command));
+    cli.add(GetUtils.findFirstNonNull(customCommand, this.command));
     for (final String s : args) {
       cli.add(s);
     }
@@ -75,29 +76,42 @@ public abstract class AbstractRepo {
         logger.error(new String(errorStream.toByteArray(), Charset.defaultCharset()));
       }
 
-    } catch (Exception ex) {
+    }
+    catch (Exception ex) {
       logger.error("Unexpected error", ex);
     }
 
     return result;
   }
 
-  protected boolean checkResult(@Nonnull final Log logger, final int code){
+  protected boolean checkResult(@Nonnull final Log logger, final int code) {
     return code == 0;
   }
-  
+
   public abstract boolean doesContainCVS(@Nonnull File folder);
-  public boolean prepareFolder(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customExe, @Nonnull final File cvsFolder){
+
+  public boolean prepareFolder(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customExe, @Nonnull final File cvsFolder) {
     return true;
   }
-  
+
+  public boolean processCVSForCustomOptions(
+      @Nonnull final Log logger,
+      @Nullable final ProxySettings proxy,
+      @Nonnull final File cvsFolder,
+      @Nullable final String customCommand,
+      @Nonnull @MustNotContainNull final String... options
+  ) {
+    logger.debug("customCvsCall: " + Arrays.toString(options));
+    return checkResult(logger, execute(customCommand, logger, cvsFolder, options));
+  }
+
   public abstract boolean processCVSRequisites(
-      @Nonnull final Log logger, 
-      @Nullable final ProxySettings proxy, 
-      @Nullable final String customCommand, 
-      @Nonnull final File cvsFolder, 
-      @Nullable final String branchId, 
-      @Nullable final String tagId, 
+      @Nonnull final Log logger,
+      @Nullable final ProxySettings proxy,
+      @Nullable final String customCommand,
+      @Nonnull final File cvsFolder,
+      @Nullable final String branchId,
+      @Nullable final String tagId,
       @Nullable final String revisionId
   );
 }

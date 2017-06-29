@@ -248,6 +248,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertTrue(getMojo.isDisableCvsAutosearch());
     assertEquals("some/relative/path",getMojo.getRelativePathToCvsFolder());
           
+    assertArrayEquals(new String[]{"one","two","three","four"}, getMojo.getCustomCvsOptions());
+    
     assertEquals("some/custom/exe.exe",getMojo.getCvsExe());
     assertTrue(getMojo.isEnforceDeletePackageFiles());
     assertFalse(getMojo.isUseMavenProxy());

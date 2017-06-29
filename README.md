@@ -9,6 +9,7 @@
 
 # Changelog
 __2.1.5 (SNAPSHOT)__
+ - added `customCvsOptions` into `get` mojo to provide custom options for CVS operation.
  - improved `get` mojo, added auto-search of CVS folder in package folder hierarchy, it can be disabled with `<disableCvsAutosearch>true</disableCvsAutosearch>`, [#23](https://github.com/raydac/mvn-golang/issues/23)
  - improved `get` mojo, added way to define relative path to CVS folder in `src` folder through `<relativePathToCvsFolder>`, by default the path extracted from package name
 

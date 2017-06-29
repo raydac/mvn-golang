@@ -51,8 +51,10 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern.compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   /**
-   * Flag to make attempt to fix detected Git cache error and re-execute the command. It will try to execute
-   * <pre>'git rm -r --cached .'</pre> just in the package directory to clear cache.
+   * Flag to make attempt to fix detected Git cache error and re-execute the
+   * command. It will try to execute
+   * <pre>'git rm -r --cached .'</pre> just in the package directory to clear
+   * cache.
    */
   @Parameter(name = "autofixGitCache", defaultValue = "false")
   private boolean autofixGitCache;
@@ -82,7 +84,16 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private String revision;
 
   /**
-   * Custom executable file to be executed for branch, tag and revision operations.
+   * Allows to define custom options for CVS operation.
+   *
+   * @since 2.1.5
+   */
+  @Parameter(name = "customCvsOptions")
+  private String[] customCvsOptions;
+
+  /**
+   * Custom executable file to be executed for branch, tag and revision
+   * operations.
    *
    * @since 2.1.1
    */
@@ -90,38 +101,48 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private String cvsExe;
 
   /**
-   * Search sources for package and its compiled version, enforce delete of found source folder and compiled '.a' file.
-   * 
+   * Search sources for package and its compiled version, enforce delete of
+   * found source folder and compiled '.a' file.
+   *
    * @since 2.1.4
    */
   @Parameter(name = "enforceDeletePackageFiles")
   private boolean enforceDeletePackageFiles;
-  
+
   /**
-   * Allows directly define relative path to the package containing CVS data inside 'src' folder for package, by default the folder is the same as package.
-   * 
+   * Allows directly define relative path to the package containing CVS data
+   * inside 'src' folder for package, by default the folder is the same as
+   * package.
+   *
    * @since 2.1.5
    */
   @Parameter(name = "relativePathToCvsFolder")
   private String relativePathToCvsFolder;
 
   /**
-   * Disable auto-search for CVS folder in package folder hierarchy, it works only if CVS folder is not defined directly.
-   * 
+   * Disable auto-search for CVS folder in package folder hierarchy, it works
+   * only if CVS folder is not defined directly.
+   *
    * @since 2.1.5
    */
   @Parameter(name = "disableCvsAutosearch", defaultValue = "false")
   private boolean disableCvsAutosearch;
-  
-  public boolean isDisableCvsAutosearch(){
+
+  public boolean isDisableCvsAutosearch() {
     return this.disableCvsAutosearch;
   }
-  
+
   @Nullable
-  public String getRelativePathToCvsFolder(){
+  @MustNotContainNull
+  public String[] getCustomCvsOptions() {
+    return this.customCvsOptions;
+  }
+
+  @Nullable
+  public String getRelativePathToCvsFolder() {
     return this.relativePathToCvsFolder;
   }
-  
+
   public boolean isAutoFixGitCache() {
     return this.autofixGitCache;
   }
@@ -129,7 +150,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   public boolean isEnforceDeletePackageFiles() {
     return this.enforceDeletePackageFiles;
   }
-  
+
   @Nullable
   public String getRevision() {
     return this.revision;
@@ -225,7 +246,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     File foundFile = null;
     if (packageSourceFolder != null) {
       final File srcFolder = getSrcFolder(goPath);
-      
+
       File current = packageSourceFolder;
 
       while (!srcFolder.equals(current)) {
@@ -243,12 +264,12 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private File getSrcFolder(@Nonnull final File goPath) {
     return new File(goPath, "src");
   }
-  
+
   @Nonnull
   private File makePathToPackageSources(@Nonnull final File goPath, @Nonnull final String pack) {
     String path = pack.trim();
     final String predefinedCvsPath = getRelativePathToCvsFolder();
-    
+
     if (predefinedCvsPath != null) {
       path = processSlashes(predefinedCvsPath);
     } else {
@@ -261,8 +282,8 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         path = processSlashes(path);
       }
     }
-    
-    return new File(getSrcFolder(goPath),path);
+
+    return new File(getSrcFolder(goPath), path);
   }
 
   @Nonnull
@@ -272,12 +293,13 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     try {
       final URI uri = URI.create(path);
       path = processSlashes(uri.getPath());
-    } catch (IllegalArgumentException ex) {
+    }
+    catch (IllegalArgumentException ex) {
       // it is not url
       path = processSlashes(path);
     }
 
-    return new File(goPath, "pkg" + File.separatorChar + this.getOs()+'_'+this.getArch()+ File.separatorChar + path);
+    return new File(goPath, "pkg" + File.separatorChar + this.getOs() + '_' + this.getArch() + File.separatorChar + path);
   }
 
   private boolean tryToFixGitCacheErrorsForPackages(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
@@ -307,43 +329,55 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
   private boolean processCVS(@Nullable final ProxySettings proxySettings, @Nonnull final File goPath) {
     final String[] packages = this.getPackages();
-    
+
     if (packages != null && packages.length > 0) {
       for (final String p : packages) {
         File rootCvsFolder = makePathToPackageSources(goPath, p);
-        
-        if (getRelativePathToCvsFolder()==null){
+
+        if (getRelativePathToCvsFolder() == null) {
           rootCvsFolder = isDisableCvsAutosearch() ? rootCvsFolder : findRootCvsFolderForPackageSources(goPath, rootCvsFolder);
         }
-        
-        if (rootCvsFolder == null){
-          getLog().error("Can't find CVS folder in hierarchy for package '"+p+"' ["+rootCvsFolder+']');
+
+        if (rootCvsFolder == null) {
+          getLog().error("Can't find CVS folder in hierarchy for package '" + p + "' [" + rootCvsFolder + ']');
           return false;
         }
-      
-        getLog().info("CVS folder for processing is : "+rootCvsFolder);
-        
+
+        getLog().info("CVS folder for processing is : " + rootCvsFolder);
+
         if (!rootCvsFolder.isDirectory()) {
           getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
           return false;
         } else {
           final CVSType repo = CVSType.investigateFolder(rootCvsFolder);
 
-          if (repo == CVSType.UNKNOWN){
-            getLog().error("Can't recognize CVS in the folder : "+rootCvsFolder+" (for package '"+p+"')");
+          if (repo == CVSType.UNKNOWN) {
+            getLog().error("Can't recognize CVS in the folder : " + rootCvsFolder + " (for package '" + p + "')");
             getLog().error("May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
             return false;
           }
-          
-          if (this.branch != null || this.tag != null || this.revision != null) {
 
-            if (!repo.getProcessor().prepareFolder(getLog(), proxySettings, getCvsExe(), rootCvsFolder)){
-              getLog().debug("Can't prepare folder : "+rootCvsFolder);
+          final boolean hasCvsRequisite = this.branch != null || this.tag != null || this.revision != null;
+          final String[] customcvs = this.customCvsOptions;
+
+          if (customcvs != null || hasCvsRequisite) {
+
+            if (!repo.getProcessor().prepareFolder(getLog(), proxySettings, getCvsExe(), rootCvsFolder)) {
+              getLog().debug("Can't prepare folder : " + rootCvsFolder);
               return false;
             }
-            
-            if (this.branch != null || this.tag != null || this.revision != null) {
-              getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(this.branch,"_"),GetUtils.ensureNonNull(this.tag,"_"),GetUtils.ensureNonNull(this.revision,"_")));
+
+            if (customcvs != null && hasCvsRequisite) {
+              getLog().warn("CVS branch, tag or revision are ignored for provided custom CVS options!");
+            }
+
+            if (customcvs != null) {
+              getLog().info("Custom CVS options : " + Arrays.toString(customcvs));
+              if (!repo.getProcessor().processCVSForCustomOptions(getLog(), proxySettings, rootCvsFolder, getCvsExe(), customcvs)) {
+                return false;
+              }
+            } else if (this.branch != null || this.tag != null || this.revision != null) {
+              getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(this.branch, "_"), GetUtils.ensureNonNull(this.tag, "_"), GetUtils.ensureNonNull(this.revision, "_")));
               if (!repo.getProcessor().processCVSRequisites(getLog(), proxySettings, getCvsExe(), rootCvsFolder, this.branch, this.tag, this.revision)) {
                 return false;
               }
@@ -359,40 +393,43 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   public void beforeExecution(@Nonnull final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
     if (isEnforceDeletePackageFiles()) {
       getLog().debug("Detected request to delete both package source and binary folders if they are presented");
-      
+
       final String[] packages = this.getPackages();
-        final File goPath;
-        try {
-          goPath = findGoPath(true);
-        } catch (IOException ex) {
-          throw new MojoFailureException("Can't find $GOPATH", ex);
-        }
+      final File goPath;
+      try {
+        goPath = findGoPath(true);
+      }
+      catch (IOException ex) {
+        throw new MojoFailureException("Can't find $GOPATH", ex);
+      }
 
       for (final String p : packages) {
-        getLog().info("Removing binary and source folders for package '"+p+'\'');
+        getLog().info("Removing binary and source folders for package '" + p + '\'');
 
         final File pkgSources = this.makePathToPackageSources(goPath, p);
         final File pkgBinary = this.makePathToPackageCompiled(goPath, p);
 
-        getLog().debug("Src folder : "+pkgSources);
-        getLog().debug("Pkg folder : "+pkgBinary);
-        
-        if (pkgSources.isDirectory()){
-          try{
+        getLog().debug("Src folder : " + pkgSources);
+        getLog().debug("Pkg folder : " + pkgBinary);
+
+        if (pkgSources.isDirectory()) {
+          try {
             FileUtils.deleteDirectory(pkgSources);
-          }catch(IOException ex){
-            throw new MojoExecutionException("Can't delete source folder : "+pkgSources, ex);
           }
-          getLog().info("\tDeleted source folder : "+pkgSources);
+          catch (IOException ex) {
+            throw new MojoExecutionException("Can't delete source folder : " + pkgSources, ex);
+          }
+          getLog().info("\tDeleted source folder : " + pkgSources);
         }
 
-        if (pkgBinary.isDirectory()){
-          try{
+        if (pkgBinary.isDirectory()) {
+          try {
             FileUtils.deleteDirectory(pkgBinary);
-          }catch(IOException ex){
-            throw new MojoExecutionException("Can't delete binary folder : "+pkgBinary, ex);
           }
-          getLog().info("\tDeleted binary folder : "+pkgBinary);
+          catch (IOException ex) {
+            throw new MojoExecutionException("Can't delete binary folder : " + pkgBinary, ex);
+          }
+          getLog().info("\tDeleted binary folder : " + pkgBinary);
         } else {
           final File compiled = new File(pkgBinary.getAbsolutePath() + ".a");
           if (compiled.isFile()) {
@@ -404,7 +441,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         }
       }
     }
-    
+
     if (this.branch != null || this.tag != null || this.revision != null) {
       final File goPath;
       try {
@@ -436,7 +473,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
       }
     }
   }
-  
+
   @Override
   protected boolean doesNeedOneMoreAttempt(@Nonnull final ProcessResult processResult, @Nonnull final String consoleOut, @Nonnull final String consoleErr) throws IOException, MojoExecutionException {
     boolean result = false;

@@ -34,6 +34,12 @@
           <goPath>some/path</goPath>
           <sources>some/sources</sources>
           <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
+          <customCvsOptions>
+            <op>one</op>
+            <op>two</op>
+            <op>three</op>
+            <op>four</op>
+          </customCvsOptions>
           <buildFlags>
             <flag>flag1</flag>
             <flag>flag2</flag>
