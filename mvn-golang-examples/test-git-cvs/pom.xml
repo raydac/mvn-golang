@@ -18,5 +18,6 @@
         <module>cvs-git-revision</module>
         <module>cvs-git-branch-master</module>
         <module>cvs-git-master-tag</module>
+        <module>cvs-git-custom</module>
     </modules>
 </project>

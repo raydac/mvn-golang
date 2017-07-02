@@ -9,11 +9,11 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>cvs-git-branch-master</artifactId>
+  <artifactId>cvs-git-custom</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>mvn-golang</packaging>
 
-  <description>Test of loading main branch</description>
+  <description>Test of loading main branch with tag</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,10 +48,16 @@
           <execution>
             <id>default-get</id>
             <configuration>
-              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
               <packages>
                 <package>github.com/raydac/mvn-golang-cvs-test</package>
               </packages>
+              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
+              <customCvsOptions>
+                <op>checkout</op>
+                <op>-B</op>
+                <op>master</op>
+                <op>tags/master_tag1</op>
+              </customCvsOptions>
             </configuration>
           </execution>
           <execution>
