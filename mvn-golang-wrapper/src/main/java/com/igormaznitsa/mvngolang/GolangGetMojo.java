@@ -442,7 +442,8 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
       }
     }
 
-    if (this.branch != null || this.tag != null || this.revision != null) {
+    final String [] customcvs = this.getCustomCvsOptions();
+    if (customcvs != null || this.branch != null || this.tag != null || this.revision != null) {
       final File goPath;
       try {
         goPath = findGoPath(true);
@@ -467,9 +468,10 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
       }
 
       getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
+      getLog().debug("Custom CVS options : "+Arrays.toString(customCvsOptions));
 
       if (!processCVS(proxySettings, goPath)) {
-        throw new MojoFailureException("Can't change branch or tag, see the log for errors!");
+        throw new MojoFailureException("Can't change branch or tag or execute custom CVS options, see the log for errors!");
       }
     }
   }
