@@ -1,6 +1,6 @@
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Java 6.0+](https://img.shields.io/badge/java-6.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.1.4|jar)
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.1.5|jar)
 [![Maven 3.0.3+](https://img.shields.io/badge/maven-3.0.3%2b-green.svg)](https://maven.apache.org/)
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-red.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
 [![Yandex.Money donation](https://img.shields.io/badge/donation-Я.деньги-yellow.svg)](https://money.yandex.ru/embed/small.xml?account=41001158080699&quickpay=small&yamoney-payment-type=on&button-text=01&button-size=l&button-color=orange&targets=%D0%9F%D0%BE%D0%B6%D0%B5%D1%80%D1%82%D0%B2%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5+%D0%BD%D0%B0+%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B+%D1%81+%D0%BE%D1%82%D0%BA%D1%80%D1%8B%D1%82%D1%8B%D0%BC+%D0%B8%D1%81%D1%85%D0%BE%D0%B4%D0%BD%D1%8B%D0%BC+%D0%BA%D0%BE%D0%B4%D0%BE%D0%BC&default-sum=100&successURL=)
@@ -26,31 +26,6 @@ __2.1.3 (14-apr-2017)__
  - Added list parameter `ldFlags` for `buildMojo` to define linker flags.
  - Added boolean flag `strip` for `buildMojo` to remove symbol table and DWARF from the result file.
  - Added parameter `buildMode` for `buildMojo` to define [Go build mode](https://golang.org/cmd/go/#hdr-Description_of_build_modes)
-
-__2.1.2 (07-nov-2016)__
-- Added `skip` attribute to skip execution of mojo
-- [#10](https://github.com/raydac/mvn-golang/issues/10), Added way to disable providing of $GOBIN through pseudo-path __NONE__
-- Changed maven phase for build from `compile` to `package` (to prevent build start before tests)
-- Enforced console output for `test` even in non-verbose mode
-- Added default packages `./...` for `fmt`,`vet`,`fix` and `test` tasks
-- Added `maven.test.failure.ignore` and `test` properties processing into `test` goal, also allowed method regex template after `#` like in surefire
-
-__2.1.1 (21-aug-2016)__
-- [#9](https://github.com/raydac/mvn-golang/issues/9), Added attribute `targetArm` to provide $GOARM value
-- Added support of proxy server [#8](https://github.com/raydac/mvn-golang/issues/8), added flag `useMavenProxy` to use proxy server defined either through maven settings.xml file or the `proxy` configuration section of the plugin.
-- Improved `clean` mojo, added flags to clean Go path folder defined through `goPath` parameter, and added flag to delete whole `storeFolder`
-- Added flag `ignoreErrorExitCode` to prevent failure for error exit code, it is useful in some test cases.
-- Added parameter `reportsFolder` to define folder where some reports will be placed.
-- Added parameters `outLogFile` and `errLogFile` to save execution console log as files in the report folder. By default such reports are not saved.
-- Console log for `test` will be shown in maven log only in verbose mode 
-
-__2.1.0 (28-may-2016)__
-- Output of environment variables has been moved under the `verbose` flag
-- __Added `mvninstall` goal which saves artifact into local maven repository during `install` phase,[#2 request](https://github.com/raydac/mvn-golang/issues/2)__
-- __Added support of branches and tags into `get`, it works for Git, Hg and SVN repositories__
-- Improved archetype template, added example of test
-- __Fixed issue [#3 "cannot run tests"](https://github.com/raydac/mvn-golang/issues/3)__
-
 
 # GO start!
 __Taste Go in just two commands!__
