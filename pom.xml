@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.igormaznitsa</groupId>
   <artifactId>mvn-golang</artifactId>
-  <version>2.1.5</version>
+  <version>2.1.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>mvn-golang</name>
@@ -13,7 +13,7 @@
   <inceptionYear>2016</inceptionYear>
     
   <properties>
-    <main-project-version>2.1.5</main-project-version>
+    <main-project-version>2.1.6-SNAPSHOT</main-project-version>
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
