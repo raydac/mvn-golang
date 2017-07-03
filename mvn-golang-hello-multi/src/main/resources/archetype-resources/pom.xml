@@ -1,0 +1,41 @@
+#set($dollar = '$')
+#set($str = "")
+#set($dt = $str.getClass().forName("java.util.Date").newInstance())
+#set($year = $dt.getYear() + 1900)
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>${groupId}</groupId>
+  <artifactId>${artifactId}</artifactId>
+  <version>${version}</version>
+  <packaging>pom</packaging>
+    
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <go.sdk.version>${gosdk}</go.sdk.version>
+    <go.wrapper.plugin.version>${gowrapper}</go.wrapper.plugin.version>
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+    <mvn.version>3.0</mvn.version>
+  </properties>
+
+  <prerequisites>
+    <maven>${dollar}{mvn.version}</maven>
+  </prerequisites>
+
+  <profiles>
+    <!-- The Profile allows to pack all generated executable modules into ZIP archive -->
+    <profile>
+      <id>assembly</id>
+      <modules>
+        <module>assembly-results</module>
+      </modules>
+    </profile>
+  </profiles>
+
+  <modules>
+    <module>common</module>
+    <module>app-1</module>
+    <module>app-2</module>
+  </modules>
+</project>

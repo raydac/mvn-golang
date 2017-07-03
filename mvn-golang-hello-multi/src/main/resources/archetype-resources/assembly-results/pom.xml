@@ -1,0 +1,73 @@
+#set($dollar = '$')
+#set($str = "")
+#set($dt = $str.getClass().forName("java.util.Date").newInstance())
+#set($year = $dt.getYear() + 1900)
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+    
+  <artifactId>assembly-results</artifactId>
+  <packaging>pom</packaging>
+    
+  <name>Assembly results</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>${dollar}{project.groupId}</groupId>
+      <artifactId>app-1</artifactId>
+      <version>${dollar}{project.version}</version>
+      <type>mvn-golang</type>
+    </dependency>
+    <dependency>
+      <groupId>${dollar}{project.groupId}</groupId>
+      <artifactId>app-2</artifactId>
+      <version>${dollar}{project.version}</version>
+      <type>mvn-golang</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>all-apps-${dollar}{project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <followSymLinks>false</followSymLinks>
+          <excludeDefaultDirectories>true</excludeDefaultDirectories>
+          <filesets>
+            <fileset>
+              <directory>${dollar}{basedir}${dollar}{file.separator}target</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <outputDirectory>${dollar}{basedir}/target</outputDirectory>
+          <descriptor>${dollar}{basedir}/deploy.xml</descriptor>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-archive</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+    
+</project>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor
+  name="mvn-golang-hello"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+  xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <requiredProperties>
+    <requiredProperty key="package">
+      <defaultValue>main</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="gowrapper">
+      <defaultValue>2.1.5-SNAPSHOT</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="gosdk">
+      <defaultValue>1.8.3</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
+
+  <fileSets>
+    <fileSet filtered="true" packaged="false">
+      <directory>app-1/res</directory>
+    </fileSet>
+    <fileSet filtered="true" packaged="false">
+      <directory>app-1/src</directory>
+      <includes>
+        <include>**/*.go</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" packaged="false">
+      <directory>app-1</directory>
+      <includes>
+        <include>*.iml</include>
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+    
+    <fileSet filtered="true" packaged="false">
+      <directory>app-2/res</directory>
+    </fileSet>
+    <fileSet filtered="true" packaged="false">
+      <directory>app-2/src</directory>
+      <includes>
+        <include>**/*.go</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" packaged="false">
+      <directory>app-2</directory>
+      <includes>
+        <include>*.iml</include>
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+    
+    <fileSet filtered="true" packaged="false">
+      <directory>common/res</directory>
+    </fileSet>
+    <fileSet filtered="true" packaged="false">
+      <directory>common/src</directory>
+      <includes>
+        <include>**/*.go</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" packaged="false">
+      <directory>common</directory>
+      <includes>
+        <include>*.iml</include>
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+    
+    <fileSet filtered="true" packaged="false">
+      <directory>assembly-results</directory>
+      <includes>
+        <!--<include>modules/assembly-results/*.iml</include>-->
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+    
+    <fileSet filtered="true" packaged="false">
+      <directory></directory>
+      <includes>
+        <include>*.iml</include>
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+    
+    <fileSet filtered="true" packaged="false">
+      <directory>.idea</directory>
+      <includes>
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+    
+</archetype-descriptor>

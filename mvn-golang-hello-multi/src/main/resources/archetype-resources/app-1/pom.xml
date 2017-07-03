@@ -1,0 +1,47 @@
+#set($dollar = '$')
+#set($str = "")
+#set($dt = $str.getClass().forName("java.util.Date").newInstance())
+#set($year = $dt.getYear() + 1900)
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>app-1</artifactId>
+  <packaging>mvn-golang</packaging>
+
+  <name>App-1</name>
+
+  <build>
+    <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
+    <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
+    
+    <resources>
+      <resource>
+        <directory>${dollar}{basedir}${dollar}{file.separator}res</directory>
+      </resource>
+    </resources>
+    
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${dollar}{go.wrapper.plugin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <goVersion>${dollar}{go.sdk.version}</goVersion>
+          <addToGoPath>
+            <common>${dollar}{basedir}/../common</common>
+          </addToGoPath>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
