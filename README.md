@@ -8,7 +8,8 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__2.1.5 (SNAPSHOT)__
+__2.1.5 (03-jul-2017)__
+ - added archetype for multimodule project `mvn-golang-hello-multi` 
  - added `customCvsOptions` into `get` mojo to provide custom options for CVS operation.
  - improved `get` mojo, added auto-search of CVS folder in package folder hierarchy, it can be disabled with `<disableCvsAutosearch>true</disableCvsAutosearch>`, [#23](https://github.com/raydac/mvn-golang/issues/23)
  - improved `get` mojo, added way to define relative path to CVS folder in `src` folder through `<relativePathToCvsFolder>`, by default the path extracted from package name
