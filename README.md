@@ -30,11 +30,16 @@ __2.1.3 (14-apr-2017)__
 # GO start!
 __Taste Go in just two commands!__
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.4 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.5 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello/pom.xml package
 ```
 it will generate a maven project with extra configuration files to make the project compatible with NetBeans IDE and Intellij IDEA Golang plugin, they can be removed with `mvn clean -Pclean-ide-config`    
 [Also you can take a look at the example `Hello world` project using the plugin](https://github.com/raydac/mvn-golang-example)
+   
+If you want to generate a multi-module project, then you can use such snippet
+```
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.1.5 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+```
 
 # Introduction
 The Plug-in just wraps Golang tool-chain and allows to use strong maven based infrastructure to build Golang projects. It also can automatically download needed Golang SDK from the main server and tune needed version of packets for their branch, tag or revisions.
