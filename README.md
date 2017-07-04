@@ -74,7 +74,7 @@ Below described build section for simple golang project which keeps source in `s
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>2.1.4</version>
+        <version>2.1.5</version>
         <extensions>true</extensions>
         <configuration>
           <goVersion>1.8.3</goVersion>
