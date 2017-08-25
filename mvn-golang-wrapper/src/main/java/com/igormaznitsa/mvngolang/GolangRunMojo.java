@@ -29,6 +29,7 @@ import com.igormaznitsa.meta.common.utils.ArrayUtils;
  * 
  * @since 2.0.0
  */
+@SuppressWarnings("SpellCheckingInspection")
 @Mojo(name = "run", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangRunMojo extends AbstractPackageGolangMojo {
 

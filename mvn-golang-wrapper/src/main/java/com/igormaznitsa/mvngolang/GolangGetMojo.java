@@ -198,7 +198,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   @Nonnull
   @MustNotContainNull
   private List<String> extractProblemPackagesFromErrorLog(@Nonnull final String errorLog) {
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
     final Matcher extractor = PATTERN_EXTRACT_PACKAGE_AND_STATUS.matcher(errorLog);
     while (extractor.find()) {
       final String packageName = extractor.group(1);
@@ -390,7 +390,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   }
 
   @Override
-  public void beforeExecution(@Nonnull final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
+  public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
     if (isEnforceDeletePackageFiles()) {
       getLog().debug("Detected request to delete both package source and binary folders if they are presented");
 

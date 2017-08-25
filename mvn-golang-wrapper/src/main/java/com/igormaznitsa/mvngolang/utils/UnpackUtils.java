@@ -157,9 +157,7 @@ public final class UnpackUtils {
               throw new IOException("Can't create folder : " + parent);
             }
 
-            final FileOutputStream fos = new FileOutputStream(targetFile);
-
-            try {
+            try (final FileOutputStream fos = new FileOutputStream(targetFile)) {
               if (modeZipFile) {
                 logger.debug("Unpacking ZIP entry : " + normalizedPath);
 
@@ -181,8 +179,6 @@ public final class UnpackUtils {
                   throw new IOException("Can't unpack file, illegal unpacked length : " + entry.getName());
                 }
               }
-            } finally {
-              fos.close();
             }
 
             if (makeAllExecutable) {

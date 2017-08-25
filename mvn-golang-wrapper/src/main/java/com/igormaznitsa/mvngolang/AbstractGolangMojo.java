@@ -100,7 +100,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * set of flags to be ignored among build and extra build flags, for inside use
    */
-  protected final Set<String> buildFlagsToIgnore = new HashSet<String>();
+  protected final Set<String> buildFlagsToIgnore = new HashSet<>();
   
   private static final String[] BANNER = new String[]{"______  ___             _________     ______",
     "___   |/  /__   __________  ____/________  / ______ ______________ _",
@@ -140,7 +140,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean supposeSdkArchiveFileName;
   
   /**
-   * Parameters of proxy server to be used to estabilish connection to SDK server.
+   * Parameters of proxy server to be used to make connection to SDK server.
    *
    * @since 2.1.1
    */
@@ -505,7 +505,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getBuildFlags() {
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
     for(final String s : ArrayUtils.joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY), getExtraBuildFlags())) {
       if (!this.buildFlagsToIgnore.contains(s)) {
         result.add(s);
@@ -953,12 +953,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String extractSDKFileName(@Nonnull final String listUrl, @Nonnull final Document doc, @Nonnull final String sdkBaseName, @Nonnull @MustNotContainNull final String[] allowedExtensions) throws IOException {
     getLog().debug("Looking for SDK started with base name : " + sdkBaseName);
 
-    final Set<String> variants = new HashSet<String>();
+    final Set<String> variants = new HashSet<>();
     for (final String ext : allowedExtensions) {
       variants.add(sdkBaseName + '.' + ext);
     }
 
-    final List<String> listedSdk = new ArrayList<String>();
+    final List<String> listedSdk = new ArrayList<>();
 
     final Element root = doc.getDocumentElement();
     if ("ListBucketResult".equals(root.getTagName())) {
@@ -1323,7 +1323,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       logOptionally("Executable file detected : " + foundExecutableTool);
     }
 
-    final List<String> commandLine = new ArrayList<String>();
+    final List<String> commandLine = new ArrayList<>();
     commandLine.add(foundExecutableTool.getAbsolutePath());
 
     final String gocommand = getGoCommand();
@@ -1464,7 +1464,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private static String preparePath(@Nonnull @MayContainNull final String... paths) {
     final StringBuilder result = new StringBuilder();
-    final Set<String> alreadyAdded = new HashSet<String>();
+    final Set<String> alreadyAdded = new HashSet<>();
     
     for (final String s : paths) {
       if (s != null && !s.isEmpty()) {

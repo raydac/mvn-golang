@@ -60,7 +60,7 @@ public class GolangTestMojo extends AbstractPackageGolangMojo {
       }else{
         name = new String[]{definedTest};
       }
-      final List<String> result = new ArrayList<String>();
+      final List<String> result = new ArrayList<>();
       result.add(ensureGoExtension(name[0]));
       if (definedTest.length()>1){
         result.add("-run");

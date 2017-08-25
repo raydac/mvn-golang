@@ -58,7 +58,7 @@ public class GolangToolMojo extends AbstractGolangMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getTailArguments() {
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
     result.add(this.command);
     for(final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
       result.add(s);

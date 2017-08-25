@@ -82,7 +82,7 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   @MustNotContainNull
   @Nonnull
   public List<String> getLdflagsAsList() {
-    return this.ldFlags == null ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(this.ldFlags));
+    return this.ldFlags == null ? new ArrayList<String>() : new ArrayList<>(Arrays.asList(this.ldFlags));
   }
 
   public boolean isStrip() {
@@ -159,7 +159,7 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
   @Nonnull
   @MustNotContainNull
   public String[] getCommandFlags() {
-    final List<String> flags = new ArrayList<String>();
+    final List<String> flags = new ArrayList<>();
 
     flags.add("-buildmode=" + this.buildMode);
 
