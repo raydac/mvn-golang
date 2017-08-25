@@ -938,7 +938,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private String extractSDKFileName(@Nonnull final Document doc, @Nonnull final String sdkBaseName, @Nonnull @MustNotContainNull final String[] allowedExtensions) throws IOException {
+  private String extractSDKFileName(@Nonnull final String listUrl, @Nonnull final Document doc, @Nonnull final String sdkBaseName, @Nonnull @MustNotContainNull final String[] allowedExtensions) throws IOException {
     getLog().debug("Looking for SDK started with base name : " + sdkBaseName);
 
     final Set<String> variants = new HashSet<String>();
@@ -966,7 +966,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       }
 
       getLog().error("Can't find any SDK to be used as " + sdkBaseName);
-      getLog().error("GoLang list contains listed SDKs");
+      getLog().error("GoLang list contains listed SDKs (" + listUrl + ")");
       getLog().error("..................................................");
       for (final String s : listedSdk) {
         getLog().error(s);
@@ -983,7 +983,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     String result = getSdkArchiveName();
     if (isSafeEmpty(result)) {
       final Document parsed = convertSdkListToDocument(loadGoLangSdkList(proxySettings));
-      result = extractSDKFileName(parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
+      result = extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
     } else {
       getLog().info("SDK archive name is predefined : " + result);
     }
@@ -1099,8 +1099,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       final String outLog = extractOutAsString();
       final String errLog = extractErrorOutAsString();
 
-      if (this.processConsoleOut(resultCode, outLog, errLog)) {
-        printLogs(outLog, errLog);
+      if (error || this.processConsoleOut(resultCode, outLog, errLog)) {
+        printLogs(error || enforcePrintOutput(), outLog, errLog);
       }
 
       if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
@@ -1173,8 +1173,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return new String(this.consoleErrBuffer.toByteArray(), Charset.defaultCharset());
   }
 
-  protected void printLogs(@Nonnull final String outLog, @Nonnull final String errLog) {
-    if ((enforcePrintOutput() || getLog().isDebugEnabled()) && !outLog.isEmpty()) {
+  protected void printLogs(final boolean forcePrint, @Nonnull final String outLog, @Nonnull final String errLog) {
+    if ((forcePrint || (getLog().isDebugEnabled()) && !outLog.isEmpty())) {
       getLog().info("");
       getLog().info("---------Exec.Out---------");
       for (final String str : outLog.split("\n")) {
