@@ -11,6 +11,7 @@
 __2.1.6 (SNAPSHOT)__
  - improved logging
  - added property `supposeSdkArchiveFileName` to suppose SDK archive file name if it is not presented in SDK list, active by default
+ - minimal version of Java increased to 1.7
 
 __2.1.5 (03-jul-2017)__
  - added archetype for multimodule project `mvn-golang-hello-multi` 
