@@ -23,7 +23,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.9.1</version>
+      <version>2.9.3</version>
     </dependency>
     <dependency>
       <groupId>com.igormaznitsa</groupId>
@@ -38,7 +38,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.4</version>
+      <version>2.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -56,6 +56,12 @@
       <artifactId>maven-core</artifactId>
       <version>${mvn.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-aether-provider</artifactId>
+      <version>3.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -84,32 +90,32 @@
     <dependency>
       <groupId>org.zeroturnaround</groupId>
       <artifactId>zt-exec</artifactId>
-      <version>1.9</version>
+      <version>1.10</version>
     </dependency>
     <dependency>
       <groupId>org.zeroturnaround</groupId>
       <artifactId>zt-zip</artifactId>
-      <version>1.9</version>
+      <version>1.12</version>
     </dependency>    
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>1.10</version>
+      <version>1.12</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.4</version>
+      <version>3.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.2</version>
+      <version>4.5.3</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
-      <version>1.7.19</version>
+      <version>1.7.21</version>
     </dependency>
   </dependencies>
   
@@ -121,7 +127,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.4</version>
+            <version>2.6</version>
             <executions>
               <execution>
                 <id>make-distributive</id>
@@ -174,7 +180,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.4</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>generate-sources</id>
@@ -188,7 +194,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9</version>
+            <version>2.10.4</version>
             <executions>
               <execution>
                 <id>generate-javadoc</id>
@@ -227,7 +233,7 @@
         <artifactId>meta-checker</artifactId>
         <version>${meta.version}</version>
         <configuration>
-          <restrictClassFormat>6</restrictClassFormat>
+          <restrictClassFormat>7</restrictClassFormat>
           <checkNullable>true</checkNullable>
           <checkMayContainNull>true</checkMayContainNull>
           <failForAnnotations>

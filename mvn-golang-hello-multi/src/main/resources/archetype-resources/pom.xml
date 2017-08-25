@@ -38,4 +38,8 @@
     <module>app-1</module>
     <module>app-2</module>
   </modules>
+  
+  <build>
+    <defaultGoal>clean package</defaultGoal>
+  </build>
 </project>

@@ -19,6 +19,16 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cvs-git-branch-v2</artifactId>
+      <version>${project.version}</version>
+      <type>mvn-golang</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
     <directory>${basedir}${file.separator}bin</directory>
@@ -48,6 +58,7 @@
           <execution>
             <id>default-get</id>
             <configuration>
+              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
               <packages>
                 <package>github.com/raydac/mvn-golang-cvs-test</package>
               </packages>

@@ -48,6 +48,7 @@
           <execution>
             <id>default-get</id>
             <configuration>
+              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
               <packages>
                 <package>github.com/raydac/mvn-golang-cvs-test</package>
               </packages>

@@ -132,6 +132,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean useMavenProxy;
 
   /**
+   * Suppose SDK archive file name if it is not presented in the list loaded from server.
+   * 
+   * @since 2.1.6
+   */
+  @Parameter(name = "supposeSdkArchiveFileName", defaultValue = "true")
+  private boolean supposeSdkArchiveFileName;
+  
+  /**
    * Parameters of proxy server to be used to estabilish connection to SDK server.
    *
    * @since 2.1.1
@@ -620,6 +628,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return this.useMavenProxy;
   }
 
+  public boolean getSupposeSdkArchiveFileName(){
+    return this.supposeSdkArchiveFileName;
+  }
+  
   @Nullable
   public ProxySettings getProxy() {
     return this.proxy;
@@ -965,8 +977,23 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         }
       }
 
+      if (this.supposeSdkArchiveFileName) {
+        final String supposedSdkName = sdkBaseName + '.' +(SystemUtils.IS_OS_WINDOWS ?  "zip" : "tar.gz");
+        getLog().warn("Can't find SDK file in the loaded list");
+        getLog().debug("..................................................");
+        for (final String s : listedSdk) {
+          getLog().debug(s);
+        }
+        getLog().debug("..................................................");
+        
+        getLog().warn("Supposed name of SDK archive is "+supposedSdkName+", trying to load it directly! It can be disabled with <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>)");
+        return supposedSdkName;
+      }
+
+      
       getLog().error("Can't find any SDK to be used as " + sdkBaseName);
       getLog().error("GoLang list contains listed SDKs (" + listUrl + ")");
+      getLog().error("It is possible directly define link to SDK through configuration parameter <sdkDownloadUrl>..</sdkDownloadUrl>");
       getLog().error("..................................................");
       for (final String s : listedSdk) {
         getLog().error(s);

@@ -19,6 +19,7 @@
         </goals>
         <configuration>
           <useMavenProxy>true</useMavenProxy>
+          <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>
           <customCommand>someCustomCommand</customCommand>
           <goRoot>some/root</goRoot>
           <goPath>some/path</goPath>

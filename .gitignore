@@ -14,3 +14,4 @@ buildNumber.properties
 /mvn-golang-examples/mvn-golang-example-gomobile/classes/
 /mvn-golang-examples/mvn-golang-example-gomobile/test-classes/
 /mvn-golang-examples/mvn-golang-example-antlr/generated/
+/nbactions.xml

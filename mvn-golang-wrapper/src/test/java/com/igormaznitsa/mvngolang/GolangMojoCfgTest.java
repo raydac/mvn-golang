@@ -61,6 +61,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml","custom");
     assertTrue(customMojo.isUseMavenProxy());
+    assertFalse(customMojo.getSupposeSdkArchiveFileName());
     assertFalse(customMojo.isSkip());
     assertNull(customMojo.getProxy());
     assertNull(customMojo.getTargetArch());

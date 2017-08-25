@@ -19,6 +19,16 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cvs-hg-branch-v2</artifactId>
+      <version>${project.version}</version>
+      <type>mvn-golang</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
     <directory>${basedir}${file.separator}bin</directory>
