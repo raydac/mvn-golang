@@ -8,24 +8,17 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.1.6 (SNAPSHOT)__
+ - improved logging
+ - added property `supposeSdkArchiveFileName` to suppose SDK archive file name if it is not presented in SDK list, active by default
+
 __2.1.5 (03-jul-2017)__
  - added archetype for multimodule project `mvn-golang-hello-multi` 
  - added `customCvsOptions` into `get` mojo to provide custom options for CVS operation.
  - improved `get` mojo, added auto-search of CVS folder in package folder hierarchy, it can be disabled with `<disableCvsAutosearch>true</disableCvsAutosearch>`, [#23](https://github.com/raydac/mvn-golang/issues/23)
  - improved `get` mojo, added way to define relative path to CVS folder in `src` folder through `<relativePathToCvsFolder>`, by default the path extracted from package name
-
-__2.1.4 (24-jun-2017)__
- - added support of BAZAAR CVS (experimental)
- - fixed order of processing of CVS branch, tag and revision in `get` mojo
- - added `enforceDeletePackageFiles` flag into `get` mojo to enforce deletion of package sources and compiled version in local repository
- - fixed processing of `revision` for CVS
-
-__2.1.3 (14-apr-2017)__
- - Improved `go-hello-test` archetype to generate [Intellij Idea Go plugin project structure](https://plugins.jetbrains.com/plugin/5047-go-language-golang-org-support-plugin)
- - Added flag `enforceGoPathToEnd` to enforce changing of folder list order in new generated GOPATH
- - Added list parameter `ldFlags` for `buildMojo` to define linker flags.
- - Added boolean flag `strip` for `buildMojo` to remove symbol table and DWARF from the result file.
- - Added parameter `buildMode` for `buildMojo` to define [Go build mode](https://golang.org/cmd/go/#hdr-Description_of_build_modes)
+   
+[full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
 # GO start!
 __Taste Go in just two commands!__

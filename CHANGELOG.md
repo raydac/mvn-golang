@@ -1,3 +1,7 @@
+# 2.1.6
+ - improved logging
+ - added property `supposeSdkArchiveFileName` to suppose SDK archive file name if it is not presented in SDK list, active by default
+
 # 2.1.5 (03-jul-2017)
 - added archetype for multimodule project `mvn-golang-hello-multi` 
 - added `customCvsOptions` into `get` mojo to provide custom options for CVS operation.
