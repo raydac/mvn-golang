@@ -1174,22 +1174,31 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   protected void printLogs(final boolean forcePrint, @Nonnull final String outLog, @Nonnull final String errLog) {
-    if ((forcePrint || (getLog().isDebugEnabled()) && !outLog.isEmpty())) {
-      getLog().info("");
-      getLog().info("---------Exec.Out---------");
-      for (final String str : outLog.split("\n")) {
-        getLog().info(StrUtils.trimRight(str));
+    final boolean outLogNotEmpty = !outLog.isEmpty();
+    final boolean errLogNotEmpty = !errLog.isEmpty();
+
+    if (outLogNotEmpty) {
+      if (forcePrint || getLog().isDebugEnabled()) {
+        getLog().info("");
+        getLog().info("---------Exec.Out---------");
+        for (final String str : outLog.split("\n")) {
+          getLog().info(StrUtils.trimRight(str));
+        }
+        getLog().info("");
+      } else {
+        getLog().debug("There is not any log out from the process");
       }
-      getLog().info("");
     }
 
-    if (!errLog.isEmpty()) {
+    if (errLogNotEmpty) {
       getLog().error("");
       getLog().error("---------Exec.Err---------");
       for (final String str : errLog.split("\n")) {
         getLog().error(StrUtils.trimRight(str));
       }
       getLog().error("");
+    } else {
+      getLog().debug("There is not any log error from the process");
     }
 
   }
