@@ -70,6 +70,7 @@
   </profiles>
 
   <build>
+    <defaultGoal>clean package</defaultGoal>
     <finalName>${dollar}{project.artifactId}-${dollar}{maven.build.timestamp}</finalName>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
     <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
