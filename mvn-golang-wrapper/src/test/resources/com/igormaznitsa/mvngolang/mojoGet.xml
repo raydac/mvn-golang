@@ -27,6 +27,7 @@
                         <password>verysecretpassword</password>
                         <nonProxyHosts>127.0.0.1|127.0.0.2|127.0.0.3</nonProxyHosts>
                     </proxy>
+                    <deleteCommonPkg>true</deleteCommonPkg>
                     <cvsExe>some/custom/exe.exe</cvsExe>
                     <autofixGitCache>true</autofixGitCache>
                     <relativePathToCvsFolder>some/relative/path</relativePathToCvsFolder>
