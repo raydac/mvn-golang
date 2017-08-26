@@ -58,11 +58,12 @@
           <execution>
             <id>default-get</id>
             <configuration>
+              <enforceDeletePackageFiles>true</enforceDeletePackageFiles>
               <packages>
                 <package>bitbucket.org/raydac/mvn-plugin-cvs-hg-test</package>
               </packages>
-	      <branch>default</branch>
-	      <tag>tag1</tag>
+      	      <branch>default</branch>
+	            <tag>tag1</tag>
             </configuration>
           </execution>
           <execution>
