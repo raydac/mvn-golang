@@ -108,6 +108,14 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     private boolean enforceDeletePackageFiles;
 
     /**
+     * Delete whole common pkg folder at $GOPATH/pkg.
+     *
+     * @since 2.1.6
+     */
+    @Parameter(name = "deleteCommonPkg", defaultValue = "false")
+    private boolean deleteCommonPkg;
+
+    /**
      * Allows directly define relative path to the package containing CVS data
      * inside 'src' folder for package, by default the folder is the same as
      * package.
@@ -159,6 +167,10 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
     public boolean isDisableCvsAutosearch() {
         return this.disableCvsAutosearch;
+    }
+
+    public boolean getDeleteCommonPkg() {
+        return this.deleteCommonPkg;
     }
 
     @Nullable
@@ -323,58 +335,58 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         return fixed != 0;
     }
 
-    private boolean processCVS(@Nullable final ProxySettings proxySettings, @Nonnull final File goPath) {
-        final String[] packages = this.getPackages();
+    private static synchronized boolean processCVS(@Nonnull final GolangGetMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull final File goPath) {
+        final String[] packages = instance.getPackages();
 
         if (packages != null && packages.length > 0) {
             for (final String p : packages) {
-                File rootCvsFolder = makePathToPackageSources(goPath, p);
+                File rootCvsFolder = instance.makePathToPackageSources(goPath, p);
 
-                if (getRelativePathToCvsFolder() == null) {
-                    rootCvsFolder = isDisableCvsAutosearch() ? rootCvsFolder : findRootCvsFolderForPackageSources(goPath, rootCvsFolder);
+                if (instance.getRelativePathToCvsFolder() == null) {
+                    rootCvsFolder = instance.isDisableCvsAutosearch() ? rootCvsFolder : instance.findRootCvsFolderForPackageSources(goPath, rootCvsFolder);
                 }
 
                 if (rootCvsFolder == null) {
-                    getLog().error("Can't find CVS folder in hierarchy for package '" + p + "' [" + rootCvsFolder + ']');
+                    instance.getLog().error("Can't find CVS folder in hierarchy for package '" + p + "' [" + rootCvsFolder + ']');
                     return false;
                 }
 
-                getLog().info("CVS folder for processing is : " + rootCvsFolder);
+                instance.getLog().info("CVS folder for processing is : " + rootCvsFolder);
 
                 if (!rootCvsFolder.isDirectory()) {
-                    getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
+                    instance.getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
                     return false;
                 } else {
                     final CVSType repo = CVSType.investigateFolder(rootCvsFolder);
 
                     if (repo == CVSType.UNKNOWN) {
-                        getLog().error("Can't recognize CVS in the folder : " + rootCvsFolder + " (for package '" + p + "')");
-                        getLog().error("May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
+                        instance.getLog().error("Can't recognize CVS in the folder : " + rootCvsFolder + " (for package '" + p + "')");
+                        instance.getLog().error("May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
                         return false;
                     }
 
-                    final boolean hasCvsRequisite = this.branch != null || this.tag != null || this.revision != null;
-                    final String[] customcvs = this.customCvsOptions;
+                    final boolean hasCvsRequisite = instance.branch != null || instance.tag != null || instance.revision != null;
+                    final String[] customcvs = instance.customCvsOptions;
 
                     if (customcvs != null || hasCvsRequisite) {
 
-                        if (!repo.getProcessor().prepareFolder(getLog(), proxySettings, getCvsExe(), rootCvsFolder)) {
-                            getLog().debug("Can't prepare folder : " + rootCvsFolder);
+                        if (!repo.getProcessor().prepareFolder(instance.getLog(), proxySettings, instance.getCvsExe(), rootCvsFolder)) {
+                            instance.getLog().debug("Can't prepare folder : " + rootCvsFolder);
                             return false;
                         }
 
                         if (customcvs != null && hasCvsRequisite) {
-                            getLog().warn("CVS branch, tag or revision are ignored for provided custom CVS options!");
+                            instance.getLog().warn("CVS branch, tag or revision are ignored for provided custom CVS options!");
                         }
 
                         if (customcvs != null) {
-                            getLog().info("Custom CVS options : " + Arrays.toString(customcvs));
-                            if (!repo.getProcessor().processCVSForCustomOptions(getLog(), proxySettings, rootCvsFolder, getCvsExe(), customcvs)) {
+                            instance.getLog().info("Custom CVS options : " + Arrays.toString(customcvs));
+                            if (!repo.getProcessor().processCVSForCustomOptions(instance.getLog(), proxySettings, rootCvsFolder, instance.getCvsExe(), customcvs)) {
                                 return false;
                             }
-                        } else if (this.branch != null || this.tag != null || this.revision != null) {
-                            getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(this.branch, "_"), GetUtils.ensureNonNull(this.tag, "_"), GetUtils.ensureNonNull(this.revision, "_")));
-                            if (!repo.getProcessor().processCVSRequisites(getLog(), proxySettings, getCvsExe(), rootCvsFolder, this.branch, this.tag, this.revision)) {
+                        } else if (instance.branch != null || instance.tag != null || instance.revision != null) {
+                            instance.getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(instance.branch, "_"), GetUtils.ensureNonNull(instance.tag, "_"), GetUtils.ensureNonNull(instance.revision, "_")));
+                            if (!repo.getProcessor().processCVSRequisites(instance.getLog(), proxySettings, instance.getCvsExe(), rootCvsFolder, instance.branch, instance.tag, instance.revision)) {
                                 return false;
                             }
                         }
@@ -387,7 +399,33 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
     @Override
     public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
+        if (getDeleteCommonPkg()) {
+            getLog().warn("Request to delete whole common pkg folder");
+
+            final File goPath;
+            try {
+                goPath = findGoPath(true);
+            } catch (IOException ex) {
+                throw new MojoExecutionException("Can't find $GOPATH", ex);
+            }
+
+            final File pkgBinary = new File(goPath, "pkg");
+
+            if (pkgBinary.isDirectory()) {
+                try {
+                    FileUtils.deleteDirectory(pkgBinary);
+                    getLog().warn("Folder " + pkgBinary + " has been deleted");
+                } catch (IOException ex) {
+                    throw new MojoExecutionException("Can't delete common PKG folder : " + pkgBinary, ex);
+                }
+            } else {
+                getLog().info("PKG folder is not found : " + pkgBinary);
+            }
+
+        }
+
         if (isEnforceDeletePackageFiles()) {
+            int deletedInstances = 0;
             getLog().debug("Detected request to delete both package source and binary folders if they are presented");
 
             final String[] packages = this.getPackages();
@@ -395,7 +433,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
             try {
                 goPath = findGoPath(true);
             } catch (IOException ex) {
-                throw new MojoFailureException("Can't find $GOPATH", ex);
+                throw new MojoExecutionException("Can't find $GOPATH", ex);
             }
 
             for (final String p : packages) {
@@ -410,15 +448,19 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
                 if (pkgSources.isDirectory()) {
                     try {
                         FileUtils.deleteDirectory(pkgSources);
+                        deletedInstances++;
                     } catch (IOException ex) {
                         throw new MojoExecutionException("Can't delete source folder : " + pkgSources, ex);
                     }
                     getLog().info("\tDeleted source folder : " + pkgSources);
+                } else {
+                    getLog().debug("Folder " + pkgSources + " is not found");
                 }
 
                 if (pkgBinary.isDirectory()) {
                     try {
                         FileUtils.deleteDirectory(pkgBinary);
+                        deletedInstances++;
                     } catch (IOException ex) {
                         throw new MojoExecutionException("Can't delete binary folder : " + pkgBinary, ex);
                     }
@@ -429,8 +471,20 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
                         if (!compiled.delete()) {
                             throw new MojoExecutionException("Can't delete compiled file : " + compiled);
                         }
+                        deletedInstances++;
                         getLog().info("\tDeleted compiled file : " + compiled);
+                    } else {
+                        getLog().debug("File " + compiled + " is not found");
                     }
+                }
+            }
+
+            if (deletedInstances > 0) {
+                try {
+                    getLog().info("1.5 second delay to be visible by systems analyzing file time stamp");
+                    Thread.sleep(1500L);
+                } catch (InterruptedException ex) {
+                    throw new MojoExecutionException("Interrupted");
                 }
             }
         }
@@ -446,6 +500,8 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
             getLog().info("(!) Get initial version of package repository before CVS operations");
             this.buildFlagsToIgnore.add("-u");
+            this.addTmpBuildFlagIfNotPresented("-d");
+
             try {
                 final boolean error = this.doMainBusiness(proxySettings, 10);
                 if (error) {
@@ -455,12 +511,13 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
                 throw new MojoExecutionException("Can't get packages", ex);
             } finally {
                 this.buildFlagsToIgnore.clear();
+                this.tempBuildFlags.clear();
             }
 
             getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
             getLog().debug("Custom CVS options : " + Arrays.toString(customCvsOptions));
 
-            if (!processCVS(proxySettings, goPath)) {
+            if (!processCVS(this, proxySettings, goPath)) {
                 throw new MojoFailureException("Can't change branch or tag or execute custom CVS options, see the log for errors!");
             }
         }
