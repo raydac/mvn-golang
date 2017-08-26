@@ -165,6 +165,68 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         return result.toString();
     }
 
+    private static synchronized boolean processCVS(@Nonnull final GolangGetMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull final File goPath) {
+        final String[] packages = instance.getPackages();
+
+        if (packages != null && packages.length > 0) {
+            for (final String p : packages) {
+                File rootCvsFolder = instance.makePathToPackageSources(goPath, p);
+
+                if (instance.getRelativePathToCvsFolder() == null) {
+                    rootCvsFolder = instance.isDisableCvsAutosearch() ? rootCvsFolder : instance.findRootCvsFolderForPackageSources(goPath, rootCvsFolder);
+                }
+
+                if (rootCvsFolder == null) {
+                    instance.getLog().error("Can't find CVS folder in hierarchy for package '" + p + "' [" + rootCvsFolder + ']');
+                    return false;
+                }
+
+                instance.getLog().info("CVS folder for processing is : " + rootCvsFolder);
+
+                if (!rootCvsFolder.isDirectory()) {
+                    instance.getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
+                    return false;
+                } else {
+                    final CVSType repo = CVSType.investigateFolder(rootCvsFolder);
+
+                    if (repo == CVSType.UNKNOWN) {
+                        instance.getLog().error("Can't recognize CVS in the folder : " + rootCvsFolder + " (for package '" + p + "')");
+                        instance.getLog().error("May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
+                        return false;
+                    }
+
+                    final boolean hasCvsRequisite = instance.branch != null || instance.tag != null || instance.revision != null;
+                    final String[] customcvs = instance.customCvsOptions;
+
+                    if (customcvs != null || hasCvsRequisite) {
+
+                        if (!repo.getProcessor().prepareFolder(instance.getLog(), proxySettings, instance.getCvsExe(), rootCvsFolder)) {
+                            instance.getLog().debug("Can't prepare folder : " + rootCvsFolder);
+                            return false;
+                        }
+
+                        if (customcvs != null && hasCvsRequisite) {
+                            instance.getLog().warn("CVS branch, tag or revision are ignored for provided custom CVS options!");
+                        }
+
+                        if (customcvs != null) {
+                            instance.getLog().info("Custom CVS options : " + Arrays.toString(customcvs));
+                            if (!repo.getProcessor().processCVSForCustomOptions(instance.getLog(), proxySettings, rootCvsFolder, instance.getCvsExe(), customcvs)) {
+                                return false;
+                            }
+                        } else if (instance.branch != null || instance.tag != null || instance.revision != null) {
+                            instance.getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(instance.branch, "_"), GetUtils.ensureNonNull(instance.tag, "_"), GetUtils.ensureNonNull(instance.revision, "_")));
+                            if (!repo.getProcessor().processCVSRequisites(instance.getLog(), proxySettings, instance.getCvsExe(), rootCvsFolder, instance.branch, instance.tag, instance.revision)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     public boolean isDisableCvsAutosearch() {
         return this.disableCvsAutosearch;
     }
@@ -333,68 +395,6 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
             fixed++;
         }
         return fixed != 0;
-    }
-
-    private static synchronized boolean processCVS(@Nonnull final GolangGetMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull final File goPath) {
-        final String[] packages = instance.getPackages();
-
-        if (packages != null && packages.length > 0) {
-            for (final String p : packages) {
-                File rootCvsFolder = instance.makePathToPackageSources(goPath, p);
-
-                if (instance.getRelativePathToCvsFolder() == null) {
-                    rootCvsFolder = instance.isDisableCvsAutosearch() ? rootCvsFolder : instance.findRootCvsFolderForPackageSources(goPath, rootCvsFolder);
-                }
-
-                if (rootCvsFolder == null) {
-                    instance.getLog().error("Can't find CVS folder in hierarchy for package '" + p + "' [" + rootCvsFolder + ']');
-                    return false;
-                }
-
-                instance.getLog().info("CVS folder for processing is : " + rootCvsFolder);
-
-                if (!rootCvsFolder.isDirectory()) {
-                    instance.getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
-                    return false;
-                } else {
-                    final CVSType repo = CVSType.investigateFolder(rootCvsFolder);
-
-                    if (repo == CVSType.UNKNOWN) {
-                        instance.getLog().error("Can't recognize CVS in the folder : " + rootCvsFolder + " (for package '" + p + "')");
-                        instance.getLog().error("May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
-                        return false;
-                    }
-
-                    final boolean hasCvsRequisite = instance.branch != null || instance.tag != null || instance.revision != null;
-                    final String[] customcvs = instance.customCvsOptions;
-
-                    if (customcvs != null || hasCvsRequisite) {
-
-                        if (!repo.getProcessor().prepareFolder(instance.getLog(), proxySettings, instance.getCvsExe(), rootCvsFolder)) {
-                            instance.getLog().debug("Can't prepare folder : " + rootCvsFolder);
-                            return false;
-                        }
-
-                        if (customcvs != null && hasCvsRequisite) {
-                            instance.getLog().warn("CVS branch, tag or revision are ignored for provided custom CVS options!");
-                        }
-
-                        if (customcvs != null) {
-                            instance.getLog().info("Custom CVS options : " + Arrays.toString(customcvs));
-                            if (!repo.getProcessor().processCVSForCustomOptions(instance.getLog(), proxySettings, rootCvsFolder, instance.getCvsExe(), customcvs)) {
-                                return false;
-                            }
-                        } else if (instance.branch != null || instance.tag != null || instance.revision != null) {
-                            instance.getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(instance.branch, "_"), GetUtils.ensureNonNull(instance.tag, "_"), GetUtils.ensureNonNull(instance.revision, "_")));
-                            if (!repo.getProcessor().processCVSRequisites(instance.getLog(), proxySettings, instance.getCvsExe(), rootCvsFolder, instance.branch, instance.tag, instance.revision)) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return true;
     }
 
     @Override
