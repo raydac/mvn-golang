@@ -15,56 +15,57 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import javax.annotation.Nonnull;
-
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import com.igormaznitsa.meta.common.utils.ArrayUtils;
+
+import javax.annotation.Nonnull;
 
 /**
  * The Mojo allows to run a program, it wraps <b>run</b> command.
- * 
+ *
  * @since 2.0.0
  */
 @SuppressWarnings("SpellCheckingInspection")
 @Mojo(name = "run", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangRunMojo extends AbstractPackageGolangMojo {
 
-  /**
-   * If the parameter is defined then <b>-exec</b> will be used with the parameter value.
-   * @since 2.0.0
-   */
-  @Parameter(name = "xprog")
-  private String xprog;
-  
-  @Override
-  public boolean isSourceFolderRequired() {
-    return true;
-  }
+    /**
+     * If the parameter is defined then <b>-exec</b> will be used with the parameter value.
+     *
+     * @since 2.0.0
+     */
+    @Parameter(name = "xprog")
+    private String xprog;
 
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  protected String[] getExtraBuildFlags() {
-    String [] result = ArrayUtils.EMPTY_STRING_ARRAY;
-    if (this.xprog != null){
-      result = new String[]{"-exec",this.xprog};
+    @Override
+    public boolean isSourceFolderRequired() {
+        return true;
     }
-    return result;
-  }
-  
-  @Override
-  @Nonnull
-  public String getGoCommand() {
-    return "run";
-  }
 
-  @Override
-  public boolean enforcePrintOutput() {
-    return true;
-  }
+    @Override
+    @Nonnull
+    @MustNotContainNull
+    protected String[] getExtraBuildFlags() {
+        String[] result = ArrayUtils.EMPTY_STRING_ARRAY;
+        if (this.xprog != null) {
+            result = new String[]{"-exec", this.xprog};
+        }
+        return result;
+    }
+
+    @Override
+    @Nonnull
+    public String getGoCommand() {
+        return "run";
+    }
+
+    @Override
+    public boolean enforcePrintOutput() {
+        return true;
+    }
 
 }

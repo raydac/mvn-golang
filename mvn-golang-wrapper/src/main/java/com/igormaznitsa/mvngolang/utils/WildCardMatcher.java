@@ -15,43 +15,43 @@
  */
 package com.igormaznitsa.mvngolang.utils;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 
 public final class WildCardMatcher {
 
-  private final Pattern pattern;
-  private final String addressPattern;
+    private final Pattern pattern;
+    private final String addressPattern;
 
-  public WildCardMatcher(@Nonnull final String txt) {
-    this.addressPattern = txt.trim();
-    final StringBuilder builder = new StringBuilder();
-    for (final char c : this.addressPattern.toCharArray()) {
-      switch (c) {
-        case '*':
-          builder.append(".*");
-          break;
-        case '?':
-          builder.append('.');
-          break;
-        default: {
-          final String code = Integer.toHexString(c).toUpperCase(Locale.ENGLISH);
-          builder.append("\\u").append("0000".substring(0,4-code.length())).append(code);
+    public WildCardMatcher(@Nonnull final String txt) {
+        this.addressPattern = txt.trim();
+        final StringBuilder builder = new StringBuilder();
+        for (final char c : this.addressPattern.toCharArray()) {
+            switch (c) {
+                case '*':
+                    builder.append(".*");
+                    break;
+                case '?':
+                    builder.append('.');
+                    break;
+                default: {
+                    final String code = Integer.toHexString(c).toUpperCase(Locale.ENGLISH);
+                    builder.append("\\u").append("0000".substring(0, 4 - code.length())).append(code);
+                }
+                break;
+            }
         }
-        break;
-      }
+        this.pattern = Pattern.compile(builder.toString());
     }
-    this.pattern = Pattern.compile(builder.toString());
-  }
 
-  public boolean match(@Nonnull final String txt) {
-    return this.pattern.matcher(txt).matches();
-  }
+    public boolean match(@Nonnull final String txt) {
+        return this.pattern.matcher(txt).matches();
+    }
 
-  @Nonnull
-  @Override
-  public String toString() {
-    return this.addressPattern;
-  }
+    @Nonnull
+    @Override
+    public String toString() {
+        return this.addressPattern;
+    }
 }

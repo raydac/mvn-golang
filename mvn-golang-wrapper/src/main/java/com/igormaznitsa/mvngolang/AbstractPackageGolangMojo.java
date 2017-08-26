@@ -15,45 +15,44 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import javax.annotation.Nonnull;
-
-import javax.annotation.Nullable;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
+import org.apache.maven.plugins.annotations.Parameter;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
-  /**
-   * List of packages.
-   */
-  @Parameter(name = "packages")
-  private String[] packages;
+    /**
+     * List of packages.
+     */
+    @Parameter(name = "packages")
+    private String[] packages;
 
-  @Nullable
-  @MustNotContainNull
-  protected String [] getDefaultPackages() {
-    return null;
-  }
-  
-  @Nullable
-  @MustNotContainNull
-  public String [] getPackages(){
-    return this.packages == null ? this.getDefaultPackages() : this.packages.clone();
-  }
-  
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  public String[] getTailArguments() {
-    return GetUtils.ensureNonNull(getPackages(), ArrayUtils.EMPTY_STRING_ARRAY);
-  }
+    @Nullable
+    @MustNotContainNull
+    protected String[] getDefaultPackages() {
+        return null;
+    }
 
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  public String[] getCommandFlags() {
-    return ArrayUtils.EMPTY_STRING_ARRAY;
-  }
+    @Nullable
+    @MustNotContainNull
+    public String[] getPackages() {
+        return this.packages == null ? this.getDefaultPackages() : this.packages.clone();
+    }
+
+    @Override
+    @Nonnull
+    @MustNotContainNull
+    public String[] getTailArguments() {
+        return GetUtils.ensureNonNull(getPackages(), ArrayUtils.EMPTY_STRING_ARRAY);
+    }
+
+    @Override
+    @Nonnull
+    @MustNotContainNull
+    public String[] getCommandFlags() {
+        return ArrayUtils.EMPTY_STRING_ARRAY;
+    }
 }

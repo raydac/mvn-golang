@@ -15,12 +15,12 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import javax.annotation.Nonnull;
-
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import javax.annotation.Nonnull;
 
 
 /**
@@ -28,21 +28,21 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  */
 @Mojo(name = "custom", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangCustomMojo extends AbstractPackageGolangMojo {
-  
-  /**
-   * Command for Go tool to be executed
-   */
-  @Parameter(name = "customCommand")
-  private String customCommand;
-  
-  @Override
-  @Nonnull
-  public String getGoCommand() {
-    return this.customCommand == null ? "" : this.customCommand;
-  }
 
-  @Override
-  public boolean enforcePrintOutput() {
-    return true;
-  }
+    /**
+     * Command for Go tool to be executed
+     */
+    @Parameter(name = "customCommand")
+    private String customCommand;
+
+    @Override
+    @Nonnull
+    public String getGoCommand() {
+        return this.customCommand == null ? "" : this.customCommand;
+    }
+
+    @Override
+    public boolean enforcePrintOutput() {
+        return true;
+    }
 }

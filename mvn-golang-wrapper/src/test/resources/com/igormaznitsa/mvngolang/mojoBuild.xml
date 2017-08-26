@@ -1,58 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.igormaznitsa</groupId>
-  <artifactId>mvngolang-tests</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  
-  <packaging>jar</packaging>
-  <name>Test GoLangMojo</name>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.igormaznitsa</groupId>
-        <artifactId>mvn-golang-wrapper</artifactId>
-        <goals>
-          <goal>build</goal>
-        </goals>
-        <configuration>
-          <skip>true</skip>
-          <useMavenProxy>true</useMavenProxy>
-          <targetOs>someos</targetOs>
-          <targetArch>somearch</targetArch>
-          <targetArm>5566677</targetArm>
-          <useGoTool>someGo.bat</useGoTool>
-          <resultFolder>target/place</resultFolder>
-          <resultName>targetName</resultName>
-          <hideBanner>false</hideBanner>
-          <goRoot>some/root</goRoot>
-          <goPath>some/path</goPath>
-          <sources>some/sources</sources>
-          <exec>gomobile</exec>
-          <execSubpath>/bin/misc/</execSubpath>
-          <buildMode>plugin</buildMode>
-          <strip>true</strip>
-          <enforceGoPathToEnd>true</enforceGoPathToEnd>
-          <ldFlags>
-            <flag>-extldflags</flag>
-            <flag>"-static"</flag>
-          </ldFlags>
-          <buildFlags>
-            <flag>flag1</flag>
-            <flag>flag2</flag>
-          </buildFlags>
-          <packages>
-            <package>one_pack</package>
-            <package>two_pack</package>
-          </packages>
-          <env>
-            <somekey>somevalue</somekey>
-          </env>
-        </configuration>
-      </plugin>  
-    </plugins>
-  </build>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvngolang-tests</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+    <name>Test GoLangMojo</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.igormaznitsa</groupId>
+                <artifactId>mvn-golang-wrapper</artifactId>
+                <goals>
+                    <goal>build</goal>
+                </goals>
+                <configuration>
+                    <skip>true</skip>
+                    <useMavenProxy>true</useMavenProxy>
+                    <targetOs>someos</targetOs>
+                    <targetArch>somearch</targetArch>
+                    <targetArm>5566677</targetArm>
+                    <useGoTool>someGo.bat</useGoTool>
+                    <resultFolder>target/place</resultFolder>
+                    <resultName>targetName</resultName>
+                    <hideBanner>false</hideBanner>
+                    <goRoot>some/root</goRoot>
+                    <goPath>some/path</goPath>
+                    <sources>some/sources</sources>
+                    <exec>gomobile</exec>
+                    <execSubpath>/bin/misc/</execSubpath>
+                    <buildMode>plugin</buildMode>
+                    <strip>true</strip>
+                    <enforceGoPathToEnd>true</enforceGoPathToEnd>
+                    <ldFlags>
+                        <flag>-extldflags</flag>
+                        <flag>"-static"</flag>
+                    </ldFlags>
+                    <buildFlags>
+                        <flag>flag1</flag>
+                        <flag>flag2</flag>
+                    </buildFlags>
+                    <packages>
+                        <package>one_pack</package>
+                        <package>two_pack</package>
+                    </packages>
+                    <env>
+                        <somekey>somevalue</somekey>
+                    </env>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

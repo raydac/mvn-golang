@@ -15,69 +15,70 @@
  */
 package com.igormaznitsa.mvngolang.cvs;
 
-import java.io.File;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
+import org.apache.maven.plugin.logging.Log;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.apache.maven.plugin.logging.Log;
-import com.igormaznitsa.mvngolang.utils.ProxySettings;
+import java.io.File;
 
 class CvsGIT extends AbstractRepo {
 
-  CvsGIT() {
-    super("git");
-  }
-
-  @Override
-  public boolean doesContainCVS(@Nonnull final File folder) {
-    return new File(folder, ".git").isDirectory();
-  }
-
-  @Override
-  public boolean processCVSRequisites(
-      @Nonnull final Log logger,
-      @Nullable final ProxySettings proxy,
-      @Nullable final String customCommand,
-      @Nonnull final File cvsFolder,
-      @Nullable final String branchId,
-      @Nullable final String tagId,
-      @Nullable final String revisionId
-  ) {
-    boolean notError = true;
-
-    if (branchId!=null) {
-      notError &= upToBranch(logger, proxy, customCommand, cvsFolder, branchId);
-    }
-    
-    if (notError && tagId != null) {
-      if (branchId == null) {
-        notError &= upToBranch(logger, proxy, customCommand, cvsFolder, "master");
-      }
-      
-      if (notError){
-        notError &= upToTag(logger, proxy, customCommand, cvsFolder, tagId);
-      }
+    CvsGIT() {
+        super("git");
     }
 
-    if (notError && revisionId != null) {
-      notError &= upToRevision(logger, proxy, customCommand, cvsFolder, revisionId);
+    @Override
+    public boolean doesContainCVS(@Nonnull final File folder) {
+        return new File(folder, ".git").isDirectory();
     }
 
-    return notError;
-  }
+    @Override
+    public boolean processCVSRequisites(
+            @Nonnull final Log logger,
+            @Nullable final ProxySettings proxy,
+            @Nullable final String customCommand,
+            @Nonnull final File cvsFolder,
+            @Nullable final String branchId,
+            @Nullable final String tagId,
+            @Nullable final String revisionId
+    ) {
+        boolean notError = true;
 
-  private boolean upToBranch(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
-    logger.debug("upToBranch: " + branchId);
-    return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", branchId));
-  }
+        if (branchId != null) {
+            notError &= upToBranch(logger, proxy, customCommand, cvsFolder, branchId);
+        }
 
-  private boolean upToTag(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
-    logger.debug("upToTag: " + tagId);
-    return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", "tags/" + tagId));
-  }
+        if (notError && tagId != null) {
+            if (branchId == null) {
+                notError &= upToBranch(logger, proxy, customCommand, cvsFolder, "master");
+            }
 
-  private boolean upToRevision(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
-    logger.debug("upToRevision: " + revisionId);
-    return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", revisionId));
-  }
+            if (notError) {
+                notError &= upToTag(logger, proxy, customCommand, cvsFolder, tagId);
+            }
+        }
+
+        if (notError && revisionId != null) {
+            notError &= upToRevision(logger, proxy, customCommand, cvsFolder, revisionId);
+        }
+
+        return notError;
+    }
+
+    private boolean upToBranch(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String branchId) {
+        logger.debug("upToBranch: " + branchId);
+        return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", branchId));
+    }
+
+    private boolean upToTag(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
+        logger.debug("upToTag: " + tagId);
+        return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", "tags/" + tagId));
+    }
+
+    private boolean upToRevision(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
+        logger.debug("upToRevision: " + revisionId);
+        return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", revisionId));
+    }
 
 }

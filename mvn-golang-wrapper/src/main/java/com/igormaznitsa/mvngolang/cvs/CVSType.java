@@ -15,37 +15,37 @@
  */
 package com.igormaznitsa.mvngolang.cvs;
 
-import java.io.File;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.File;
 
 public enum CVSType {
-  UNKNOWN(new CvsNone()),
-  GIT(new CvsGIT()),
-  HG(new CvsHG()),
-  SVN(new CvsSVN()),
-  BAZAAR(new CvsBZR());
+    UNKNOWN(new CvsNone()),
+    GIT(new CvsGIT()),
+    HG(new CvsHG()),
+    SVN(new CvsSVN()),
+    BAZAAR(new CvsBZR());
 
-  private final AbstractRepo processor;
+    private final AbstractRepo processor;
 
-  private CVSType(@Nonnull final AbstractRepo processor) {
-    this.processor = processor;
-  }
-
-  @Nonnull
-  public AbstractRepo getProcessor(){
-    return this.processor;
-  }
-  
-  @Nonnull
-  public static CVSType investigateFolder(@Nullable final File folder) {
-    CVSType result = UNKNOWN;
-    for(final CVSType t : values()){
-      if (t.getProcessor().doesContainCVS(folder)){
-        result = t;
-        break;
-      }
+    private CVSType(@Nonnull final AbstractRepo processor) {
+        this.processor = processor;
     }
-    return result;
-  }
+
+    @Nonnull
+    public static CVSType investigateFolder(@Nullable final File folder) {
+        CVSType result = UNKNOWN;
+        for (final CVSType t : values()) {
+            if (t.getProcessor().doesContainCVS(folder)) {
+                result = t;
+                break;
+            }
+        }
+        return result;
+    }
+
+    @Nonnull
+    public AbstractRepo getProcessor() {
+        return this.processor;
+    }
 }

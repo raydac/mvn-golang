@@ -15,14 +15,14 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import java.io.File;
-import javax.annotation.Nonnull;
-
-import javax.annotation.Nullable;
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import com.igormaznitsa.meta.annotation.MustNotContainNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
 
 
 /**
@@ -31,27 +31,27 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangGenerateMojo extends AbstractPackageGolangMojo {
 
-  @Override
-  @Nonnull
-  public String getGoCommand() {
-    return "generate";
-  }
+    @Override
+    @Nonnull
+    public String getGoCommand() {
+        return "generate";
+    }
 
-  @Override
-  @Nullable
-  @MustNotContainNull
-  protected String[] getDefaultPackages() {
-    return new String[]{'.' + File.separator + "..."};
-  }
+    @Override
+    @Nullable
+    @MustNotContainNull
+    protected String[] getDefaultPackages() {
+        return new String[]{'.' + File.separator + "..."};
+    }
 
-  @Override
-  public boolean isSourceFolderRequired() {
-    return true;
-  }
-  
-  @Override
-  public boolean enforcePrintOutput() {
-    return true;
-  }
- 
+    @Override
+    public boolean isSourceFolderRequired() {
+        return true;
+    }
+
+    @Override
+    public boolean enforcePrintOutput() {
+        return true;
+    }
+
 }

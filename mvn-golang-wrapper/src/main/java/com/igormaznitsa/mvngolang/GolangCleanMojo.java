@@ -15,11 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import java.io.File;
-import java.io.IOException;
-import javax.annotation.Nonnull;
-
-import javax.annotation.Nullable;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -27,7 +23,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.plexus.util.FileUtils;
-import com.igormaznitsa.mvngolang.utils.ProxySettings;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * The Mojo wraps the 'clean' command.
@@ -35,108 +35,108 @@ import com.igormaznitsa.mvngolang.utils.ProxySettings;
 @Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangCleanMojo extends AbstractPackageGolangMojo {
 
-  /**
-   * Clean the Go Path folder if it exists.
-   *
-   * @since 2.1.1
-   */
-  @Parameter(name = "cleanGoPath", defaultValue = "false")
-  private boolean cleanGoPath;
+    /**
+     * Clean the Go Path folder if it exists.
+     *
+     * @since 2.1.1
+     */
+    @Parameter(name = "cleanGoPath", defaultValue = "false")
+    private boolean cleanGoPath;
 
-  /**
-   * Delete whole the Store folder.
-   *
-   * @since 2.1.1
-   */
-  @Parameter(name = "deleteStoreFolder", defaultValue = "false")
-  private boolean deleteStoreFolder;
+    /**
+     * Delete whole the Store folder.
+     *
+     * @since 2.1.1
+     */
+    @Parameter(name = "deleteStoreFolder", defaultValue = "false")
+    private boolean deleteStoreFolder;
 
-  @Override
-  public boolean isSourceFolderRequired() {
-    return true;
-  }
-
-  @Override
-  @Nonnull
-  public String getGoCommand() {
-    return "clean";
-  }
-
-  private void deleteStoreFolder() throws MojoFailureException {
-    try {
-      final File goStoreFolder = new File(getStoreFolder());
-      if (goStoreFolder.isDirectory()) {
-        getLog().info("Deleting the Store Folder : " + goStoreFolder);
-        FileUtils.deleteDirectory(goStoreFolder);
-      } else {
-        getLog().info("The Store Folder does not found : " + goStoreFolder);
-      }
-    } catch (IOException ex) {
-      throw new MojoFailureException("Can't delete the Store Folder", ex);
+    @Override
+    public boolean isSourceFolderRequired() {
+        return true;
     }
-  }
 
-  private void cleanGoPath() throws MojoFailureException {
-    try {
-      final File goPathFolder = findGoPath(false);
-      if (goPathFolder.isDirectory()) {
-        getLog().info("Cleaning the Go Path folder : " + goPathFolder);
-        FileUtils.cleanDirectory(goPathFolder);
-      } else {
-        getLog().info("The Go Path folder not found : " + goPathFolder);
-      }
-    } catch (IOException ex) {
-      throw new MojoFailureException("Can't clean the Go Path folder", ex);
+    @Override
+    @Nonnull
+    public String getGoCommand() {
+        return "clean";
     }
-  }
 
-  @Override
-  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
-    if (!error) {
-      final File directory;
-      if (getProject().getPackaging().equals("mvn-golang")) {
-        directory = new File(getProject().getBasedir(), "bin");
-      } else {
-        directory = new File(getProject().getBuild().getDirectory());
-      }
-
-      if (directory.isDirectory()) {
+    private void deleteStoreFolder() throws MojoFailureException {
         try {
-          getLog().info("Deleting folder : " + directory);
-          FileUtils.deleteDirectory(directory);
+            final File goStoreFolder = new File(getStoreFolder());
+            if (goStoreFolder.isDirectory()) {
+                getLog().info("Deleting the Store Folder : " + goStoreFolder);
+                FileUtils.deleteDirectory(goStoreFolder);
+            } else {
+                getLog().info("The Store Folder does not found : " + goStoreFolder);
+            }
         } catch (IOException ex) {
-          throw new MojoFailureException("Can't delete folder", ex);
+            throw new MojoFailureException("Can't delete the Store Folder", ex);
         }
-      } else {
-        getLog().info(String.format("Folder %s is not found", directory.getAbsolutePath()));
-      }
-
-      final File reportFolderFile = new File(getReportsFolder());
-      if (reportFolderFile.isDirectory()) {
-        try{
-          getLog().info("Deleting report folder : "+reportFolderFile);
-          FileUtils.deleteDirectory(reportFolderFile);
-        }catch(IOException ex){
-          throw new MojoExecutionException("Can't delete report folder : "+reportFolderFile);
-        }
-      } else {
-        getLog().debug("There is no report folder : "+reportFolderFile);
-      }
-      
-      if (this.cleanGoPath) {
-        cleanGoPath();
-      }
-
-      if (this.deleteStoreFolder) {
-        deleteStoreFolder();
-      }
     }
-  }
 
-  @Override
-  protected boolean processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
-    return false;
-  }
-  
-  
+    private void cleanGoPath() throws MojoFailureException {
+        try {
+            final File goPathFolder = findGoPath(false);
+            if (goPathFolder.isDirectory()) {
+                getLog().info("Cleaning the Go Path folder : " + goPathFolder);
+                FileUtils.cleanDirectory(goPathFolder);
+            } else {
+                getLog().info("The Go Path folder not found : " + goPathFolder);
+            }
+        } catch (IOException ex) {
+            throw new MojoFailureException("Can't clean the Go Path folder", ex);
+        }
+    }
+
+    @Override
+    public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
+        if (!error) {
+            final File directory;
+            if (getProject().getPackaging().equals("mvn-golang")) {
+                directory = new File(getProject().getBasedir(), "bin");
+            } else {
+                directory = new File(getProject().getBuild().getDirectory());
+            }
+
+            if (directory.isDirectory()) {
+                try {
+                    getLog().info("Deleting folder : " + directory);
+                    FileUtils.deleteDirectory(directory);
+                } catch (IOException ex) {
+                    throw new MojoFailureException("Can't delete folder", ex);
+                }
+            } else {
+                getLog().info(String.format("Folder %s is not found", directory.getAbsolutePath()));
+            }
+
+            final File reportFolderFile = new File(getReportsFolder());
+            if (reportFolderFile.isDirectory()) {
+                try {
+                    getLog().info("Deleting report folder : " + reportFolderFile);
+                    FileUtils.deleteDirectory(reportFolderFile);
+                } catch (IOException ex) {
+                    throw new MojoExecutionException("Can't delete report folder : " + reportFolderFile);
+                }
+            } else {
+                getLog().debug("There is no report folder : " + reportFolderFile);
+            }
+
+            if (this.cleanGoPath) {
+                cleanGoPath();
+            }
+
+            if (this.deleteStoreFolder) {
+                deleteStoreFolder();
+            }
+        }
+    }
+
+    @Override
+    protected boolean processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
+        return false;
+    }
+
+
 }

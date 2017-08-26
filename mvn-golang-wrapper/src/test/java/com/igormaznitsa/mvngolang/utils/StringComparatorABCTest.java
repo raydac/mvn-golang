@@ -16,18 +16,20 @@
 package com.igormaznitsa.mvngolang.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
+
 public class StringComparatorABCTest {
-  
-  @Test
-  public void testSorting() {
-    final List<String> list = Arrays.asList("b","c","1","hello","ABC","A");
-    Collections.sort(list,StringComparatorABC.getInstance());
-    assertArrayEquals(new String[]{"1", "A", "ABC", "b", "c", "hello"}, list.toArray());
-  }
-  
+
+    @Test
+    public void testSorting() {
+        final List<String> list = Arrays.asList("b", "c", "1", "hello", "ABC", "A");
+        Collections.sort(list, StringComparatorABC.getInstance());
+        assertArrayEquals(new String[]{"1", "A", "ABC", "b", "c", "hello"}, list.toArray());
+    }
+
 }

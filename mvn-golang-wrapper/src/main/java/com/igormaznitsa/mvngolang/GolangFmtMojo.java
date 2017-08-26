@@ -15,14 +15,14 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import java.io.File;
-import javax.annotation.Nonnull;
-
-import javax.annotation.Nullable;
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import com.igormaznitsa.meta.annotation.MustNotContainNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
 
 
 /**
@@ -30,28 +30,28 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
  */
 @Mojo(name = "fmt", defaultPhase = LifecyclePhase.PROCESS_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangFmtMojo extends AbstractPackageGolangMojo {
-  
-  @Override
-  @Nonnull
-  public String getGoCommand() {
-    return "fmt";
-  }
 
-  @Override
-  @Nullable
-  @MustNotContainNull
-  protected String[] getDefaultPackages() {
-    return new String[]{'.' + File.separator + "..."};
-  }
+    @Override
+    @Nonnull
+    public String getGoCommand() {
+        return "fmt";
+    }
 
-  @Override
-  public boolean isSourceFolderRequired() {
-    return true;
-  }
+    @Override
+    @Nullable
+    @MustNotContainNull
+    protected String[] getDefaultPackages() {
+        return new String[]{'.' + File.separator + "..."};
+    }
 
-  @Override
-  public boolean enforcePrintOutput() {
-    return true;
-  }
+    @Override
+    public boolean isSourceFolderRequired() {
+        return true;
+    }
+
+    @Override
+    public boolean enforcePrintOutput() {
+        return true;
+    }
 
 }

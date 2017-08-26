@@ -15,29 +15,29 @@
  */
 package com.igormaznitsa.mvngolang.utils;
 
-import java.io.Serializable;
-import java.util.Comparator;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
+import java.io.Serializable;
+import java.util.Comparator;
 
 @ThreadSafe
-public final class StringComparatorABC implements Comparator<String>,Serializable {
+public final class StringComparatorABC implements Comparator<String>, Serializable {
 
-  private static final long serialVersionUID = -8700761616096593374L;
-  
-  private static final StringComparatorABC INSTANCE = new StringComparatorABC();
+    private static final long serialVersionUID = -8700761616096593374L;
 
-  @Nonnull
-  public static StringComparatorABC getInstance(){
-    return INSTANCE;
-  }
-  
-  private StringComparatorABC(){
-  }
-  
-  @Override
-  public int compare(@Nonnull final String a, @Nonnull final String b) {
-    return a.compareTo(b);
-  }
-  
+    private static final StringComparatorABC INSTANCE = new StringComparatorABC();
+
+    private StringComparatorABC() {
+    }
+
+    @Nonnull
+    public static StringComparatorABC getInstance() {
+        return INSTANCE;
+    }
+
+    @Override
+    public int compare(@Nonnull final String a, @Nonnull final String b) {
+        return a.compareTo(b);
+    }
+
 }

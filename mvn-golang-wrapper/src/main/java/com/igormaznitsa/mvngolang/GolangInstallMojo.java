@@ -15,11 +15,11 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import javax.annotation.Nonnull;
-
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import javax.annotation.Nonnull;
 
 
 /**
@@ -28,20 +28,20 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 @Mojo(name = "install", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangInstallMojo extends AbstractPackageGolangMojo {
 
-  @Override
-  @Nonnull
-  public String getGoCommand() {
-    return "install";
-  }
+    @Override
+    @Nonnull
+    public String getGoCommand() {
+        return "install";
+    }
 
-  @Override
-  public boolean isSourceFolderRequired() {
-    return true;
-  }
+    @Override
+    public boolean isSourceFolderRequired() {
+        return true;
+    }
 
-  @Override
-  public boolean enforcePrintOutput() {
-    return true;
-  }
+    @Override
+    public boolean enforcePrintOutput() {
+        return true;
+    }
 
 }
