@@ -1,7 +1,10 @@
 # 2.1.6
- - improved logging
- - added property `supposeSdkArchiveFileName` to suppose SDK archive file name if it is not presented in SDK list, active by default
- - minimal version of Java increased to 1.7
+- implemented file locker to synchronize SDK loading between JVM processes, if cache folder is shared
+- improved `get` mojo behavior during branch, tag and revision processing
+- improved `get` mojo, added `deleteCommonPkg` flag to delete whole common `pkg` folder, by default false
+- improved logging
+- added property `supposeSdkArchiveFileName` to suppose SDK archive file name if it is not presented in common SDK list, active by default
+- minimal version of Java increased to 1.7
 
 # 2.1.5 (03-jul-2017)
 - added archetype for multimodule project `mvn-golang-hello-multi` 
