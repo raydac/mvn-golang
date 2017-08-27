@@ -290,7 +290,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         final String[] packages = getTailArguments();
         final boolean result;
         if (packages.length == 0) {
-            getLog().info("There are not packages to get");
+            getLog().info("There are no packages to get");
             result = true;
         } else {
             result = super.isMojoMustNotBeExecuted();

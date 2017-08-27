@@ -489,7 +489,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             }
 
             if (sdkFolder.isDirectory()) {
-                instance.getLog().info("SDK cache folder : " + sdkFolder);
+                if (instance.verbose || instance.getLog().isDebugEnabled()) {
+                    instance.getLog().info("SDK cache folder : " + sdkFolder);
+                }
                 return sdkFolder;
             } else if (dontLoadIfNotInCache) {
                 throw new IOException("Can't find " + baseSdkName + " in the cache but loading is directly disabled");

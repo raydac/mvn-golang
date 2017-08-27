@@ -1,4 +1,4 @@
-# 2.1.6
+# 2.1.6 (27-aug-2017)
 - implemented file locker to synchronize SDK loading between JVM processes, if cache folder is shared
 - improved `get` mojo behavior during branch, tag and revision processing
 - improved `get` mojo, added `deleteCommonPkg` flag to delete whole common `pkg` folder, by default false
