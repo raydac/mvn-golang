@@ -70,6 +70,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import java.net.URLEncoder;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -945,8 +946,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     @Nonnull
-    private String loadGoLangSdkList(@Nullable final ProxySettings proxySettings) throws IOException {
-        final String sdksite = getSdkSite();
+    private String loadGoLangSdkList(@Nullable final ProxySettings proxySettings, @Nullable final String keyPrefix) throws IOException {
+        final String sdksite = getSdkSite() + (keyPrefix == null ? "" : "?prefix="+keyPrefix);
 
         getLog().warn("Loading list of available GoLang SDKs from " + sdksite);
         final HttpGet get = new HttpGet(sdksite);
@@ -1099,14 +1100,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     @Nonnull
     private String findSdkArchiveFileName(@Nullable final ProxySettings proxySettings, @Nonnull final String sdkBaseName) throws IOException {
-        String result = getSdkArchiveName();
-        if (isSafeEmpty(result)) {
-            final Document parsed = convertSdkListToDocument(loadGoLangSdkList(proxySettings));
-            result = extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
-        } else {
-            getLog().info("SDK archive name is predefined : " + result);
-        }
-        return GetUtils.ensureNonNullStr(result);
+      String result = getSdkArchiveName();
+      if (isSafeEmpty(result)) {
+        final Document parsed = convertSdkListToDocument(loadGoLangSdkList(proxySettings, URLEncoder.encode(sdkBaseName, "UTF-8")));
+        result = extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
+      } else {
+        getLog().info("SDK archive name is predefined : " + result);
+      }
+      return GetUtils.ensureNonNullStr(result);
     }
 
     private void warnIfContainsUC(@Nonnull final String message, @Nonnull final String str) {

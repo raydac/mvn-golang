@@ -8,6 +8,9 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.1.7 (SNAPSHOT)__
+ - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
+
 __2.1.6 (27-aug-2017)__
  - implemented file locker to synchronize SDK loading between JVM processes, if cache folder is shared
  - improved `get` mojo behavior during branch, tag and revision processing
@@ -225,21 +228,5 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
  - __[Multimodule project.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-multimodule)__
  - __[Preprocessing.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-preprocessing)__
  - __[Versioning of dependencies](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/test-git-cvs)__
- 
-# Public snapshot repository for the plugin
-To make accessible the snapshot version of the plugin during development, I have tuned public maven snapshot repository which can be added into project with snippet
-```xml
-<repositories>
- <repository>
-  <id>coldcore.ru-snapshots</id>
-  <name>ColdCore.RU Mvn Snapshots</name>
-  <url>http://coldcore.ru/m2</url>
-  <snapshots>
-   <enabled>true</enabled>
-  </snapshots>
-  <releases>
-   <enabled>false</enabled>
-  </releases>
- </repository>
-</repositories>
-```
+
+Because NetBeans IDE is very well in its processing of Maven projects and strongly supports them just out of the box, I have made [small plugin for NetBeans IDE](https://github.com/raydac/nb-mvn-golang-plugin) which makes some automation of processing maven projects with the mvn golang plugin.

@@ -1,3 +1,6 @@
+# 2.1.7 (SNAPSHOT)
+- improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
+
 # 2.1.6 (27-aug-2017)
 - implemented file locker to synchronize SDK loading between JVM processes, if cache folder is shared
 - improved `get` mojo behavior during branch, tag and revision processing
