@@ -77,7 +77,7 @@ Below described build section for simple golang project which keeps source in `s
         <version>2.1.6</version>
         <extensions>true</extensions>
         <configuration>
-          <goVersion>1.9</goVersion>
+          <goVersion>1.9.1</goVersion>
         </configuration>
         <executions>
           <execution>

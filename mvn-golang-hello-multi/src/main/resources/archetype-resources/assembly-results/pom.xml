@@ -55,7 +55,9 @@
         <configuration>
           <appendAssemblyId>false</appendAssemblyId>
           <outputDirectory>${dollar}{basedir}/target</outputDirectory>
-          <descriptor>${dollar}{basedir}/deploy.xml</descriptor>
+          <descriptors>
+            <descriptor>${dollar}{basedir}/deploy.xml</descriptor>
+          </descriptors>
         </configuration>
         <executions>
           <execution>
