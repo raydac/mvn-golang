@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.Artifact;
@@ -100,7 +101,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
                 getLog().debug("Effective pom has been written");
             }
         } finally {
-            IOUtils.closeQuietly(writer);
+            closeSilently(writer);
         }
     }
 

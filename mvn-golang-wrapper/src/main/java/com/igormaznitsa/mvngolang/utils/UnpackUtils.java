@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang.utils;
 
+import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -100,10 +101,10 @@ public final class UnpackUtils {
                 }
 
             } catch (ArchiveException ex) {
-                IOUtils.closeQuietly(in);
+                closeSilently(in);
                 throw new IOException("Can't recognize or read archive file : " + archiveFile, ex);
             } catch (CantReadArchiveEntryException ex) {
-                IOUtils.closeQuietly(in);
+                closeSilently(in);
                 throw new IOException("Can't read entry from archive file : " + archiveFile, ex);
             }
         }
@@ -146,7 +147,7 @@ public final class UnpackUtils {
                                         throw new IOException("Can't unpack file, illegal unpacked length : " + entry.getName());
                                     }
                                 } finally {
-                                    IOUtils.closeQuietly(zipEntryInStream);
+                                    closeSilently(zipEntryInStream);
                                 }
                             } else {
                                 logger.debug("Unpacking archive entry : " + normalizedPath);
@@ -175,8 +176,8 @@ public final class UnpackUtils {
             }
             return unpackedFilesCounter;
         } finally {
-            IOUtils.closeQuietly(theZipFile);
-            IOUtils.closeQuietly(archInputStream);
+            closeSilently(theZipFile);
+            closeSilently(archInputStream);
         }
     }
 
