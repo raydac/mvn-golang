@@ -17,7 +17,6 @@ package com.igormaznitsa.mvngolang;
 
 import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
