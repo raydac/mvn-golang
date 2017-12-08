@@ -87,8 +87,8 @@
         <extensions>true</extensions>
         <configuration>
           <goVersion>${dollar}{go.sdk.version}</goVersion>
-          <goPath>${dollar}{basedir}</goPath>
-          <enforceGoPathToEnd>true</enforceGoPathToEnd>
+          <!--<goPath>${dollar}{basedir}</goPath>-->
+          <!--<enforceGoPathToEnd>true</enforceGoPathToEnd>-->
           <!--<verbose>true</verbose>-->
         </configuration>
         <executions>
