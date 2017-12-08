@@ -976,7 +976,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           );
 
           builder.setSSLSocketFactory(sslfactory);
-          getLog().warn("SSL certificate check during HTTP request has been turned off");
+          getLog().warn("SSL certificate check has been disabled");
         }
         catch (final Exception ex) {
           throw new MojoExecutionException("Can't disable SSL certificate check", ex);
