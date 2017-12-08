@@ -74,10 +74,15 @@ import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.ssl.TrustStrategy;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -850,11 +855,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public boolean isDisableSslCheck() {
     return this.disableSSLcheck;
   }
-  
+
   public void setDisableSslCheck(final boolean flag) {
     this.disableSSLcheck = flag;
   }
-  
+
   @Nullable
   public ProxySettings getProxy() {
     return this.proxy;
@@ -935,47 +940,77 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         }
 
         final String[] ignoreForAddresses = proxy.nonProxyHosts == null ? new String[0] : proxy.nonProxyHosts.split("\\|");
+
+        final WildCardMatcher[] matchers;
+
         if (ignoreForAddresses.length > 0) {
-          final WildCardMatcher[] matchers = new WildCardMatcher[ignoreForAddresses.length];
+          matchers = new WildCardMatcher[ignoreForAddresses.length];
           for (int i = 0; i < ignoreForAddresses.length; i++) {
             matchers[i] = new WildCardMatcher(ignoreForAddresses[i]);
           }
-
-          final HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(new HttpHost(proxy.host, proxy.port, proxy.protocol)) {
-            @Override
-            @Nonnull
-            public HttpRoute determineRoute(@Nonnull final HttpHost host, @Nonnull final HttpRequest request, @Nonnull final HttpContext context) throws HttpException {
-              final String hostName = host.getHostName();
-              for (final WildCardMatcher m : matchers) {
-                if (m.match(hostName)) {
-                  getLog().debug("Ignoring proxy for host : " + hostName);
-                  return new HttpRoute(host);
-                }
-              }
-              return super.determineRoute(host, request, context);
-            }
-          };
-          builder.setRoutePlanner(routePlanner);
-          getLog().debug("Route planner tuned to ignore proxy for addresses : " + Arrays.toString(matchers));
+        } else {
+          matchers = new WildCardMatcher[0];
         }
+
+        getLog().debug("Regular routing mode");
+
+        final HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(new HttpHost(proxy.host, proxy.port, proxy.protocol)) {
+          @Override
+          @Nonnull
+          public HttpRoute determineRoute(@Nonnull final HttpHost host, @Nonnull final HttpRequest request, @Nonnull final HttpContext context) throws HttpException {
+            HttpRoute result = null;
+            final String hostName = host.getHostName();
+            for (final WildCardMatcher m : matchers) {
+              if (m.match(hostName)) {
+                getLog().debug("Ignoring proxy for host : " + hostName);
+                result = new HttpRoute(host);
+                break;
+              }
+            }
+            if (result == null) {
+              result = super.determineRoute(host, request, context);
+            }
+            getLog().debug("Made connection route : " + result);
+            return result;
+          }
+        };
+
+        builder.setRoutePlanner(routePlanner);
+        getLog().debug("Proxy will ignore: " + Arrays.toString(matchers));
       }
 
       builder.setUserAgent("mvn-golang-wrapper-agent/1.0");
 
       if (this.isDisableSslCheck()) {
         try {
-          final SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustStrategy() {
+          final SSLContext sslcontext = SSLContext.getInstance("TLS");
+          X509TrustManager tm = new X509TrustManager() {
             @Override
-            public boolean isTrusted(@MustNotContainNull @Nonnull final X509Certificate[] chain, @Nonnull final String authType) throws CertificateException {
-              return true;
+            @Nullable
+            @MustNotContainNull
+            public X509Certificate[] getAcceptedIssuers() {
+              return null;
             }
-          }).build();
 
-          final SSLConnectionSocketFactory sslfactory = new SSLConnectionSocketFactory(
-              sslcontext, null, null, new NoopHostnameVerifier()
-          );
+            @Override
+            public void checkClientTrusted(@Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull final String arg1) throws CertificateException {
+            }
 
+            @Override
+            public void checkServerTrusted(@Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull String arg1) throws CertificateException {
+            }
+          };
+          sslcontext.init(null, new TrustManager[]{tm}, null);
+
+          final SSLConnectionSocketFactory sslfactory = new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
+          final Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
+              .register("https", sslfactory)
+              .register("http", new PlainConnectionSocketFactory()).build();
+
+          builder.setConnectionManager(new BasicHttpClientConnectionManager(r));
           builder.setSSLSocketFactory(sslfactory);
+          builder.setSSLContext(sslcontext);
+
           getLog().warn("SSL certificate check has been disabled");
         }
         catch (final Exception ex) {
@@ -983,7 +1018,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         }
       }
       this.httpClient = builder.build();
-
     }
     return this.httpClient;
   }
