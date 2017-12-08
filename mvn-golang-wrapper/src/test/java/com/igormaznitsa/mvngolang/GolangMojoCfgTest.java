@@ -58,6 +58,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     @Test
     public void testGolangCustomMojoConfiguration() throws Exception {
         final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
+        assertFalse(customMojo.isDisableSslCheck());
         assertTrue(customMojo.isUseMavenProxy());
         assertFalse(customMojo.getSupposeSdkArchiveFileName());
         assertFalse(customMojo.isSkip());
@@ -104,6 +105,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     @Test
     public void testGolangFixMojoConfiguration() throws Exception {
         final GolangFixMojo fixMojo = findMojo(GolangFixMojo.class, "mojoFix.xml", "fix");
+        assertTrue(fixMojo.isDisableSslCheck());
         assertFalse(fixMojo.isUseMavenProxy());
         assertFalse(fixMojo.isSkip());
         assertNull(fixMojo.getProxy());

@@ -21,6 +21,7 @@
                 <configuration>
                     <goRoot>some/root</goRoot>
                     <goPath>some/path</goPath>
+                    <disableSSLcheck>true</disableSSLcheck>
                     <sources>some/sources</sources>
                     <buildFlags>
                         <flag>flag1</flag>
