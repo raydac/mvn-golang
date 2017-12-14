@@ -1304,6 +1304,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       final String outLog = extractOutAsString();
       final String errLog = extractErrorOutAsString();
 
+      if (getLog().isDebugEnabled()) {
+        getLog().debug("OUT_LOG: "+outLog);
+        getLog().debug("ERR_LOG: "+errLog);
+      }
+      
       if (error || this.processConsoleOut(resultCode, outLog, errLog)) {
         printLogs(error || enforcePrintOutput(), outLog, errLog);
       }
