@@ -10,7 +10,6 @@
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>app-2</artifactId>
