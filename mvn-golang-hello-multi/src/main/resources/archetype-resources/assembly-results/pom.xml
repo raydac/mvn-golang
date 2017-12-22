@@ -9,7 +9,6 @@
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
     
   <artifactId>assembly-results</artifactId>

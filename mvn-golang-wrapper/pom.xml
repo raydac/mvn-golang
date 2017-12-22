@@ -6,7 +6,6 @@
     <groupId>com.igormaznitsa</groupId>
     <artifactId>mvn-golang</artifactId>
     <version>2.1.7-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>mvn-golang-wrapper</artifactId>
