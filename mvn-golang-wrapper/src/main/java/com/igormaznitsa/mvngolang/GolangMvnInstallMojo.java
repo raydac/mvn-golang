@@ -18,9 +18,7 @@ package com.igormaznitsa.mvngolang;
 import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.installer.ArtifactInstallationException;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -29,11 +27,16 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.repository.RepositoryManager;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
+import java.util.Collections;
 import java.util.Locale;
 
 /**
@@ -44,15 +47,18 @@ import java.util.Locale;
 @Mojo(name = "mvninstall", defaultPhase = LifecyclePhase.INSTALL, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangMvnInstallMojo extends AbstractMojo {
 
-    @Parameter(property = "localRepository", required = true, readonly = true)
-    protected ArtifactRepository localRepository;
+    @Component
+    protected RepositoryManager repositoryManager;
 
     @Component
     protected ArtifactInstaller installer;
 
-    @Parameter(readonly = true, defaultValue = "${project}")
+    @Parameter(readonly = true, required = true, defaultValue = "${project}")
     private MavenProject project;
 
+    @Parameter(readonly = true, required = true, defaultValue = "${session}")
+    private MavenSession session;
+    
     /**
      * Compression level of zip file. Must be 1..9
      *
@@ -66,14 +72,17 @@ public class GolangMvnInstallMojo extends AbstractMojo {
         try {
             final File archive = compressProjectFiles();
             try {
-                this.installer.install(archive, project.getArtifact(), this.localRepository);
+                ProjectBuildingRequest pbr = session.getProjectBuildingRequest();
+                this.installer.install( pbr, Collections.singletonList( project.getArtifact() ) );
             } finally {
+                // Usually created archives etc. will be created in target directory
+                // and will not be deleted by the plugin itself. Usually by `mvn clean ..`..
                 FileUtils.deleteQuietly(archive);
             }
+        } catch (ArtifactInstallerException ex) {
+            throw new MojoFailureException("Can't install the artifact!");
         } catch (IOException ex) {
             throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
-        } catch (ArtifactInstallationException ex) {
-            throw new MojoFailureException("Can't install the artifact!");
         }
     }
 
