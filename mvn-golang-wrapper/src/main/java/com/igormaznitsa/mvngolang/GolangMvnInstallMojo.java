@@ -72,7 +72,8 @@ public class GolangMvnInstallMojo extends AbstractMojo {
         try {
             final File archive = compressProjectFiles();
             try {
-                ProjectBuildingRequest pbr = session.getProjectBuildingRequest();
+                ProjectBuildingRequest pbr = this.session.getProjectBuildingRequest();
+                this.project.getArtifact().setFile(archive);
                 this.installer.install( pbr, Collections.singletonList( project.getArtifact() ) );
             } finally {
                 // Usually created archives etc. will be created in target directory
@@ -80,7 +81,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
                 FileUtils.deleteQuietly(archive);
             }
         } catch (ArtifactInstallerException ex) {
-            throw new MojoFailureException("Can't install the artifact!");
+            throw new MojoFailureException("Can't install the artifact!", ex);
         } catch (IOException ex) {
             throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
         }
