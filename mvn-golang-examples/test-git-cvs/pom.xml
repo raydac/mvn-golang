@@ -5,7 +5,6 @@
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-examples</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     
     <artifactId>test-git-cvs</artifactId>
