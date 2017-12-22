@@ -17,3 +17,6 @@ buildNumber.properties
 **/nbactions.xml
 **/.idea
 *.iml
+.settings
+.project
+.classpath
