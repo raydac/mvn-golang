@@ -10,15 +10,15 @@
                     <lifecycle>
                         <id>default</id>
                         <phases>
-                            <clean>com.igormaznitsa:mvn-golang-wrapper:clean</clean>
-                            <validate>com.igormaznitsa:mvn-golang-wrapper:fix</validate>
-                            <initialize>com.igormaznitsa:mvn-golang-wrapper:get</initialize>
-                            <generate-sources>com.igormaznitsa:mvn-golang-wrapper:generate</generate-sources>
-                            <process-sources>com.igormaznitsa:mvn-golang-wrapper:fmt</process-sources>
-                            <test>com.igormaznitsa:mvn-golang-wrapper:test</test>
-                            <package>com.igormaznitsa:mvn-golang-wrapper:build</package>
-                            <install>com.igormaznitsa:mvn-golang-wrapper:mvninstall</install>
-                            <deploy>com.igormaznitsa:mvn-golang-wrapper:install</deploy>
+                            <clean>com.igormaznitsa:mvn-golang-wrapper:${project.version}:clean</clean>
+                            <validate>com.igormaznitsa:mvn-golang-wrapper:${project.version}:fix</validate>
+                            <initialize>com.igormaznitsa:mvn-golang-wrapper:${project.version}:get</initialize>
+                            <generate-sources>com.igormaznitsa:mvn-golang-wrapper:${project.version}:generate</generate-sources>
+                            <process-sources>com.igormaznitsa:mvn-golang-wrapper:${project.version}:fmt</process-sources>
+                            <test>com.igormaznitsa:mvn-golang-wrapper:${project.version}:test</test>
+                            <package>com.igormaznitsa:mvn-golang-wrapper:${project.version}:build</package>
+                            <install>com.igormaznitsa:mvn-golang-wrapper:${project.version}:mvninstall</install>
+                            <deploy>com.igormaznitsa:mvn-golang-wrapper:${project.version}:install</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>
