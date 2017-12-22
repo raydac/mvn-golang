@@ -26,10 +26,6 @@
     <url>https://github.com/raydac/mvn-golang/issues</url>
   </issueManagement>
 
-  <prerequisites>
-    <maven>${mvn.version}</maven>
-  </prerequisites>
-
   <developers>
     <developer>
       <id>raydac</id>
