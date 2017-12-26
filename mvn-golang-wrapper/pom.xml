@@ -41,7 +41,8 @@
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.4</version>
+      <version>3.5</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -127,7 +128,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.1.0</version>
             <executions>
               <execution>
                 <id>make-distributive</id>
@@ -180,13 +180,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>generate-sources</id>
                 <phase>package</phase>
                 <goals>
-                  <goal>jar</goal>
+                  <goal>jar-no-fork</goal>
                 </goals>
               </execution>
             </executions>
@@ -194,7 +193,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.0.0-M1</version>
             <executions>
               <execution>
                 <id>generate-javadoc</id>
@@ -209,7 +207,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -259,39 +256,15 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
-        <configuration>
-          <compilerArgument>-Xlint:all</compilerArgument>
-          <verbose>false</verbose>
-          <source>1.7</source>
-          <target>1.7</target>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.4</version>
-        <configuration>
-          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-          <goalPrefix>mvn-golang-wrapper</goalPrefix>
-        </configuration>
         <executions>
           <execution>
             <id>mojo-descriptor</id>
             <phase>process-classes</phase>
             <goals>
               <goal>descriptor</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>generated-helpmojo</id>
-            <goals>
               <goal>helpmojo</goal>
             </goals>
-            <phase>process-classes</phase>
           </execution>
         </executions>
       </plugin>
