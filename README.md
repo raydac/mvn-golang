@@ -8,6 +8,9 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.1.8 (SNAPSHOT)__
+- added support for tail arguments to GolangRunMojo.
+
 __2.1.7 (SNAPSHOT)__
  - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
  - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
