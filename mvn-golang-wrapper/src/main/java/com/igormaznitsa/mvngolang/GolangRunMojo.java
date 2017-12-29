@@ -15,14 +15,21 @@
  */
 package com.igormaznitsa.mvngolang;
 
-import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import com.igormaznitsa.meta.common.utils.ArrayUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
-import javax.annotation.Nonnull;
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.meta.common.utils.ArrayUtils;
+import com.igormaznitsa.meta.common.utils.GetUtils;
 
 /**
  * The Mojo allows to run a program, it wraps <b>run</b> command.
@@ -41,6 +48,30 @@ public class GolangRunMojo extends AbstractPackageGolangMojo {
     @Parameter(name = "xprog")
     private String xprog;
 
+    /**
+     * Command arguments.
+     */
+    @Parameter(name = "args")
+    private String[] args;
+    
+    @Nullable
+    @MustNotContainNull
+    public String[] getArgs() {
+        return this.args == null ? null : this.args.clone();
+    }
+    
+    @Override
+    @Nonnull
+    @MustNotContainNull
+    public String[] getTailArguments() {
+        final List<String> result = new ArrayList<>();
+        result.addAll(Arrays.asList(this.getPackages()));
+        for (final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
+            result.add(s);
+        }
+        return result.toArray(new String[result.size()]);
+    }
+    
     @Override
     public boolean isSourceFolderRequired() {
         return true;

@@ -232,6 +232,25 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
         assertArrayEquals(new String[]{"flag1", "flag2"}, toolMojo.getBuildFlags());
         assertArrayEquals(new String[]{"arg1", "arg2"}, toolMojo.getArgs());
     }
+    
+    @Test
+    public void testGolangRunMojoConfiguration() throws Exception {
+        final GolangRunMojo runMojo = findMojo(GolangRunMojo.class, "mojoRun.xml", "run");
+        assertFalse(runMojo.isUseMavenProxy());
+        assertNull(runMojo.getProxy());
+        assertFalse(runMojo.isSkip());
+        assertFalse(runMojo.isUseEnvVars());
+        assertNull(runMojo.getTargetArm());
+        assertEquals("run", runMojo.getGoCommand());
+        assertFalse(runMojo.isVerbose());
+        assertTrue(runMojo.isHideBanner());
+        assertEqualsPath("some/sources", runMojo.getSources(false).getPath());
+        assertEquals("main.go", runMojo.getPackages()[0]);
+        assertEqualsPath("some/root", runMojo.getGoRoot());
+        assertEqualsPath("some/path", runMojo.findGoPath(false).getPath());
+        assertArrayEquals(new String[]{"main.go", "arg1", "arg2"}, runMojo.getTailArguments());
+        assertArrayEquals(new String[]{"arg1", "arg2"}, runMojo.getArgs());
+    }
 
     @Test
     public void testGolangGetMojoConfiguration() throws Exception {
