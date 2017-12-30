@@ -11,7 +11,7 @@
 __2.1.7 (SNAPSHOT)__
  - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
  - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
- - added support for tail arguments to GolangRunMojo.
+ - added `args` attribute to the `run` mojo to provide tail command line arguments.
 
 __2.1.6 (27-aug-2017)__
  - implemented file locker to synchronize SDK loading between JVM processes, if cache folder is shared
