@@ -29,7 +29,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
-import com.igormaznitsa.meta.common.utils.GetUtils;
 
 /**
  * The Mojo allows to run a program, it wraps <b>run</b> command.
@@ -49,26 +48,31 @@ public class GolangRunMojo extends AbstractPackageGolangMojo {
     private String xprog;
 
     /**
-     * Command arguments.
+     * Command arguments. They follow package names in command line..
+     * 
+     * @since 2.1.7
      */
     @Parameter(name = "args")
     private String[] args;
     
-    @Nullable
+    /**
+     * Get command line arguments.
+     * @return array of arguments, must not be null
+     * 
+     * @since 2.1.7
+     */
+    @Nonnull
     @MustNotContainNull
     public String[] getArgs() {
-        return this.args == null ? null : this.args.clone();
+        return this.args == null ? ArrayUtils.EMPTY_STRING_ARRAY : this.args.clone();
     }
     
     @Override
     @Nonnull
     @MustNotContainNull
     public String[] getTailArguments() {
-        final List<String> result = new ArrayList<>();
-        result.addAll(Arrays.asList(this.getPackages()));
-        for (final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
-            result.add(s);
-        }
+        final List<String> result = new ArrayList<>(Arrays.asList(super.getTailArguments()));
+        result.addAll(Arrays.asList(this.getArgs()));
         return result.toArray(new String[result.size()]);
     }
     

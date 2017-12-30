@@ -248,8 +248,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
         assertEquals("main.go", runMojo.getPackages()[0]);
         assertEqualsPath("some/root", runMojo.getGoRoot());
         assertEqualsPath("some/path", runMojo.findGoPath(false).getPath());
-        assertArrayEquals(new String[]{"main.go", "arg1", "arg2"}, runMojo.getTailArguments());
         assertArrayEquals(new String[]{"arg1", "arg2"}, runMojo.getArgs());
+        assertArrayEquals(new String[]{"main.go", "arg1", "arg2"}, runMojo.getTailArguments());
     }
 
     @Test
