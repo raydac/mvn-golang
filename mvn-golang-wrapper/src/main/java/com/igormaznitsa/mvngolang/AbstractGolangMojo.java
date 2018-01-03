@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.LazyInited;
@@ -22,6 +23,7 @@ import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.meta.common.utils.StrUtils;
+import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 import com.igormaznitsa.mvngolang.utils.WildCardMatcher;
@@ -35,12 +37,19 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.routing.HttpRoutePlanner;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -61,28 +70,21 @@ import org.zeroturnaround.exec.ProcessResult;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import java.net.URLEncoder;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -92,14 +94,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public static final String NAME_PATTERN = "go%s.%s-%s%s";
   private static final List<String> ALLOWED_SDKARCHIVE_CONTENT_TYPE = Collections.unmodifiableList(Arrays.asList("application/octet-stream", "application/zip", "application/x-tar", "application/x-gzip"));
   private static final ReentrantLock LOCKER = new ReentrantLock();
-  private static final String[] BANNER = new String[]{"______  ___             _________     ______",
-    "___   |/  /__   __________  ____/________  / ______ ______________ _",
-    "__  /|_/ /__ | / /_  __ \\  / __ _  __ \\_  /  _  __ `/_  __ \\_  __ `/",
-    "_  /  / / __ |/ /_  / / / /_/ / / /_/ /  /___/ /_/ /_  / / /  /_/ / ",
-    "/_/  /_/  _____/ /_/ /_/\\____/  \\____//_____/\\__,_/ /_/ /_/_\\__, /",
-    "                                                           /____/",
-    "                  https://github.com/raydac/mvn-golang",
-    ""
+  private static final String[] BANNER = new String[] {"______  ___             _________     ______",
+      "___   |/  /__   __________  ____/________  / ______ ______________ _",
+      "__  /|_/ /__ | / /_  __ \\  / __ _  __ \\_  /  _  __ `/_  __ \\_  __ `/",
+      "_  /  / / __ |/ /_  / / / /_/ / / /_/ /  /___/ /_/ /_  / / /  /_/ / ",
+      "/_/  /_/  _____/ /_/ /_/\\____/  \\____//_____/\\__,_/ /_/ /_/_\\__, /",
+      "                                                           /____/",
+      "                  https://github.com/raydac/mvn-golang",
+      ""
   };
   /**
    * set of flags to be ignored among build and extra build flags, for inside
@@ -489,25 +491,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private static String preparePath(@Nonnull @MayContainNull final String... paths) {
-    final StringBuilder result = new StringBuilder();
-    final Set<String> alreadyAdded = new HashSet<>();
-
-    for (final String s : paths) {
-      if (s != null && !s.isEmpty()) {
-        if (!alreadyAdded.contains(s)) {
-          if (result.length() > 0) {
-            result.append(SystemUtils.IS_OS_WINDOWS ? ';' : ':');
-          }
-          result.append(s);
-          alreadyAdded.add(s);
-        }
-      }
-    }
-    return result.toString();
-  }
-
-  @Nonnull
   private synchronized static File loadSDKAndUnpackIntoCache(@Nonnull final AbstractGolangMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull final File cacheFolder, @Nonnull final String baseSdkName, final boolean dontLoadIfNotInCache) throws IOException, MojoExecutionException {
     final File sdkFolder = new File(cacheFolder, baseSdkName);
 
@@ -519,8 +502,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         while (lockFile.exists()) {
           try {
             Thread.sleep(100L);
-          }
-          catch (InterruptedException ex) {
+          } catch (InterruptedException ex) {
             throw new IOException("Wait of SDK loading is interrupted", ex);
           }
         }
@@ -593,8 +575,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         errorsDuringLoading = false;
 
         return instance.unpackArchToFolder(archiveFile, "go", sdkFolder);
-      }
-      finally {
+      } finally {
         methodGet.releaseConnection();
         if (errorsDuringLoading || !instance.isKeepSdkArchive()) {
           instance.logOptionally("Deleting archive : " + archiveFile + (errorsDuringLoading ? " (because error during loading)" : ""));
@@ -603,8 +584,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           instance.logOptionally("Archive file is kept for special flag : " + archiveFile);
         }
       }
-    }
-    finally {
+    } finally {
       FileUtils.deleteQuietly(lockFile);
     }
   }
@@ -740,23 +720,27 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public File findGoPath(final boolean ensureExist) throws IOException {
+  @MustNotContainNull
+  public File[] findGoPath(final boolean ensureExist) throws IOException {
     LOCKER.lock();
     try {
-      final String theGoPath = getGoPath();
-
-      if (theGoPath.contains(File.pathSeparator)) {
-        getLog().error("Detected multiple folder items in the 'goPath' parameter but it must contain only folder!");
-        throw new IOException("Detected multiple folder items in the 'goPath'");
+      final String foundGoPath = getGoPath();
+      if (getLog().isDebugEnabled()) {
+        getLog().debug("findGoPath(" + ensureExist + "), getGoPath() returns " + foundGoPath);
       }
 
-      final File result = new File(theGoPath);
-      if (ensureExist && !result.isDirectory() && !result.mkdirs()) {
-        throw new IOException("Can't create folder : " + theGoPath);
+      final List<File> result = new ArrayList<>();
+
+      for (final String p : foundGoPath.split(String.format("\\%s", File.pathSeparator))) {
+        final File folder = new File(p);
+        result.add(folder);
+        if (ensureExist && !folder.isDirectory() && !folder.mkdirs()) {
+          throw new IOException("Can't create folder for GOPATH : " + folder.getAbsolutePath());
+        }
       }
-      return result;
-    }
-    finally {
+
+      return result.toArray(new File[result.size()]);
+    } finally {
       LOCKER.unlock();
     }
   }
@@ -774,8 +758,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         }
       }
       return result;
-    }
-    finally {
+    } finally {
       LOCKER.unlock();
     }
   }
@@ -1000,7 +983,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             public void checkServerTrusted(@Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull String arg1) throws CertificateException {
             }
           };
-          sslcontext.init(null, new TrustManager[]{tm}, null);
+          sslcontext.init(null, new TrustManager[] {tm}, null);
 
           final SSLConnectionSocketFactory sslfactory = new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
           final Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
@@ -1012,8 +995,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           builder.setSSLContext(sslcontext);
 
           getLog().warn("SSL certificate check has been disabled");
-        }
-        catch (final Exception ex) {
+        } catch (final Exception ex) {
           throw new MojoExecutionException("Can't disable SSL certificate check", ex);
         }
       }
@@ -1071,8 +1053,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       } else {
         throw new IOException(String.format("Can't load list of SDKs from %s : %d %s", sdksite, statusLine.getStatusCode(), statusLine.getReasonPhrase()));
       }
-    }
-    finally {
+    } finally {
       get.releaseConnection();
     }
   }
@@ -1083,16 +1064,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       final DocumentBuilder builder = factory.newDocumentBuilder();
       return builder.parse(new InputSource(new StringReader(sdkListAsString)));
-    }
-    catch (ParserConfigurationException ex) {
+    } catch (ParserConfigurationException ex) {
       getLog().error("Can't configure XML parser", ex);
       throw new IOException("Can't configure XML parser", ex);
-    }
-    catch (SAXException ex) {
+    } catch (SAXException ex) {
       getLog().error("Can't parse document", ex);
       throw new IOException("Can't parse document", ex);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       getLog().error("Unexpected IOException", ex);
       throw new IOException("Unexpected IOException", ex);
     }
@@ -1140,8 +1118,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
       detectedError = false;
 
-    }
-    finally {
+    } finally {
       if (detectedError && !isKeepUnarchFolderIfError()) {
         logOptionally("Deleting folder because error during unpack : " + destinationFolder);
         FileUtils.deleteQuietly(destinationFolder);
@@ -1210,7 +1187,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     String result = getSdkArchiveName();
     if (isSafeEmpty(result)) {
       final Document parsed = convertSdkListToDocument(loadGoLangSdkList(proxySettings, URLEncoder.encode(sdkBaseName, "UTF-8")));
-      result = extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
+      result = extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[] {"tar.gz", "zip"});
     } else {
       getLog().info("SDK archive name is predefined : " + result);
     }
@@ -1256,7 +1233,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
         final String sdkBaseName = String.format(NAME_PATTERN, sdkVersion, this.getOs(), this.getArch(), isSafeEmpty(definedOsxVersion) ? "" : "-" + definedOsxVersion);
         warnIfContainsUC("Prefer usage of lower case chars only for SDK base name", sdkBaseName);
-        result = loadSDKAndUnpackIntoCache(this, proxySettings, cacheFolder, sdkBaseName, this.disableSdkLoad);
+        result = loadSDKAndUnpackIntoCache(this, proxySettings, cacheFolder, sdkBaseName, isDisableSdkLoad());
       } else {
         logOptionally("Detected predefined SDK root folder : " + predefinedGoRoot);
         result = new File(predefinedGoRoot);
@@ -1264,8 +1241,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           throw new MojoFailureException("Predefined SDK root is not a directory : " + result);
         }
       }
-    }
-    finally {
+    } finally {
       LOCKER.unlock();
     }
     return result;
@@ -1305,10 +1281,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       final String errLog = extractErrorOutAsString();
 
       if (getLog().isDebugEnabled()) {
-        getLog().debug("OUT_LOG: "+outLog);
-        getLog().debug("ERR_LOG: "+errLog);
+        getLog().debug("OUT_LOG: " + outLog);
+        getLog().debug("ERR_LOG: " + errLog);
       }
-      
+
       if (error || this.processConsoleOut(resultCode, outLog, errLog)) {
         printLogs(error || enforcePrintOutput(), outLog, errLog);
       }
@@ -1346,15 +1322,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       boolean error = false;
       try {
         error = doMainBusiness(proxySettings, 10);
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
         error = true;
         throw new MojoExecutionException(ex.getMessage(), ex);
-      }
-      catch (InterruptedException ex) {
+      } catch (InterruptedException ex) {
         error = true;
-      }
-      finally {
+      } finally {
         afterExecution(null, error);
       }
     }
@@ -1426,8 +1399,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public boolean isMojoMustNotBeExecuted() throws MojoFailureException {
     try {
       return isSourceFolderRequired() && !this.getSources(false).isDirectory();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       throw new MojoFailureException("Can't check source folder", ex);
     }
   }
@@ -1466,7 +1438,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
     final File detectedRoot = findGoRoot(proxySettings);
     final String gobin = getGoBin();
-    final File gopath = findGoPath(true);
+    final File[] gopathParts = findGoPath(true);
 
     if (isMojoMustNotBeExecuted()) {
       return null;
@@ -1477,7 +1449,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final File executableFileInBin = gobin == null ? null : new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
 
-    final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
+    final File[] exeVariants = new File[] {executableFileInBin, executableFileInPathOrRoot};
 
     final File foundExecutableTool = findExisting(exeVariants);
 
@@ -1540,11 +1512,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
 
+
+    String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(gopathParts);
     if (isEnforceGoPathToEnd()) {
-      addEnvVar(result, "GOPATH", preparePath(getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd(), gopath.getAbsolutePath()));
+      preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd(), preparedGoPath);
     } else {
-      addEnvVar(result, "GOPATH", preparePath(gopath.getAbsolutePath(), getExtraPathToAddToGoPathBeforeSources(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd()));
+      preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(preparedGoPath, makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd());
     }
+    addEnvVar(result, "GOPATH", preparedGoPath);
 
     if (gobin == null) {
       getLog().warn("GOBIN is disabled by direct order");
@@ -1574,7 +1549,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     String thePath = GetUtils.ensureNonNullStr(System.getenv("PATH"));
-    thePath = preparePath(thePath, (detectedRoot + File.separator + getExecSubpath()), gobin);
+    thePath = IOUtils.makeOsFilePathWithoutDuplications(thePath, (detectedRoot + File.separator + getExecSubpath()), gobin);
     addEnvVar(result, "PATH", thePath);
 
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
@@ -1595,10 +1570,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  protected String getExtraPathToAddToGoPathBeforeSources() {
+  protected String makePathFromExtraGoPathElements() {
     String result = "";
     if (this.addToGoPath != null) {
-      result = preparePath(this.addToGoPath);
+      result = IOUtils.makeOsFilePathWithoutDuplications(this.addToGoPath);
     }
     return result;
   }
@@ -1620,8 +1595,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       try {
         getLog().debug("Writing out console log : " + fileToWriteErr);
         FileUtils.write(fileToWriteOut, out, "UTF-8");
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
         throw new MojoExecutionException("Can't save console output log into file : " + fileToWriteOut, ex);
       }
     }
@@ -1634,8 +1608,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       try {
         getLog().debug("Writing error console log : " + fileToWriteErr);
         FileUtils.write(fileToWriteErr, err, "UTF-8");
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
         throw new MojoExecutionException("Can't save console error log into file : " + fileToWriteErr, ex);
       }
     }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.cvs;
 
 import javax.annotation.Nonnull;
@@ -20,32 +21,34 @@ import javax.annotation.Nullable;
 import java.io.File;
 
 public enum CVSType {
-    UNKNOWN(new CvsNone()),
-    GIT(new CvsGIT()),
-    HG(new CvsHG()),
-    SVN(new CvsSVN()),
-    BAZAAR(new CvsBZR());
+  UNKNOWN(new CvsNone()),
+  GIT(new CvsGIT()),
+  HG(new CvsHG()),
+  SVN(new CvsSVN()),
+  BAZAAR(new CvsBZR());
 
-    private final AbstractRepo processor;
+  private final AbstractRepo processor;
 
-    private CVSType(@Nonnull final AbstractRepo processor) {
-        this.processor = processor;
-    }
+  private CVSType(@Nonnull final AbstractRepo processor) {
+    this.processor = processor;
+  }
 
-    @Nonnull
-    public static CVSType investigateFolder(@Nullable final File folder) {
-        CVSType result = UNKNOWN;
-        for (final CVSType t : values()) {
-            if (t.getProcessor().doesContainCVS(folder)) {
-                result = t;
-                break;
-            }
+  @Nonnull
+  public static CVSType investigateFolder(@Nullable final File folder) {
+    CVSType result = UNKNOWN;
+    if (folder.isDirectory()) {
+      for (final CVSType t : values()) {
+        if (t.getProcessor().doesContainCVS(folder)) {
+          result = t;
+          break;
         }
-        return result;
+      }
     }
+    return result;
+  }
 
-    @Nonnull
-    public AbstractRepo getProcessor() {
-        return this.processor;
-    }
+  @Nonnull
+  public AbstractRepo getProcessor() {
+    return this.processor;
+  }
 }
