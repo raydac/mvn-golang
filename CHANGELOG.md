@@ -1,4 +1,5 @@
 # 2.1.7 (SNAPSHOT)
+- improved GOPATH value processing, multi-folder value allowed
 - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
 - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
 - added `args` attribute to the `run` mojo to provide tail command line arguments.
