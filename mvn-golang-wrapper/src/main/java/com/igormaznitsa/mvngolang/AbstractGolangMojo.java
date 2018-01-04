@@ -215,8 +215,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String goPath;
 
   /**
-   * Folder to be used as $GOARM. NB! By default it has value
-   * "${user.home}${file.separator}.mvnGoLang${file.separator}.go_arm"
+   * Value to be provided as $GOARM.
    *
    * @since 2.1.1
    */
@@ -356,8 +355,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String useGoTool;
 
   /**
-   * Allows to find environment variable values for $GOROOT, $GOROOT_BOOTSTRAP,
-   * $GOOS, $GOARCH, $GOPATH and use them for process..
+   * Flag to override all provided configuration variables by their environment values if such value is detected
+   * <ul>
+   * <li>goRoot by $GOROOT</li>
+   * <li>goRootBootstrap by $GOROOT_BOOTSTRAP</li>
+   * <li>targetOs by $GOOS</li>
+   * <li>targetArch by $GOARCH</li>
+   * <li>targetArm by $GOARM</li>
+   * <li>goPath by $GOPATH</li>
+   * </ul>
+   * <b>NB! Your configuration values will be ignored if you define the flag because it has higher priority!</b>
    */
   @Parameter(name = "useEnvVars", defaultValue = "false")
   private boolean useEnvVars;
@@ -589,21 +596,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  @Nullable
-  public String getGoBin() {
-    final String foundInEnvironment = System.getenv("GOBIN");
-    String result = assertNotNull(this.goBin);
-
-    if ("NONE".equals(result.trim())) {
-      result = null;
-    } else {
-      if (foundInEnvironment != null && isUseEnvVars()) {
-        result = foundInEnvironment;
-      }
-    }
-    return result;
-  }
-
   public boolean isSkip() {
     return this.skip;
   }
@@ -789,42 +781,54 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return result;
   }
 
-  @Nonnull
-  public String getGoPath() {
-    final String foundInEnvironment = System.getenv("GOPATH");
-    String result = assertNotNull(this.goPath);
+  @Nullable
+  private String getValueOrEnv(@Nonnull final String varName, @Nullable final String configValue) {
+    final String foundInEnvironment = System.getenv(varName);
+    String result = configValue;
 
     if (foundInEnvironment != null && isUseEnvVars()) {
+      if (!isSafeEmpty(configValue)) {
+        getLog().warn(String.format("Value %s is replaced by environment value.", varName));
+      }
       result = foundInEnvironment;
     }
     return result;
   }
 
   @Nullable
+  public String getGoRoot() {
+    return getValueOrEnv("GOROOT", this.goRoot);
+  }
+
+  @Nullable
+  public String getGoRootBootstrap() {
+    return getValueOrEnv("GOROOT_BOOTSTRAP", this.goRootBootstrap);
+  }
+
+  @Nullable
+  public String getGoBin() {
+    String result = getValueOrEnv("GOBIN", this.goBin);
+    return "NONE".equals(result) ? null : result;
+  }
+
+  @Nonnull
+  public String getGoPath() {
+    return assertNotNull(getValueOrEnv("GOPATH", this.goPath));
+  }
+
+  @Nullable
   public String getTargetArm() {
-    String result = this.targetArm;
-    if (isSafeEmpty(result) && isUseEnvVars()) {
-      result = System.getenv("GOARM");
-    }
-    return result;
+    return getValueOrEnv("GOARM", this.targetArm);
   }
 
   @Nullable
   public String getTargetOS() {
-    String result = this.targetOs;
-    if (isSafeEmpty(result) && isUseEnvVars()) {
-      result = System.getenv("GOOS");
-    }
-    return result;
+    return getValueOrEnv("GOOS", this.targetOs);
   }
 
   @Nullable
   public String getTargetArch() {
-    String result = this.targetArch;
-    if (isSafeEmpty(result) && isUseEnvVars()) {
-      result = System.getenv("GOARCH");
-    }
-    return result;
+    return getValueOrEnv("GOARCH", this.targetArch);
   }
 
   public boolean isUseMavenProxy() {
@@ -856,28 +860,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   public String getGoVersion() {
     return this.goVersion;
-  }
-
-  @Nullable
-  public String getGoRoot() {
-    String result = this.goRoot;
-
-    if (isSafeEmpty(result) && isUseEnvVars()) {
-      result = System.getenv("GOROOT");
-    }
-
-    return result;
-  }
-
-  @Nullable
-  public String getGoRootBootstrap() {
-    String result = this.goRootBootstrap;
-
-    if (isSafeEmpty(result) && isUseEnvVars()) {
-      result = System.getenv("GOROOT_BOOTSTRAP");
-    }
-
-    return result;
   }
 
   @Nonnull
