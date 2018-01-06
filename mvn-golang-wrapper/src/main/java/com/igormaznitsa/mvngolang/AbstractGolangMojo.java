@@ -109,8 +109,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    */
   protected final Set<String> buildFlagsToIgnore = new HashSet<>();
   protected final List<String> tempBuildFlags = new ArrayList<>();
+
   @Parameter(defaultValue = "${settings}", readonly = true)
   protected Settings settings;
+
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;
   /**
@@ -435,7 +437,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   private static String extractExtensionOfArchive(@Nonnull final String archiveName) {
-    final String lcName = archiveName;
+    final String lcName = archiveName.toLowerCase(Locale.ENGLISH);
     final String result;
     if (lcName.endsWith(".tar.gz")) {
       result = archiveName.substring(archiveName.length() - "tar.gz".length());

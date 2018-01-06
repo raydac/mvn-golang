@@ -41,7 +41,7 @@ public final class UnpackUtils {
     private UnpackUtils() {
     }
 
-    public static int unpackFileToFolder(@Nonnull final Log logger, @Nullable final String folder, @Nonnull final File archiveFile, @Nonnull final File destinationFolder, final boolean makeAllExecutable) throws IOException {
+    public static int unpackFileToFolder(@Nonnull final Log logger, @Nullable final String folder, @Nonnull final File archiveFile, @Nonnull final File destinationFolder, final boolean tryMakeAllExecutable) throws IOException {
         final String normalizedName = archiveFile.getName().toLowerCase(Locale.ENGLISH);
 
         final ArchEntryGetter entryGetter;
@@ -161,11 +161,13 @@ public final class UnpackUtils {
                             }
                         }
 
-                        if (makeAllExecutable) {
+                        if (tryMakeAllExecutable) {
                             try {
-                                targetFile.setExecutable(true, true);
+                                if (!targetFile.setExecutable(true, true)){
+                                    logger.debug("Can't make file executable : "+targetFile);
+                                }
                             } catch (SecurityException ex) {
-                                throw new IOException("Can't make file executable : " + targetFile, ex);
+                                throw new IOException("Can't make file executable for secuity reasons : " + targetFile, ex);
                             }
                         }
                         unpackedFilesCounter++;

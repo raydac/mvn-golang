@@ -52,6 +52,10 @@ public class GolangToolMojo extends AbstractGolangMojo {
         return this.args == null ? null : this.args.clone();
     }
 
+    public void setArgs(@Nullable @MustNotContainNull final String [] value) {
+        this.args = value == null ? null : value.clone();
+    }
+
     @Override
     @Nonnull
     @MustNotContainNull
@@ -62,6 +66,10 @@ public class GolangToolMojo extends AbstractGolangMojo {
             result.add(s);
         }
         return result.toArray(new String[result.size()]);
+    }
+
+    public void setCommand(@Nullable final String value) {
+        this.command = value;
     }
 
     @Nonnull

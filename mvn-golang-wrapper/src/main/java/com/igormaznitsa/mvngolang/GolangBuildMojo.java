@@ -97,7 +97,7 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
         return this.buildMode;
     }
 
-    public void setBuildode(@Nullable final String buildMode) {
+    public void setBuilMode(@Nullable final String buildMode) {
         this.buildMode = GetUtils.ensureNonNull(buildMode, "default");
     }
 
@@ -144,9 +144,11 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
             }
             // softly try to make it executable
             try {
-                resultFile.setExecutable(true);
+                if (!resultFile.setExecutable(true)){
+                    getLog().warn("Can't make result file executable : "+resultFile);
+                }
             } catch (SecurityException ex) {
-                getLog().warn("Security exception during setting executable flag : " + resultFile);
+                getLog().warn("Security exception during executable flag set : " + resultFile);
             }
 
             getLog().info("The Result file has been successfuly created : " + resultFile);

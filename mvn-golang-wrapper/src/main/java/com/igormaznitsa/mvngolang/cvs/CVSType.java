@@ -29,14 +29,14 @@ public enum CVSType {
 
   private final AbstractRepo processor;
 
-  private CVSType(@Nonnull final AbstractRepo processor) {
+  CVSType(@Nonnull final AbstractRepo processor) {
     this.processor = processor;
   }
 
   @Nonnull
   public static CVSType investigateFolder(@Nullable final File folder) {
     CVSType result = UNKNOWN;
-    if (folder.isDirectory()) {
+    if (folder != null && folder.isDirectory()) {
       for (final CVSType t : values()) {
         if (t.getProcessor().doesContainCVS(folder)) {
           result = t;

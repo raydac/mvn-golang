@@ -178,12 +178,9 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
             rootCvsFolder = instance.isDisableCvsAutosearch() ? rootCvsFolder : instance.findRootCvsFolderForPackageSources(f, rootCvsFolder);
           }
 
-          if (rootCvsFolder == null) {
-            instance.getLog().error("Can't find CVS folder in hierarchy for package '" + p + "' [" + rootCvsFolder + ']');
-            return false;
+          if (instance.getLog().isDebugEnabled()){
+            instance.getLog().debug(String.format("CVS folder path for %s is %s",p,rootCvsFolder));
           }
-
-          instance.getLog().info("CVS folder for processing is : " + rootCvsFolder);
 
           if (!rootCvsFolder.isDirectory()) {
             instance.getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
@@ -446,46 +443,48 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         throw new MojoExecutionException("Can't find $GOPATH", ex);
       }
 
-      for (final File f : goPath) {
-        for (final String p : packages) {
-          getLog().info("Removing binary and source folders for package '" + p + "\' in " + f);
+      if (packages !=null) {
+        for (final File f : goPath) {
+          for (final String p : packages) {
+            getLog().info("Removing binary and source folders for package '" + p + "\' in " + f);
 
-          final File pkgSources = this.makePathToPackageSources(f, p);
-          final File pkgBinary = this.makePathToPackageCompiled(f, p);
+            final File pkgSources = this.makePathToPackageSources(f, p);
+            final File pkgBinary = this.makePathToPackageCompiled(f, p);
 
-          getLog().debug("Src folder : " + pkgSources);
-          getLog().debug("Pkg folder : " + pkgBinary);
+            getLog().debug("Src folder : " + pkgSources);
+            getLog().debug("Pkg folder : " + pkgBinary);
 
-          if (pkgSources.isDirectory()) {
-            try {
-              FileUtils.deleteDirectory(pkgSources);
-              deletedInstances++;
-            } catch (IOException ex) {
-              throw new MojoExecutionException("Can't delete source folder : " + pkgSources, ex);
-            }
-            getLog().info("\tDeleted source folder : " + pkgSources);
-          } else {
-            getLog().debug("Folder " + pkgSources + " is not found");
-          }
-
-          if (pkgBinary.isDirectory()) {
-            try {
-              FileUtils.deleteDirectory(pkgBinary);
-              deletedInstances++;
-            } catch (IOException ex) {
-              throw new MojoExecutionException("Can't delete binary folder : " + pkgBinary, ex);
-            }
-            getLog().info("\tDeleted binary folder : " + pkgBinary);
-          } else {
-            final File compiled = new File(pkgBinary.getAbsolutePath() + ".a");
-            if (compiled.isFile()) {
-              if (!compiled.delete()) {
-                throw new MojoExecutionException("Can't delete compiled file : " + compiled);
+            if (pkgSources.isDirectory()) {
+              try {
+                FileUtils.deleteDirectory(pkgSources);
+                deletedInstances++;
+              } catch (IOException ex) {
+                throw new MojoExecutionException("Can't delete source folder : " + pkgSources, ex);
               }
-              deletedInstances++;
-              getLog().info("\tDeleted compiled file : " + compiled);
+              getLog().info("\tDeleted source folder : " + pkgSources);
             } else {
-              getLog().debug("File " + compiled + " is not found");
+              getLog().debug("Folder " + pkgSources + " is not found");
+            }
+
+            if (pkgBinary.isDirectory()) {
+              try {
+                FileUtils.deleteDirectory(pkgBinary);
+                deletedInstances++;
+              } catch (IOException ex) {
+                throw new MojoExecutionException("Can't delete binary folder : " + pkgBinary, ex);
+              }
+              getLog().info("\tDeleted binary folder : " + pkgBinary);
+            } else {
+              final File compiled = new File(pkgBinary.getAbsolutePath() + ".a");
+              if (compiled.isFile()) {
+                if (!compiled.delete()) {
+                  throw new MojoExecutionException("Can't delete compiled file : " + compiled);
+                }
+                deletedInstances++;
+                getLog().info("\tDeleted compiled file : " + compiled);
+              } else {
+                getLog().debug("File " + compiled + " is not found");
+              }
             }
           }
         }
