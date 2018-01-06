@@ -105,7 +105,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
    *
    * @since 2.1.4
    */
-  @Parameter(name = "enforceDeletePackageFiles")
+  @Parameter(name = "enforceDeletePackageFiles", defaultValue = "false")
   private boolean enforceDeletePackageFiles;
 
   /**
