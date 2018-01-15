@@ -3,6 +3,9 @@
 - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
 - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
 - added `args` attribute to the `run` mojo to provide tail command line arguments.
+- added processing of maven session offline mode 
+- improved proxy server settings processing to process NTLM authorisation
+- removed maven-enforcer-plugin because it throws NPE for old maven versions
 
 # 2.1.6 (27-aug-2017)
 - implemented file locker to synchronize SDK loading between JVM processes, if cache folder is shared
