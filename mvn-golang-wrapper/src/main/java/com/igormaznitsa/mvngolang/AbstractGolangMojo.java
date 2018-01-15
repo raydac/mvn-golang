@@ -32,7 +32,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -53,6 +53,7 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -115,6 +116,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;
+
+  @Parameter(defaultValue = "${session}", readonly = true, required = true)
+  private MavenSession session;
+
   /**
    * Use proxy server defined for maven.
    *
@@ -500,101 +505,104 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private synchronized static File loadSDKAndUnpackIntoCache(@Nonnull final AbstractGolangMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull final File cacheFolder, @Nonnull final String baseSdkName, final boolean dontLoadIfNotInCache) throws IOException, MojoExecutionException {
-    final File sdkFolder = new File(cacheFolder, baseSdkName);
+  private File loadSDKAndUnpackIntoCache(@Nonnull final AbstractGolangMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull final File cacheFolder, @Nonnull final String baseSdkName, final boolean dontLoadIfNotInCache) throws IOException, MojoExecutionException {
+    synchronized (AbstractGolangMojo.class) {
+      final File sdkFolder = new File(cacheFolder, baseSdkName);
 
-    final File lockFile = new File(cacheFolder, ".lck_load_" + baseSdkName);
-    lockFile.deleteOnExit();
-    try {
-      if (!lockFile.createNewFile()) {
-        instance.getLog().info("Detected SDK loading, waiting for the process end");
-        while (lockFile.exists()) {
-          try {
-            Thread.sleep(100L);
-          } catch (InterruptedException ex) {
-            throw new IOException("Wait of SDK loading is interrupted", ex);
-          }
-        }
-        instance.getLog().info("Loading process has been completed");
-        return sdkFolder;
-      }
-
-      if (sdkFolder.isDirectory()) {
-        if (instance.verbose || instance.getLog().isDebugEnabled()) {
-          instance.getLog().info("SDK cache folder : " + sdkFolder);
-        }
-        return sdkFolder;
-      } else if (dontLoadIfNotInCache) {
-        throw new IOException("Can't find " + baseSdkName + " in the cache but loading is directly disabled");
-      }
-
-      final String predefinedLink = instance.getSdkDownloadUrl();
-
-      final File archiveFile;
-      final String linkForDownloading;
-
-      if (isSafeEmpty(predefinedLink)) {
-        instance.logOptionally("There is not any predefined SDK URL");
-        final String sdkFileName = instance.findSdkArchiveFileName(proxySettings, baseSdkName);
-        archiveFile = new File(cacheFolder, sdkFileName);
-        linkForDownloading = instance.getSdkSite() + sdkFileName;
-      } else {
-        final String extension = extractExtensionOfArchive(assertNotNull(predefinedLink));
-        archiveFile = new File(cacheFolder, baseSdkName + '.' + extension);
-        linkForDownloading = predefinedLink;
-        instance.logOptionally("Using predefined URL to download SDK : " + linkForDownloading);
-        instance.logOptionally("Detected extension of archive : " + extension);
-      }
-
-      final HttpGet methodGet = new HttpGet(linkForDownloading);
-      final RequestConfig config = instance.processRequestConfig(proxySettings, RequestConfig.custom()).build();
-      methodGet.setConfig(config);
-
-      boolean errorsDuringLoading = true;
-
+      final File lockFile = new File(cacheFolder, ".lck_load_" + baseSdkName);
+      lockFile.deleteOnExit();
       try {
-        if (!archiveFile.isFile()) {
-          instance.getLog().warn("Loading SDK archive with URL : " + linkForDownloading);
-
-          final HttpResponse response = instance.getHttpClient(proxySettings).execute(methodGet);
-          final StatusLine statusLine = response.getStatusLine();
-
-          if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-            throw new IOException(String.format("Can't load SDK archive from %s : %d %s", linkForDownloading, statusLine.getStatusCode(), statusLine.getReasonPhrase()));
+        if (!lockFile.createNewFile()) {
+          instance.getLog().info("Detected SDK loading, waiting for the process end");
+          while (lockFile.exists()) {
+            try {
+              Thread.sleep(100L);
+            } catch (InterruptedException ex) {
+              throw new IOException("Wait of SDK loading is interrupted", ex);
+            }
           }
-
-          final HttpEntity entity = response.getEntity();
-          final Header contentType = entity.getContentType();
-
-          if (!ALLOWED_SDKARCHIVE_CONTENT_TYPE.contains(contentType.getValue())) {
-            throw new IOException("Unsupported content type : " + contentType.getValue());
-          }
-
-          final InputStream inStream = entity.getContent();
-          instance.getLog().info("Downloading SDK archive into file : " + archiveFile);
-          FileUtils.copyInputStreamToFile(inStream, archiveFile);
-
-          instance.getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
-
-          inStream.close();
-        } else {
-          instance.getLog().info("Archive file of SDK has been found in the cache : " + archiveFile);
+          instance.getLog().info("Loading process has been completed");
+          return sdkFolder;
         }
 
-        errorsDuringLoading = false;
+        if (sdkFolder.isDirectory()) {
+          if (instance.verbose || instance.getLog().isDebugEnabled()) {
+            instance.getLog().info("SDK cache folder : " + sdkFolder);
+          }
+          return sdkFolder;
+        } else if (dontLoadIfNotInCache || this.session.isOffline()) {
+          getLog().error("Can't find cached Golang SDK and downloading is disabled or Maven in offline mode");
+          throw new IOException("Can't find " + baseSdkName + " in the cache but loading is directly disabled");
+        }
 
-        return instance.unpackArchToFolder(archiveFile, "go", sdkFolder);
+        final String predefinedLink = instance.getSdkDownloadUrl();
+
+        final File archiveFile;
+        final String linkForDownloading;
+
+        if (isSafeEmpty(predefinedLink)) {
+          instance.logOptionally("There is not any predefined SDK URL");
+          final String sdkFileName = instance.findSdkArchiveFileName(proxySettings, baseSdkName);
+          archiveFile = new File(cacheFolder, sdkFileName);
+          linkForDownloading = instance.getSdkSite() + sdkFileName;
+        } else {
+          final String extension = extractExtensionOfArchive(assertNotNull(predefinedLink));
+          archiveFile = new File(cacheFolder, baseSdkName + '.' + extension);
+          linkForDownloading = predefinedLink;
+          instance.logOptionally("Using predefined URL to download SDK : " + linkForDownloading);
+          instance.logOptionally("Detected extension of archive : " + extension);
+        }
+
+        final HttpGet methodGet = new HttpGet(linkForDownloading);
+        final RequestConfig config = instance.processRequestConfig(proxySettings, RequestConfig.custom()).build();
+        methodGet.setConfig(config);
+
+        boolean errorsDuringLoading = true;
+
+        try {
+          if (!archiveFile.isFile()) {
+            instance.getLog().warn("Loading SDK archive with URL : " + linkForDownloading);
+
+            final HttpResponse response = instance.getHttpClient(proxySettings).execute(methodGet);
+            final StatusLine statusLine = response.getStatusLine();
+
+            if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+              throw new IOException(String.format("Can't load SDK archive from %s : %d %s", linkForDownloading, statusLine.getStatusCode(), statusLine.getReasonPhrase()));
+            }
+
+            final HttpEntity entity = response.getEntity();
+            final Header contentType = entity.getContentType();
+
+            if (!ALLOWED_SDKARCHIVE_CONTENT_TYPE.contains(contentType.getValue())) {
+              throw new IOException("Unsupported content type : " + contentType.getValue());
+            }
+
+            final InputStream inStream = entity.getContent();
+            instance.getLog().info("Downloading SDK archive into file : " + archiveFile);
+            FileUtils.copyInputStreamToFile(inStream, archiveFile);
+
+            instance.getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
+
+            inStream.close();
+          } else {
+            instance.getLog().info("Archive file of SDK has been found in the cache : " + archiveFile);
+          }
+
+          errorsDuringLoading = false;
+
+          return instance.unpackArchToFolder(archiveFile, "go", sdkFolder);
+        } finally {
+          methodGet.releaseConnection();
+          if (errorsDuringLoading || !instance.isKeepSdkArchive()) {
+            instance.logOptionally("Deleting archive : " + archiveFile + (errorsDuringLoading ? " (because error during loading)" : ""));
+            deleteFileIfExists(archiveFile);
+          } else {
+            instance.logOptionally("Archive file is kept for special flag : " + archiveFile);
+          }
+        }
       } finally {
-        methodGet.releaseConnection();
-        if (errorsDuringLoading || !instance.isKeepSdkArchive()) {
-          instance.logOptionally("Deleting archive : " + archiveFile + (errorsDuringLoading ? " (because error during loading)" : ""));
-          deleteFileIfExists(archiveFile);
-        } else {
-          instance.logOptionally("Archive file is kept for special flag : " + archiveFile);
-        }
+        FileUtils.deleteQuietly(lockFile);
       }
-    } finally {
-      FileUtils.deleteQuietly(lockFile);
     }
   }
 
@@ -901,7 +909,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (proxy != null) {
         if (proxy.hasCredentials()) {
           final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-          credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port), new UsernamePasswordCredentials(proxy.username, proxy.password));
+          credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port),
+              new NTCredentials(proxy.username, proxy.password, GetUtils.ensureNonNull(System.getenv("COMPUTERNAME"), ""), GetUtils.ensureNonNull(System.getenv("USERDOMAIN"), "")));
           builder.setDefaultCredentialsProvider(credentialsProvider);
           getLog().debug(String.format("Credentials provider has been created for proxy (username : %s): %s", proxy.username, proxy.toString()));
         }
