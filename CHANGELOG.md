@@ -1,4 +1,5 @@
 # 2.1.7 (SNAPSHOT)
+- added `target386` to provide value for `$GO386` environment variable
 - improved GOPATH value processing, multi-folder value allowed
 - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
 - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)

@@ -22,6 +22,7 @@
                     <useMavenProxy>true</useMavenProxy>
                     <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>
                     <customCommand>someCustomCommand</customCommand>
+                    <target386>387</target386>
                     <goRoot>some/root</goRoot>
                     <goPath>some/path</goPath>
                     <sources>some/sources</sources>
