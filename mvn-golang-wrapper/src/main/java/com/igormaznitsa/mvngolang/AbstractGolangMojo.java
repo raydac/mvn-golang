@@ -32,6 +32,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
@@ -78,7 +79,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -914,6 +917,28 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
+  private static String extractComputerName() {
+    String result = System.getenv("COMPUTERNAME");
+    if (result == null) {
+      result = System.getenv("HOSTNAME");
+    }
+    if (result == null) {
+      try {
+        result = InetAddress.getLocalHost().getHostName();
+      } catch (UnknownHostException ex) {
+        result = null;
+      }
+    }
+    return GetUtils.ensureNonNull(result, "<Unknown computer>");
+  }
+
+  @Nonnull
+  private static String extractDomainName() {
+    final String result = System.getenv("USERDOMAIN");
+    return GetUtils.ensureNonNull(result,"");
+  }
+
+  @Nonnull
   private synchronized HttpClient getHttpClient(@Nullable final ProxySettings proxy) throws MojoExecutionException {
     if (this.httpClient == null) {
       final HttpClientBuilder builder = HttpClients.custom();
@@ -922,7 +947,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         if (proxy.hasCredentials()) {
           final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
           credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port),
-              new NTCredentials(proxy.username, proxy.password, GetUtils.ensureNonNull(System.getenv("COMPUTERNAME"), ""), GetUtils.ensureNonNull(System.getenv("USERDOMAIN"), "")));
+              new NTCredentials(GetUtils.ensureNonNull(proxy.username,""), proxy.password, extractComputerName(), extractDomainName()));
           builder.setDefaultCredentialsProvider(credentialsProvider);
           getLog().debug(String.format("Credentials provider has been created for proxy (username : %s): %s", proxy.username, proxy.toString()));
         }
