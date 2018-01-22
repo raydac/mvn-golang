@@ -21,6 +21,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <mvn.version>3.0</mvn.version>
+    <final.extension></final.extension>
   </properties>
 
   <inceptionYear>${year}</inceptionYear>
@@ -38,6 +39,17 @@
   </prerequisites>
 
   <profiles>
+    <profile>
+      <id>windows-profile</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <final.extension>.exe</final.extension>
+      </properties>
+    </profile>
     <!-- The Profile allows to remove all IDE specific data from project folder -->
     <profile>
       <id>clean-ide-config</id>
@@ -71,7 +83,7 @@
 
   <build>
     <defaultGoal>clean package</defaultGoal>
-    <finalName>${dollar}{project.artifactId}-${dollar}{maven.build.timestamp}</finalName>
+    <finalName>${dollar}{project.artifactId}-${dollar}{maven.build.timestamp}${final.extension}</finalName>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
     <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
     <resources>
