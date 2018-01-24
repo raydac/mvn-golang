@@ -20,7 +20,8 @@
   <build>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
     <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
-    
+    <finalName>${dollar}{project.artifactId}-${dollar}{project.version}${dollar}{final.extension}</finalName>
+
     <resources>
       <resource>
         <directory>${dollar}{basedir}${dollar}{file.separator}res</directory>
@@ -36,7 +37,7 @@
         <configuration>
           <goVersion>${dollar}{go.sdk.version}</goVersion>
           <addToGoPath>
-            <common>${dollar}{basedir}/../common</common>
+            <common>${dollar}{basedir}${dollar}{file.separator}..${dollar}{file.separator}common</common>
           </addToGoPath>
         </configuration>
       </plugin>

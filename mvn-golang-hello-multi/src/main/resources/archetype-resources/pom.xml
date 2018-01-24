@@ -17,6 +17,7 @@
     <go.wrapper.plugin.version>${gowrapper}</go.wrapper.plugin.version>
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <mvn.version>3.0</mvn.version>
+    <final.extension></final.extension>
   </properties>
 
   <prerequisites>
@@ -24,6 +25,17 @@
   </prerequisites>
 
   <profiles>
+    <profile>
+      <id>windows-profile</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <final.extension>.exe</final.extension>
+      </properties>
+    </profile>
     <!-- The Profile allows to pack all generated executable modules into ZIP archive -->
     <profile>
       <id>assembly</id>
