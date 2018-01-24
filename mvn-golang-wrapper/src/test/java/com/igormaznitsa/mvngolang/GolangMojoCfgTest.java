@@ -33,8 +33,8 @@ import static org.junit.Assert.assertArrayEquals;
 public class GolangMojoCfgTest extends AbstractMojoTestCase {
 
   private static void assertEqualsPath(final String etalon, final String toCheck) {
-    assertFalse("Must be single path", etalon.contains(":") || etalon.contains(";"));
-    assertFalse("Must be single path", toCheck.contains(":") || toCheck.contains(";"));
+    assertFalse("Must contain single path : " + etalon, etalon.contains(File.pathSeparator));
+    assertFalse("Must contain single path : " + toCheck, etalon.contains(File.pathSeparator));
 
     String normalizedEtalon = etalon.replace('\\', '/');
     String normalizedToCheck = toCheck.replace('\\', '/');
