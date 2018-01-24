@@ -1,4 +1,5 @@
 # 2.1.7 (SNAPSHOT)
+- fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
 - added `target386` to provide value for `$GO386` environment variable
 - improved GOPATH value processing, multi-folder value allowed
 - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
