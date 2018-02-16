@@ -72,7 +72,14 @@ public class GolangBuildMojo extends AbstractPackageGolangMojo {
 
     /**
      * List of linker flags.
-     *
+     * <pre>
+     * {@code
+     *      <ldFlags>
+     *        <ldFlag>-a</ldFlag>
+     *        <ldFlag>main.prodVersion=1.2.3</ldFlag>
+     *      </ldFlags>
+     * }
+     * </pre>
      * @since 2.1.3
      */
     @Parameter(name = "ldFlags")
