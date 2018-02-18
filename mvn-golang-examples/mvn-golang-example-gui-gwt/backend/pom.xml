@@ -13,7 +13,11 @@
     <packaging>mvn-golang</packaging>
     
     <description>Backend part of the GoLang+GWT example, it implements the server side.</description>
-    
+
+    <properties>
+        <final.extension></final.extension>
+    </properties>
+            
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -23,7 +27,22 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>under-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <final.extension>.exe</final.extension>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
+        <finalName>${project.artifactId}-${project.version}${final.extension}</finalName>
         <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
         <directory>${basedir}${file.separator}bin</directory>
         <plugins>
