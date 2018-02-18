@@ -1,4 +1,4 @@
-# 2.1.7 (SNAPSHOT)
+# 2.1.7 (18-feb-2018)
 - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
 - added `target386` to provide value for `$GO386` environment variable
 - improved GOPATH value processing, multi-folder value allowed

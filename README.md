@@ -8,7 +8,7 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__2.1.7 (SNAPSHOT)__
+__2.1.7 (18-feb-2018)__
  - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
  - added `target386` to provide value for `$GO386` environment variable
  - improved GOPATH value processing, multi-folder value allowed
@@ -27,12 +27,6 @@ __2.1.6 (27-aug-2017)__
  - added property `supposeSdkArchiveFileName` to suppose SDK archive file name if it is not presented in common SDK list, active by default
  - minimal version of Java increased to 1.7
 
-__2.1.5 (03-jul-2017)__
- - added archetype for multimodule project `mvn-golang-hello-multi` 
- - added `customCvsOptions` into `get` mojo to provide custom options for CVS operation.
- - improved `get` mojo, added auto-search of CVS folder in package folder hierarchy, it can be disabled with `<disableCvsAutosearch>true</disableCvsAutosearch>`, [#23](https://github.com/raydac/mvn-golang/issues/23)
- - improved `get` mojo, added way to define relative path to CVS folder in `src` folder through `<relativePathToCvsFolder>`, by default the path extracted from package name
-   
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
 # GO start!
