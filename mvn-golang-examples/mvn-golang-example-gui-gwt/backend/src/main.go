@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"front/bindata"
-	"github.com/gorilla/websocket"
 	"github.com/skratchdot/open-golang/open"
 	"io"
 	"log"
@@ -33,8 +32,6 @@ func makeTimestamp() int64 {
 var eventmap = map[string](func(data_struct) data_struct){
 	"buttons/send": eventButtonSend,
 }
-
-var upgrader = websocket.Upgrader{}
 
 func eventButtonSend(data data_struct) data_struct {
 	data.Data = data.Data + "! Hello from the Go side!"
