@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="gotest">
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='com.igormaznitsa.gotest' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/gotest/greet" class="com.igormaznitsa.server.GreetingServiceImpl" />
+
+</module>

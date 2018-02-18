@@ -1,0 +1,49 @@
+body {
+    margin-top: 5% !important;
+    margin-bottom: 5% !important;
+    margin-left:  10% !important;
+    margin-right: 10% !important;
+}
+
+.mainTitle {
+    text-align: left;
+    margin-left: 40px;
+    font-size: 48pt;
+    font-weight: bold;
+    color: darkgray;
+}
+
+.subTitle {
+    text-align: center;
+    margin-left: 40px;
+    font-size: 20pt;
+    font-weight: bold;
+    color: darkgray;
+}
+
+.sendButton {
+  display: block;
+  font-size: 16pt;
+}
+
+.bottomRecord {
+    text-align: right;
+}
+
+.bottomRecord a {
+    color: cornflowerblue !important;
+    text-decoration: none !important;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: red;
+}

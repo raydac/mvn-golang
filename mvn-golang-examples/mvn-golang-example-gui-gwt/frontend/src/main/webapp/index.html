@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the    -->
+<!-- browser's rendering engine into               -->
+<!-- "Standards Mode". Replacing this declaration  -->
+<!-- with a "Quirks Mode" doctype may lead to some -->
+<!-- differences in layout.                        -->
+
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <link type="text/css" rel="stylesheet" href="main.css">
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="/favicon.ico" type="image/x-icon">
+        <title>GoLang+GWT Example</title>
+        <script type="text/javascript" language="javascript" src="gwtfront/gwtfront.nocache.js"></script>
+    </head>
+
+    <body>
+        <!-- OPTIONAL: include this if you want history support -->
+        <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+        <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+        <noscript>
+        <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+            Your web browser must have JavaScript enabled
+            in order for this application to display correctly.
+        </div>
+        </noscript>
+
+        <table>
+            <tr>
+                <td rowspan="2"><a target="_blank" href="https://github.com/raydac/mvn-golang"><img src="images/logo.png"></a></td>
+                <td><div class="mainTitle">GoLang+GWT Example</div></td>
+            </tr>
+            <tr>
+                <td><div class="subTitle"><a target="_blank" href="https://github.com/raydac/mvn-golang">https://github.com/raydac/mvn-golang</a></div></td>
+            </tr>
+        </table>
+
+        <hr>
+        <table>
+            <tr><td>
+                    <table align="left">
+                        <tr>
+                            <td colspan="2" style="font-weight:bold;">Please enter your name:</td>
+                        </tr>
+                        <tr>
+                            <td id="nameFieldContainer"></td>
+                            <td id="sendButtonContainer"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="color:red;" id="errorLabelContainer"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="color:green;" id="messageLabelContainer"></td>
+                        </tr>
+                    </table>
+                </td></tr>
+            <tr><td>
+                    <table>
+                        <tr>
+                            <td>Time on the server side:</td>
+                            <td id="timerZone"></td>
+                        </tr>
+                    </table>
+                </td></tr>
+        </table>
+        <div class="bottomRecord"><a href="http://www.igormaznitsa.com">2018, Igor Maznitsa, Tallinn</a></div>
+    </body>
+</html>
