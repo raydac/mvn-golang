@@ -31,8 +31,18 @@ public class BackendService {
 
     public interface PushListener {
 
+        /**
+         * Notificaton for push event
+         * @param event event data as JSON object
+         * @return true if push event should continue processing, false if push event shold be stopped
+         */
         boolean onPushEvent(JSONObject event);
 
+        /**
+         * Notification about error in push event mechanism
+         * @param thr error object
+         * @return true if push event mechanism should continue its work, false if it should be stopped
+         */
         boolean onPushSystemError(Throwable thr);
     }
 

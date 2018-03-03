@@ -10,12 +10,15 @@ import (
 	"mime"
 	"net"
 	"net/http"
+	"os"
 	pathop "path"
 	"strconv"
 	"time"
 )
 
 //go:generate go-bindata -prefix "../../frontend/target/frontend.out" -pkg bindata -o ../bin/src/front/bindata/binasset.go ../../frontend/target/frontend.out/...
+
+var watchdog_chn = make(chan int)
 
 type data_struct struct {
 	Data string
@@ -39,6 +42,8 @@ func eventButtonSend(data data_struct) data_struct {
 }
 
 func push_handler(rw http.ResponseWriter, req *http.Request) {
+	watchdog_chn <- 0
+
 	rw.Header().Set("Content-Type", "application/json")
 	rw.Header().Set("Cache-Control", "no-cache")
 	var data push_event
@@ -48,6 +53,17 @@ func push_handler(rw http.ResponseWriter, req *http.Request) {
 		log.Panic(err)
 	}
 	rw.Write(js)
+}
+
+func watchdog() {
+	for {
+		select {
+		case <-watchdog_chn:
+		case <-time.After(5 * time.Second):
+			log.Print("Looks like that UI part has been closed")
+			os.Exit(0)
+		}
+	}
 }
 
 func static_handler(rw http.ResponseWriter, req *http.Request) {
@@ -150,6 +166,8 @@ func listenStartBrowserAndServe(addr string) error {
 	if err != nil {
 		return err
 	}
+
+	go watchdog()
 
 	return server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)})
 

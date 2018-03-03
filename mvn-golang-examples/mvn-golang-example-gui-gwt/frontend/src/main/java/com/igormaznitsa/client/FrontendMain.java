@@ -2,10 +2,6 @@ package com.igormaznitsa.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.Window;
@@ -13,6 +9,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
+
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -53,38 +50,32 @@ public class FrontendMain implements EntryPoint, BackendService.PushListener {
         nameField.setFocus(true);
         nameField.selectAll();
 
-        sendButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                sendButton.setEnabled(false);
-                errorLabel.setText("");
-                messageLabel.setText("");
-                
-                backend.doDataRequest("buttons/send", nameField.getText(), new BackendService.Callback(){
-                    @Override
-                    public void onResponseReceived(String eventId, JSONObject wholeJsonResponse, String dataFeldValue) {
-                        messageLabel.setText(dataFeldValue);
-                        sendButton.setEnabled(true);
-                    }
+        sendButton.addClickHandler(event -> {
+            sendButton.setEnabled(false);
+            errorLabel.setText("");
+            messageLabel.setText("");
 
-                    @Override
-                    public void onError(String eventId, Throwable exception) {
-                        LOGGER.severe("Error '"+eventId+"', "+exception);
-                        errorLabel.setText(exception.getMessage());
-                        sendButton.setEnabled(true);
-                    }
-                    
-                });
-            }
+            backend.doDataRequest("buttons/send", nameField.getText(), new BackendService.Callback(){
+                @Override
+                public void onResponseReceived(String eventId, JSONObject wholeJsonResponse, String dataFeldValue) {
+                    messageLabel.setText(dataFeldValue);
+                    sendButton.setEnabled(true);
+                }
+
+                @Override
+                public void onError(String eventId, Throwable exception) {
+                    LOGGER.severe("Error '"+eventId+"', "+exception);
+                    errorLabel.setText(exception.getMessage());
+                    sendButton.setEnabled(true);
+                }
+
+            });
         });
         
-        nameField.addKeyDownHandler(new KeyDownHandler() {
-            @Override
-            public void onKeyDown(KeyDownEvent event) {
-                // if enter then send data
-                if (event.getNativeKeyCode() == 13) {
-                 sendButton.click();
-                }
+        nameField.addKeyDownHandler(event -> {
+            // if enter then send data
+            if (event.getNativeKeyCode() == 13) {
+             sendButton.click();
             }
         });
         
