@@ -10,7 +10,7 @@
 # Changelog
 __2.1.8 (SNAPSHOT)__
  - fixed dependency for `[termui test project in examples](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)`
- - small improvements in processing of Git CVS
+ - added `customScript` section into `get` to execute some custom script over package CVS folder 
 
 __2.1.7 (18-feb-2018)__
  - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
