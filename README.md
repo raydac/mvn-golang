@@ -8,6 +8,9 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.1.8 (SNAPSHOT)__
+ - improved processing of tag and revision for Git CVS
+
 __2.1.7 (18-feb-2018)__
  - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
  - added `target386` to provide value for `$GO386` environment variable
