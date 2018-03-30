@@ -28,12 +28,23 @@
           </configuration>
           <executions>
             <execution>
-              <id>default-get</id>
+              <id>get-panicparse</id>
+              <goals>
+                <goal>get</goal>
+              </goals>
               <configuration>
-                <buildFlags>
-                  <flag>-u</flag>
-                </buildFlags>
-                <autofixGitCache>true</autofixGitCache>
+                <packages>
+                  <package>github.com/maruel/panicparse</package>
+                </packages>
+                <tag>v1.0.2</tag>
+              </configuration>
+            </execution>
+            <execution>
+              <id>get-termui</id>
+              <goals>
+                <goal>get</goal>
+              </goals>
+              <configuration>
                 <packages>
                   <package>github.com/gizak/termui</package>
                 </packages>
@@ -44,5 +55,5 @@
         </plugin>
       </plugins>
     </build>
-    
+
 </project>
