@@ -50,6 +50,15 @@
                         <package>one_pack</package>
                         <package>two_pack</package>
                     </packages>
+                    <customScript>
+                        <path>some/test/script</path>
+                        <options>
+                            <option>some1</option>
+                            <option>some2</option>
+                            <option>some3</option>
+                        </options>
+                        <ignoreFail>true</ignoreFail>
+                    </customScript>
                 </configuration>
             </plugin>
         </plugins>

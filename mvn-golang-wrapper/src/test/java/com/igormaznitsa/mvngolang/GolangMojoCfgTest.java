@@ -269,6 +269,11 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
 
     final ProxySettings proxy = getMojo.getProxy();
 
+    final CustomScript script = getMojo.getCustomScript();
+    assertEquals("some/test/script", script.path);
+    assertTrue(script.ignoreFail);
+    assertArrayEquals(new String[]{"some1", "some2", "some3"}, script.options);
+    
     assertEquals("https", proxy.protocol);
     assertEquals("127.33.44.55", proxy.host);
     assertEquals(999, proxy.port);

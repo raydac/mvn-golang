@@ -17,6 +17,7 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.cvs.CVSType;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
@@ -39,6 +40,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.zeroturnaround.exec.InvalidExitValueException;
+import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
  * The Mojo wraps the 'get' command.
@@ -50,10 +54,19 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern.compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   /**
-   * Flag to make attempt to fix detected Git cache error and re-execute the
-   * command. It will try to execute
-   * <pre>'git rm -r --cached .'</pre> just in the package directory to clear
-   * cache.
+   * Script to be called in the end of all operations over CVS, <b>it will be executed separately for each package</b>.
+   * The Script will be started with the CVS root folder of package as the execution folder.
+   * During start there will be added number of environment variables: MVNGO_CVS_BRANCH, MVNGO_CVS_TAG, MVNGO_CVS_REVISION, MVNGO_CVS_PACKAGE
+   * 
+   * @since 2.1.8
+   */
+  @Parameter(name = "customScript")
+  private CustomScript customScript;  
+          
+  /**
+   * Flag to try to fix GIT cache error if it is detected.
+   * 
+   * @since 1.0
    */
   @Parameter(name = "autofixGitCache", defaultValue = "false")
   private boolean autofixGitCache;
@@ -166,7 +179,12 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     return result.toString();
   }
 
-  private static synchronized boolean processCVS(@Nonnull final GolangGetMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull @MustNotContainNull final File[] goPath) {
+  @Nullable
+  public CustomScript getCustomScript() {
+    return this.customScript;
+  }
+  
+  private synchronized boolean processCVS(@Nonnull final GolangGetMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull @MustNotContainNull final File[] goPath) {
     final String[] packages = instance.getPackages();
 
     if (packages != null && packages.length > 0) {
@@ -221,12 +239,62 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
               }
             }
           }
+
+          if (this.getCustomScript() != null) {
+            if (!processCustomScriptCallForPackage(p, rootCvsFolder, Assertions.assertNotNull(this.getCustomScript()))) {
+              return false;
+            }
+          }
+
         }
       }
     }
     return true;
   }
 
+  private boolean processCustomScriptCallForPackage(@Nonnull final String packageName, @Nonnull final File rootCvsFolder, @Nonnull final CustomScript script) {
+    final List<String> command = new ArrayList<>();
+
+    command.add(script.path);
+    if (script.options != null) {
+      for (final String s : script.options) {
+        command.add(s);
+      }
+    }
+
+    if (getLog().isDebugEnabled()) {
+      getLog().debug("CLI : " + command);
+      getLog().debug("Package name : " + packageName);
+      getLog().debug("Root CVS folder : " + rootCvsFolder);
+    }
+
+    getLog().warn(String.format("Starting script in VCS folder [%s] : %s", packageName, StringUtils.join(command.toArray(), ' ')));
+
+    final ProcessExecutor processExecutor = new ProcessExecutor(command.toArray(new String[command.size()]));
+    processExecutor
+            .exitValueAny()
+            .directory(rootCvsFolder)
+            .environment("MVNGO_CVS_BRANCH", GetUtils.ensureNonNull(this.branch, ""))
+            .environment("MVNGO_CVS_TAG", GetUtils.ensureNonNull(this.tag, ""))
+            .environment("MVNGO_CVS_REVISION", GetUtils.ensureNonNull(this.revision, ""))
+            .environment("MVNGO_CVS_PACKAGE", packageName)
+            .redirectError(System.err)
+            .redirectOutput(System.out);
+
+    boolean result = false;
+    
+    try{
+      final ProcessResult process = processExecutor.executeNoTimeout();
+      final int exitValue = process.getExitValue();
+
+      result = script.ignoreFail ? true : exitValue == 0;
+    }catch(IOException | InterruptedException | InvalidExitValueException ex){
+      getLog().error("Error in proces custom script", ex);
+    }
+    
+    return result;
+  }
+  
   public boolean isDisableCvsAutosearch() {
     return this.disableCvsAutosearch;
   }
