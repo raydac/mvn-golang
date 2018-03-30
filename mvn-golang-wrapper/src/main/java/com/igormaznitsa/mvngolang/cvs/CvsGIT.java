@@ -73,14 +73,12 @@ class CvsGIT extends AbstractRepo {
 
     private boolean upToTag(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String tagId) {
         logger.debug("upToTag: " + tagId);
-        return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", "--quiet", "--force", "tags/" + tagId))
-                && checkResult(logger, execute(customCommand, logger, cvsFolder, "reset", "--quiet", "--hard", tagId));
+        return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", "--quiet", "--force", "tags/" + tagId));
     }
 
     private boolean upToRevision(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customCommand, @Nonnull final File cvsFolder, @Nonnull final String revisionId) {
         logger.debug("upToRevision: " + revisionId);
-        return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", "--quiet", "--force", revisionId))
-                && checkResult(logger, execute(customCommand, logger, cvsFolder, "reset", "--quiet", "--hard", revisionId));
+        return checkResult(logger, execute(customCommand, logger, cvsFolder, "checkout", "--quiet", "--force", revisionId));
     }
 
 }
