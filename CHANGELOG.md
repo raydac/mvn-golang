@@ -1,5 +1,6 @@
 # 2.1.8 (SNAPSHOT)
-- improved processing of tag and revision for Git CVS
+- fixed dependency for `[termui test project in examples](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)`
+- minor improvements in processing of Git CVS
 
 # 2.1.7 (18-feb-2018)
 - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
@@ -8,7 +9,7 @@
 - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
 - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
 - added `args` attribute to the `run` mojo to provide tail command line arguments.
-- added processing of maven session offline mode 
+- added processing of maven session offline mode
 - improved proxy server settings processing to process NTLM authorisation
 - removed maven-enforcer-plugin because it throws NPE for old maven versions
 
@@ -21,7 +22,7 @@
 - minimal version of Java increased to 1.7
 
 # 2.1.5 (03-jul-2017)
-- added archetype for multimodule project `mvn-golang-hello-multi` 
+- added archetype for multimodule project `mvn-golang-hello-multi`
 - added `customCvsOptions` into `get` mojo to provide custom options for CVS operation.
 - improved `get` mojo, added auto-search of CVS folder in package folder hierarchy, it can be disabled with `<disableCvsAutosearch>true</disableCvsAutosearch>`, #23
 - improved `get` mojo, added way to define relative path to CVS folder in `src` folder through `<relativePathToCvsFolder>`, by default the path extracted from package name
@@ -54,7 +55,7 @@
 - Added flag `ignoreErrorExitCode` to prevent failure for error exit code, it is useful in some test cases.
 - Added parameter `reportsFolder` to define folder where some reports will be placed.
 - Added parameters `outLogFile` and `errLogFile` to save execution console log as files in the report folder. By default such reports are not saved.
-- Console log for `test` will be shown in maven log only in verbose mode 
+- Console log for `test` will be shown in maven log only in verbose mode
 
 # 2.1.0 (28-may-2016)
 - Output of environment variables has been moved under the `verbose` flag
@@ -78,7 +79,7 @@
 - Build of example applications moved to the special profile `examples`
 
 # 1.1.0 (05-apr-2016)
-- Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile) 
+- Added [test example for `gomobile` for Android ARM 7](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-gomobile)
 - Added `<findExecInGoPath>`, it allows to find golang tool in $GOPATH instead of $GOROOT (by default `false`)
 - Added `<echo>` and `<echoWarn>` to print echo messages into maven log
 - Added `<exec>` parameter to define gotool name (by default `go`)

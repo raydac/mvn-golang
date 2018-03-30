@@ -9,7 +9,8 @@
 
 # Changelog
 __2.1.8 (SNAPSHOT)__
- - improved processing of tag and revision for Git CVS
+ - fixed dependency for `[termui test project in examples](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)`
+ - small improvements in processing of Git CVS
 
 __2.1.7 (18-feb-2018)__
  - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
@@ -18,7 +19,7 @@ __2.1.7 (18-feb-2018)__
  - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
  - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
  - added `args` attribute to the `run` mojo to provide tail command line arguments.
- - added processing of maven session offline mode 
+ - added processing of maven session offline mode
  - improved proxy server settings processing to process NTLM authorisation
  - removed maven-enforcer-plugin because it throws NPE for old maven versions
 
@@ -40,7 +41,7 @@ mvn -f ./gohello/pom.xml package
 ```
 it will generate a maven project with extra configuration files to make the project compatible with NetBeans IDE and Intellij IDEA Golang plugin, they can be removed with `mvn clean -Pclean-ide-config`    
 [Also you can take a look at the example `Hello world` project using the plugin](https://github.com/raydac/mvn-golang-example)
-   
+
 If you want to generate a multi-module project, then you can use such snippet
 ```
 mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.1.6 -DgroupId=com.go.test -DartifactId=gohello-multi -Dversion=1.0-SNAPSHOT
@@ -113,9 +114,9 @@ The Plug-in doesn't work with standard maven dependencies andf they must be defi
        <package>github.com/kataras/iris</package>
      </packages>
    </configuration>
-</execution> 
+</execution>
 ```
-it will be executed as `bin/go get github.com/gizak/termui github.com/kataras/iris` 
+it will be executed as `bin/go get github.com/gizak/termui github.com/kataras/iris`
 
 If you want work with specific branch then use below snipet
 ```
@@ -195,7 +196,7 @@ if you want disable creation of artifact then you can use snippet
   <phase>none</phase>
 </execution>
 ```
-# Configuration 
+# Configuration
 
 About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvn-golang/wiki/PluginConfigParameters).
 
