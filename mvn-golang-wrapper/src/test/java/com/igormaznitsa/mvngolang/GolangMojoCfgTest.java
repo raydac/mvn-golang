@@ -27,6 +27,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.junit.Test;
 
 import java.io.File;
+import org.apache.maven.plugin.AbstractMojo;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -45,7 +46,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("Wrong path : " + toCheck + " instead of " + etalon, normalizedEtalon, normalizedToCheck);
   }
 
-  private <T extends AbstractGolangMojo> T findMojo(final Class<T> klazz, final String pomName, final String goal) throws Exception {
+  private <T> T findMojo(final Class<T> klazz, final String pomName, final String goal) throws Exception {
     final File pomFile = new File(GolangMojoCfgTest.class.getResource(pomName).toURI());
     final MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
     final ProjectBuildingRequest buildingRequest = executionRequest.getProjectBuildingRequest();
@@ -111,6 +112,13 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertArrayEquals(new String[] {"one_pack", "two_pack"}, cleanMojo.getTailArguments());
     assertArrayEquals(new String[] {"flag1", "flag2"}, cleanMojo.getBuildFlags());
     assertNull(cleanMojo.getTarget386());
+  }
+
+  @Test
+  public void testGolangMvnInstallMojoConfiguration() throws Exception {
+    final GolangMvnInstallMojo mvnInstallMojo = findMojo(GolangMvnInstallMojo.class, "mojoMvnInstall.xml", "mvninstall");
+    assertTrue(mvnInstallMojo.isInstallAttached());
+    assertEquals(3, mvnInstallMojo.getCompression());
   }
 
   @Test

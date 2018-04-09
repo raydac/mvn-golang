@@ -36,8 +36,10 @@ import org.zeroturnaround.zip.ZipUtil;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import org.apache.maven.project.MavenProjectHelper;
 
 /**
  * The Mojo packs all found source and resource project folders and create new artifact in the local repository.
@@ -53,11 +55,22 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     @Component
     protected ArtifactInstaller installer;
 
+    @Component
+    protected MavenProjectHelper projectHelper;
+    
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
     private MavenProject project;
 
     @Parameter(readonly = true, required = true, defaultValue = "${session}")
     private MavenSession session;
+
+    /**
+     * Flag to install attached artifacts.
+     * 
+     * @since 2.1.8
+     */
+    @Parameter(name = "installAttached", defaultValue = "false")
+    private boolean installAttached;
     
     /**
      * Compression level of zip file. Must be 1..9
@@ -67,14 +80,38 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     @Parameter(name = "compression", defaultValue = "9")
     private int compression;
 
+    public void setCompression(final int level) {
+      this.compression = level;
+    }
+    
+    public int getCompression() {
+      return this.compression;
+    }
+    
+    public void setInstallAttached(final boolean flag) {
+      this.installAttached = flag;
+    }
+    
+    public boolean isInstallAttached() {
+      return this.installAttached;
+    }
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            final File archive = compressProjectFiles();
-            try {
-                ProjectBuildingRequest pbr = this.session.getProjectBuildingRequest();
-                this.project.getArtifact().setFile(archive);
-                this.installer.install( pbr, Collections.singletonList( project.getArtifact() ) );
+          final File archive = compressProjectFiles();
+          try {
+            final ProjectBuildingRequest pbr = this.session.getProjectBuildingRequest();
+            this.project.getArtifact().setFile(archive);
+
+            final List<Artifact> artifactsToInstall = new ArrayList<Artifact>();
+
+            artifactsToInstall.add(this.project.getArtifact());
+            if (this.isInstallAttached()) {
+              artifactsToInstall.addAll(this.project.getAttachedArtifacts());
+            }
+
+            this.installer.install(pbr, artifactsToInstall);
             } finally {
                 // Usually created archives etc. will be created in target directory
                 // and will not be deleted by the plugin itself. Usually by `mvn clean ..`..
