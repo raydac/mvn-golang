@@ -9,6 +9,7 @@
 
 # Changelog
 __2.1.8 (SNAPSHOT)__
+ - [#48](https://github.com/raydac/mvn-golang/issues/48) added support of attached artifacts into `mvninstall` mojo through boolean configuration flag `installAttached`
  - fixed dependency for [termui test project in examples](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)
  - added `customScript` section into `get` to execute some custom script over package CVS folder 
 
