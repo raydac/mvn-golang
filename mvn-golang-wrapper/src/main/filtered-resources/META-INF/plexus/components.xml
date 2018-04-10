@@ -17,8 +17,8 @@
                             <process-sources>com.igormaznitsa:mvn-golang-wrapper:${project.version}:fmt</process-sources>
                             <test>com.igormaznitsa:mvn-golang-wrapper:${project.version}:test</test>
                             <package>com.igormaznitsa:mvn-golang-wrapper:${project.version}:build</package>
-                            <install>com.igormaznitsa:mvn-golang-wrapper:${project.version}:mvninstall</install>
-                            <deploy>com.igormaznitsa:mvn-golang-wrapper:${project.version}:install</deploy>
+                            <install>com.igormaznitsa:mvn-golang-wrapper:${project.version}:mvninstall,org.apache.maven.plugins:maven-install-plugin:install</install>
+                            <deploy>com.igormaznitsa:mvn-golang-wrapper:${project.version}:install,org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
                         </phases>
                     </lifecycle>
                 </lifecycles>
