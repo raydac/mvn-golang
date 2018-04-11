@@ -100,25 +100,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
       try {
         final File archive = compressProjectFiles();
-        try {
-          final ProjectBuildingRequest pbr = this.session.getProjectBuildingRequest();
-          this.project.getArtifact().setFile(archive);
-
-          final List<Artifact> artifactsToInstall = new ArrayList<Artifact>();
-
-          artifactsToInstall.add(this.project.getArtifact());
-          if (this.isInstallAttached()) {
-            artifactsToInstall.addAll(this.project.getAttachedArtifacts());
-          }
-
-          this.installer.install(pbr, artifactsToInstall);
-        } finally {
-          // Usually created archives etc. will be created in target directory
-          // and will not be deleted by the plugin itself. Usually by `mvn clean ..`..
-          FileUtils.deleteQuietly(archive);
-        }
-      } catch (ArtifactInstallerException ex) {
-        throw new MojoFailureException("Can't install the artifact!", ex);
+        this.project.getArtifact().setFile(archive);
       } catch (IOException ex) {
         throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
       }
