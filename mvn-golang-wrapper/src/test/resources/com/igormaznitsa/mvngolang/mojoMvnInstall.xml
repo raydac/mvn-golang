@@ -20,7 +20,6 @@
                 </goals>
                 <configuration>
                     <compression>3</compression>
-                    <installAttached>true</installAttached>
                 </configuration>
             </plugin>
         </plugins>

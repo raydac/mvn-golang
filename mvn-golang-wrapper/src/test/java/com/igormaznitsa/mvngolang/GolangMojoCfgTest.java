@@ -117,7 +117,6 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangMvnInstallMojoConfiguration() throws Exception {
     final GolangMvnInstallMojo mvnInstallMojo = findMojo(GolangMvnInstallMojo.class, "mojoMvnInstall.xml", "mvninstall");
-    assertTrue(mvnInstallMojo.isInstallAttached());
     assertEquals(3, mvnInstallMojo.getCompression());
   }
 

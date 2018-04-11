@@ -65,14 +65,6 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     private MavenSession session;
 
     /**
-     * Flag to install attached artifacts.
-     * 
-     * @since 2.1.8
-     */
-    @Parameter(name = "installAttached", defaultValue = "false")
-    private boolean installAttached;
-    
-    /**
      * Compression level of zip file. Must be 1..9
      *
      * @since 2.1.0
@@ -86,14 +78,6 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     
     public int getCompression() {
       return this.compression;
-    }
-    
-    public void setInstallAttached(final boolean flag) {
-      this.installAttached = flag;
-    }
-    
-    public boolean isInstallAttached() {
-      return this.installAttached;
     }
     
     @Override
