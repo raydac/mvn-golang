@@ -42,7 +42,7 @@
                   <filtering>false</filtering>
                 </resource>
               </resources>
-            </configuration>            
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -62,7 +62,6 @@
             </goals>
             <configuration>
               <packages>
-                <package>github.com/nsf/termbox-go</package>
                 <package>github.com/VladimirMarkelov/clui</package>
               </packages>
             </configuration>
