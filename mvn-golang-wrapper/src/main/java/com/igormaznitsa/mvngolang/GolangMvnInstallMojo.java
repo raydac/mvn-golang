@@ -27,17 +27,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.artifact.install.ArtifactInstaller;
-import org.apache.maven.shared.artifact.install.ArtifactInstallerException;
 import org.apache.maven.shared.repository.RepositoryManager;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import org.apache.maven.project.MavenProjectHelper;
 
@@ -65,6 +61,14 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     private MavenSession session;
 
     /**
+     * Set this to 'true' to bypass artifact install.
+     * 
+     * @since 2.1.8
+     */
+    @Parameter(property = "maven.install.skip", defaultValue = "false")
+    private boolean skip;
+    
+    /**
      * Compression level of zip file. Must be 1..9
      *
      * @since 2.1.0
@@ -80,13 +84,19 @@ public class GolangMvnInstallMojo extends AbstractMojo {
       return this.compression;
     }
     
+    public boolean isSkip() {
+      return this.skip;
+    }
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-      try {
-        final File archive = compressProjectFiles();
-        this.project.getArtifact().setFile(archive);
-      } catch (IOException ex) {
-        throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
+      if (!this.isSkip()) {
+        try {
+          final File archive = compressProjectFiles();
+          this.project.getArtifact().setFile(archive);
+        } catch (IOException ex) {
+          throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
+        }
       }
     }
 
