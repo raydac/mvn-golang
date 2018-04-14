@@ -9,6 +9,7 @@
 
 # Changelog
 __2.1.8 (SNAPSHOT)__
+ - added support of `maven.deploy.skip` and `maven.install.skip` prperties in `install` and `deploy` mojos
  - [#48](https://github.com/raydac/mvn-golang/issues/48) improved processing of `install` and `deploy` to be more compatible with standard maven process
  - fixed dependency for [termui test project in examples](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)
  - added `customScript` section into `get` to execute some custom script over package CVS folder 
