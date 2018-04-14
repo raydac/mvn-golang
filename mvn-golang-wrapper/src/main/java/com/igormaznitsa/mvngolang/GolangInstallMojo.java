@@ -20,6 +20,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import javax.annotation.Nonnull;
+import org.apache.maven.plugins.annotations.Parameter;
 
 
 /**
@@ -28,6 +29,19 @@ import javax.annotation.Nonnull;
 @Mojo(name = "install", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangInstallMojo extends AbstractPackageGolangMojo {
 
+    /**
+    * Set this to 'true' to bypass artifact deploy
+    *
+    * @since 2.1.8
+    */
+    @Parameter(property = "maven.deploy.skip", defaultValue = "false")
+    private boolean skip;
+
+    @Override
+    public boolean isSkip() {
+      return this.skip;
+    }
+    
     @Override
     @Nonnull
     public String getGoCommand() {
