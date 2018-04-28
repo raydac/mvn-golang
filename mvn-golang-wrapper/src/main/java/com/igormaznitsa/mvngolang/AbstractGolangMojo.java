@@ -1248,10 +1248,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         final File cacheFolder = new File(this.storeFolder);
 
         if (!cacheFolder.isDirectory()) {
-          logOptionally("Making SDK cache folder : " + cacheFolder);
-          if (!cacheFolder.mkdirs()) {
-            throw new IOException("Can't create folder " + cacheFolder);
+          if (cacheFolder.isFile()) {
+            throw new IOException("Can't create folder '" + cacheFolder + "' because there is presented a file with such name!");
           }
+          logOptionally("Making SDK cache folder : " + cacheFolder);
+          FileUtils.forceMkdir(cacheFolder);
         }
 
         final String definedOsxVersion = this.getOSXVersion();
