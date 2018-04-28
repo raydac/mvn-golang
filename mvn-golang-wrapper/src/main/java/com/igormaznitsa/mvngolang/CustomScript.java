@@ -22,5 +22,5 @@ package com.igormaznitsa.mvngolang;
 public class CustomScript {
   public String path;
   public String[] options;
-  public boolean ignoreFail;
+  public boolean ignoreFail = false;
 }

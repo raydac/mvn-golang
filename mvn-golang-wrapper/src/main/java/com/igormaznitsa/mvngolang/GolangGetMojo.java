@@ -55,7 +55,7 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
   /**
    * Script to be called in the end of all operations over CVS, <b>it will be executed separately for each package</b>.
-   * The Script will be started with the CVS root folder of package as the execution folder.
+   * The Script will be started with the package CVS root folder.
    * During start there will be added number of environment variables: MVNGO_CVS_BRANCH, MVNGO_CVS_TAG, MVNGO_CVS_REVISION, MVNGO_CVS_PACKAGE
    * 
    * @since 2.1.8
