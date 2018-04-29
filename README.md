@@ -38,7 +38,7 @@ __2.1.6 (27-aug-2017)__
 # GO start!
 __Taste Go in just two commands!__
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.6 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.8 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello/pom.xml package
 ```
 it will generate a maven project with extra configuration files to make the project compatible with NetBeans IDE and Intellij IDEA Golang plugin, they can be removed with `mvn clean -Pclean-ide-config`    
@@ -46,7 +46,7 @@ it will generate a maven project with extra configuration files to make the proj
 
 If you want to generate a multi-module project, then you can use such snippet
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.1.6 -DgroupId=com.go.test -DartifactId=gohello-multi -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.1.8 -DgroupId=com.go.test -DartifactId=gohello-multi -Dversion=1.0-SNAPSHOT
 ```
 
 # Introduction
