@@ -17,6 +17,11 @@
 
   <name>Common</name>
 
+  <properties>
+      <maven.install.skip>true</maven.install.skip>
+      <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <build>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
     <directory>${dollar}{basedir}${dollar}{file.separator}bin</directory>
@@ -39,10 +44,6 @@
         <executions>
           <execution>
             <id>default-build</id>
-            <phase>none</phase>
-          </execution>
-          <execution>
-            <id>default-mvninstall</id>
             <phase>none</phase>
           </execution>
         </executions>
