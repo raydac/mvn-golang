@@ -82,10 +82,10 @@ Below described build section for simple golang project which keeps source in `s
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>2.1.6</version>
+        <version>2.1.8</version>
         <extensions>true</extensions>
         <configuration>
-          <goVersion>1.9.2</goVersion>
+          <goVersion>1.10.1</goVersion>
         </configuration>
         <executions>
           <execution>
@@ -191,9 +191,16 @@ If you want to save generated artifact then you can use snippet below
     </executions>
 </plugin>
 ```
-if you want disable creation of artifact then you can use snippet
+if you want to disable creation of artifact then you can use standard maven properties
 ```
- <execution>
+<properties>
+    <maven.install.skip>true</maven.install.skip>
+    <maven.deploy.skip>true</maven.deploy.skip>
+</properties>
+```
+or disable mojo execution
+```
+<execution>
   <id>default-mvninstall</id>
   <phase>none</phase>
 </execution>
