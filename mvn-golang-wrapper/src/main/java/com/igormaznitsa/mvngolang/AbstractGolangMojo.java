@@ -128,7 +128,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    *
    * @since 2.1.1
    */
-  @Parameter(name = "useMavenProxy", defaultValue = "false")
+  @Parameter(name = "useMavenProxy", defaultValue = "true")
   private boolean useMavenProxy;
 
   /**
