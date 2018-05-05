@@ -69,7 +69,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
     assertFalse(customMojo.isDisableSslCheck());
-    assertTrue(customMojo.isUseMavenProxy());
+    assertFalse(customMojo.isUseMavenProxy());
     assertFalse(customMojo.getSupposeSdkArchiveFileName());
     assertFalse(customMojo.isSkip());
     assertNull(customMojo.getProxy());
@@ -96,7 +96,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCleanMojoConfiguration() throws Exception {
     final GolangCleanMojo cleanMojo = findMojo(GolangCleanMojo.class, "mojoClean.xml", "clean");
-    assertFalse(cleanMojo.isUseMavenProxy());
+    assertTrue(cleanMojo.isUseMavenProxy());
     assertFalse(cleanMojo.isSkip());
     assertNull(cleanMojo.getProxy());
     assertNull(cleanMojo.getTargetArch());
@@ -124,7 +124,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   public void testGolangFixMojoConfiguration() throws Exception {
     final GolangFixMojo fixMojo = findMojo(GolangFixMojo.class, "mojoFix.xml", "fix");
     assertTrue(fixMojo.isDisableSslCheck());
-    assertFalse(fixMojo.isUseMavenProxy());
+    assertTrue(fixMojo.isUseMavenProxy());
     assertFalse(fixMojo.isSkip());
     assertNull(fixMojo.getProxy());
     assertFalse(fixMojo.isUseEnvVars());
@@ -142,7 +142,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangFmtMojoConfiguration() throws Exception {
     final GolangFmtMojo fmtMojo = findMojo(GolangFmtMojo.class, "mojoFmt.xml", "fmt");
-    assertFalse(fmtMojo.isUseMavenProxy());
+    assertTrue(fmtMojo.isUseMavenProxy());
     assertFalse(fmtMojo.isSkip());
     assertNull(fmtMojo.getProxy());
     assertFalse(fmtMojo.isUseEnvVars());
@@ -160,7 +160,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangGenerateMojoConfiguration() throws Exception {
     final GolangGenerateMojo genMojo = findMojo(GolangGenerateMojo.class, "mojoGenerate.xml", "generate");
-    assertFalse(genMojo.isUseMavenProxy());
+    assertTrue(genMojo.isUseMavenProxy());
     assertFalse(genMojo.isSkip());
     assertNull(genMojo.getProxy());
     assertFalse(genMojo.isUseEnvVars());
@@ -178,7 +178,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangInstallMojoConfiguration() throws Exception {
     final GolangInstallMojo instMojo = findMojo(GolangInstallMojo.class, "mojoInstall.xml", "install");
-    assertFalse(instMojo.isUseMavenProxy());
+    assertTrue(instMojo.isUseMavenProxy());
     assertFalse(instMojo.isSkip());
     assertNull(instMojo.getProxy());
     assertFalse(instMojo.isUseEnvVars());
@@ -196,7 +196,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangVetMojoConfiguration() throws Exception {
     final GolangVetMojo vetMojo = findMojo(GolangVetMojo.class, "mojoVet.xml", "vet");
-    assertFalse(vetMojo.isUseMavenProxy());
+    assertTrue(vetMojo.isUseMavenProxy());
     assertFalse(vetMojo.isSkip());
     assertNull(vetMojo.getProxy());
     assertFalse(vetMojo.isUseEnvVars());
@@ -214,7 +214,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangTestMojoConfiguration() throws Exception {
     final GolangTestMojo testMojo = findMojo(GolangTestMojo.class, "mojoTest.xml", "test");
-    assertFalse(testMojo.isUseMavenProxy());
+    assertTrue(testMojo.isUseMavenProxy());
     assertNull(testMojo.getProxy());
     assertFalse(testMojo.isSkip());
     assertFalse(testMojo.isUseEnvVars());
@@ -234,7 +234,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangToolMojoConfiguration() throws Exception {
     final GolangToolMojo toolMojo = findMojo(GolangToolMojo.class, "mojoTool.xml", "tool");
-    assertFalse(toolMojo.isUseMavenProxy());
+    assertTrue(toolMojo.isUseMavenProxy());
     assertNull(toolMojo.getProxy());
     assertFalse(toolMojo.isSkip());
     assertFalse(toolMojo.isUseEnvVars());
@@ -254,7 +254,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangRunMojoConfiguration() throws Exception {
     final GolangRunMojo runMojo = findMojo(GolangRunMojo.class, "mojoRun.xml", "run");
-    assertFalse(runMojo.isUseMavenProxy());
+    assertTrue(runMojo.isUseMavenProxy());
     assertNull(runMojo.getProxy());
     assertFalse(runMojo.isSkip());
     assertFalse(runMojo.isUseEnvVars());
@@ -280,7 +280,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("some/test/script", script.path);
     assertTrue(script.ignoreFail);
     assertArrayEquals(new String[]{"some1", "some2", "some3"}, script.options);
-    
+
     assertEquals("https", proxy.protocol);
     assertEquals("127.33.44.55", proxy.host);
     assertEquals(999, proxy.port);
