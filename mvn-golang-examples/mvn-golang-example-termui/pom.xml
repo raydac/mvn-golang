@@ -33,22 +33,7 @@
                 <goal>get</goal>
               </goals>
               <configuration>
-                <packages>
-                  <package>github.com/maruel/panicparse</package>
-                </packages>
-                <tag>v1.0.2</tag>
-              </configuration>
-            </execution>
-            <execution>
-              <id>get-termui</id>
-              <goals>
-                <goal>get</goal>
-              </goals>
-              <configuration>
-                <packages>
-                  <package>github.com/gizak/termui</package>
-                </packages>
-                <branch>v2</branch>
+                <packageListFile>dependencies.txt</packageListFile>
               </configuration>
             </execution>
           </executions>
