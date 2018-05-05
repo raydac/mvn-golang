@@ -1,3 +1,7 @@
+# 2.1.9 (SNAPSHOT)
+ - added  `packageListFile` option to the `get` mojo, it allows to keep package list in external file
+ - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
+
 # 2.1.8 (29-apr-2018)
 - added support of `maven.deploy.skip` and `maven.install.skip` prperties in `install` and `deploy` mojos
 - [#48](https://github.com/raydac/mvn-golang/issues/48) improved processing of `install` and `deploy` to be more compatible with standard maven process
