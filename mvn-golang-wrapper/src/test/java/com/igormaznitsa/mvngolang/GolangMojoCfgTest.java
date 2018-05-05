@@ -309,7 +309,6 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", getMojo.getSources(false).getPath());
     assertEqualsPath("some/root", getMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(getMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, getMojo.getTailArguments());
     assertArrayEquals(new String[] {"flag1", "flag2"}, getMojo.getBuildFlags());
     assertEquals("bin", getMojo.getExecSubpath());
     assertEquals("go", getMojo.getExec());
