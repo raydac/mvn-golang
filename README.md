@@ -8,6 +8,9 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.1.9 (SNAPSHOT)__
+ - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
+
 __2.1.8 (29-apr-2018)__
  - added support of `maven.deploy.skip` and `maven.install.skip` prperties in `install` and `deploy` mojos
  - [#48](https://github.com/raydac/mvn-golang/issues/48) improved processing of `install` and `deploy` to be more compatible with standard maven process
@@ -24,14 +27,6 @@ __2.1.7 (18-feb-2018)__
  - added processing of maven session offline mode
  - improved proxy server settings processing to process NTLM authorisation
  - removed maven-enforcer-plugin because it throws NPE for old maven versions
-
-__2.1.6 (27-aug-2017)__
- - implemented file locker to synchronize SDK loading between JVM processes, if cache folder is shared
- - improved `get` mojo behavior during branch, tag and revision processing
- - improved `get` mojo, added `deleteCommonPkg` flag to delete whole common `pkg` folder, by default false
- - improved logging
- - added property `supposeSdkArchiveFileName` to suppose SDK archive file name if it is not presented in common SDK list, active by default
- - minimal version of Java increased to 1.7
 
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
