@@ -113,6 +113,11 @@ public final class PackageList {
       this.revision = map.get(TAG_REVISION);
     }
 
+    @Nonnull
+    public String makeString() {
+      return "package: " + this.pkg + ",branch: " + this.branch + ",tag: " + this.tag + ",revision: " + this.revision;
+    }
+
     public boolean doesNeedCvsProcessing() {
       return this.branch != null || this.tag != null || this.revision != null;
     }

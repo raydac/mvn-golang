@@ -499,7 +499,13 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   }
 
   private void preparePackageList() throws MojoExecutionException {
-    final String[] standardPackages = super.getPackages();
+    final boolean debugEnabled = getLog().isDebugEnabled();
+    
+    if (debugEnabled){
+      getLog().debug("Preparing package list");
+    }
+    
+    final String[] packagesInConfiguration = super.getPackages();
     final List<PackageList.Package> list = new ArrayList<>();
 
     final File file = this.getPackageListFile();
@@ -517,15 +523,29 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
       } catch (ParseException ex) {
         throw new MojoExecutionException("Can't parse package list file", ex);
       }
+    } else {
+      if (debugEnabled) {
+        getLog().debug("No provided package list file");
+      }
     }
 
-    if (standardPackages != null) {
-      for (final String p : standardPackages) {
+    if (packagesInConfiguration != null && packagesInConfiguration.length > 0) {
+      for (final String p : packagesInConfiguration) {
         list.add(new PackageList.Package(p, this.getBranch(), this.getTag(), this.getRevision()));
+      }
+    } else {
+      if (debugEnabled) {
+        getLog().debug("No defined packages in mojo configuration");
       }
     }
 
     this.integralPackageList = Collections.unmodifiableList(list);
+  
+    if (debugEnabled) {
+      for(final PackageList.Package p : this.integralPackageList) {
+        getLog().debug("Added package in list: " + p.makeString());
+      }
+    }
   }
 
   @Override
