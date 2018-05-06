@@ -27,7 +27,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.junit.Test;
 
 import java.io.File;
-import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.execution.MavenSession;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -310,7 +310,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/root", getMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(getMojo.findGoPath(false)));
     assertArrayEquals(new String[] {"flag1", "flag2"}, getMojo.getBuildFlags());
-    assertEquals("test.txt",getMojo.getPackageListFile().getName());
+//    assertEquals("test.txt",getMojo.getExternalPackageFile());
     assertEquals("bin", getMojo.getExecSubpath());
     assertEquals("go", getMojo.getExec());
   }

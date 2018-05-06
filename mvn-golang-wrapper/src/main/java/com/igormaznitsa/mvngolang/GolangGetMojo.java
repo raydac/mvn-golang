@@ -68,12 +68,21 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private CustomScript customScript;
 
   /**
-   * File contains list of packages. Each package takes a line and described in format 'package: NAME [,branch: BRANCH][,tag: TAG][,revsion: REVISION]'
+   * Path to a file contains list of packages. Each package takes a line and
+   * described in format 'package: NAME [,branch: BRANCH][,tag: TAG][,revsion:
+   * REVISION]'
+   *
+   * There is special field value 'none' which allows to efine value but to not
+   * make any work, sometime it is useful for multi-profile projects.
+   *
+   * NB! Its value can be provided through property
+   * 'mvn.golang.get.packages.file', but keep in mind that the value will be the
+   * same for all get goals.
    *
    * @since 2.1.9
    */
-  @Parameter(name = "packageListFile")
-  private File packageListFile;
+  @Parameter(name = "externalPackageFile", property = "mvn.golang.get.packages.file")
+  private String externalPackageFile;
 
   /**
    * Flag to try to fix GIT cache error if it is detected.
@@ -163,8 +172,8 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
   private List<PackageList.Package> integralPackageList;
 
   @Nullable
-  public File getPackageListFile() {
-    return this.packageListFile;
+  public String getExternalPackageFile() {
+    return this.externalPackageFile;
   }
 
   @Override
@@ -500,32 +509,39 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
 
   private void preparePackageList() throws MojoExecutionException {
     final boolean debugEnabled = getLog().isDebugEnabled();
-    
-    if (debugEnabled){
+
+    if (debugEnabled) {
       getLog().debug("Preparing package list");
     }
-    
+
     final String[] packagesInConfiguration = super.getPackages();
     final List<PackageList.Package> list = new ArrayList<>();
 
-    final File file = this.getPackageListFile();
+    final String extPackageFilePath = this.getExternalPackageFile();
 
-    if (file != null) {
-      getLog().info("Loading package list file : " + file);
-      try {
-        final String text = FileUtils.readFileToString(file, "UTF-8");
-        if (getLog().isDebugEnabled()) {
-          getLog().debug(text);
+    if (extPackageFilePath != null) {
+      if ("none".equals(extPackageFilePath)) {
+        getLog().warn("Provided value 'none' as package list file name, so that it is ignored");
+      } else {
+        final File extFile = new File(extPackageFilePath);
+
+        getLog().info("Loading external package list file : " + extFile.getAbsolutePath());
+
+        try {
+          final String text = FileUtils.readFileToString(extFile, "UTF-8");
+          if (getLog().isDebugEnabled()) {
+            getLog().debug(text);
+          }
+          list.addAll(new PackageList(text).getPackages());
+        } catch (IOException ex) {
+          throw new MojoExecutionException("Can't load external package list file : " + extFile, ex);
+        } catch (ParseException ex) {
+          throw new MojoExecutionException("Can't parse external package list file", ex);
         }
-        list.addAll(new PackageList(text).getPackages());
-      } catch (IOException ex) {
-        throw new MojoExecutionException("Can't load package list file : " + file, ex);
-      } catch (ParseException ex) {
-        throw new MojoExecutionException("Can't parse package list file", ex);
       }
     } else {
       if (debugEnabled) {
-        getLog().debug("No provided package list file");
+        getLog().debug("There is no provided external package list file");
       }
     }
 
@@ -535,14 +551,14 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
       }
     } else {
       if (debugEnabled) {
-        getLog().debug("No defined packages in mojo configuration");
+        getLog().debug("There are no defined packages in mojo configuration");
       }
     }
 
     this.integralPackageList = Collections.unmodifiableList(list);
-  
+
     if (debugEnabled) {
-      for(final PackageList.Package p : this.integralPackageList) {
+      for (final PackageList.Package p : this.integralPackageList) {
         getLog().debug("Added package in list: " + p.makeString());
       }
     }
@@ -649,16 +665,18 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
     }
 
     final String[] customcvs = this.getCustomCvsOptions();
-    
+
     boolean hasTagBranchOrRevision = false;
-    
+
     final List<PackageList.Package> packages = Assertions.assertNotNull("Integral package list must be not inited", this.integralPackageList);
-    
-    for(final PackageList.Package p : packages) {
+
+    for (final PackageList.Package p : packages) {
       hasTagBranchOrRevision |= p.doesNeedCvsProcessing();
-      if (hasTagBranchOrRevision) break;
+      if (hasTagBranchOrRevision) {
+        break;
+      }
     }
-    
+
     if (customcvs != null || hasTagBranchOrRevision) {
       final File[] goPath;
       try {
