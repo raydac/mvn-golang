@@ -16,6 +16,7 @@
 
     <properties>
       <mvn.golang.get.packages.file>${basedir}${file.separator}dependencies.txt</mvn.golang.get.packages.file>
+      <mvn.golang.go.version>${go.sdk.version}</mvn.golang.go.version>
     </properties>
 
     <build>
@@ -27,9 +28,6 @@
           <artifactId>mvn-golang-wrapper</artifactId>
           <version>${main-project-version}</version>
           <extensions>true</extensions>
-          <configuration>
-            <goVersion>${go.sdk.version}</goVersion>
-          </configuration>
         </plugin>
       </plugins>
     </build>
