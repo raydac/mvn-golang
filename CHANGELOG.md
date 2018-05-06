@@ -1,5 +1,5 @@
 # 2.1.9 (SNAPSHOT)
- - added  `packageListFile` option to the `get` mojo, it allows to keep package list in external file
+ - added `externalPackageFile` (property `mvn.golang.get.packages.file`) option to the `get` mojo, it allows to keep package list in external file
  - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
 
 # 2.1.8 (29-apr-2018)

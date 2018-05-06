@@ -14,6 +14,10 @@
     <name>TermUI example</name>
     <description>Example of mvn-golang-wrapper usage to build a application with getting of some external dependency. It builds a sample from https://github.com/gizak/termui</description>
 
+    <properties>
+      <mvn.golang.get.packages.file>${basedir}${file.separator}dependencies.txt</mvn.golang.get.packages.file>
+    </properties>
+
     <build>
       <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
       <directory>${basedir}${file.separator}bin</directory>
@@ -26,17 +30,6 @@
           <configuration>
             <goVersion>${go.sdk.version}</goVersion>
           </configuration>
-          <executions>
-            <execution>
-              <id>get-panicparse</id>
-              <goals>
-                <goal>get</goal>
-              </goals>
-              <configuration>
-                <packageListFile>dependencies.txt</packageListFile>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </build>
