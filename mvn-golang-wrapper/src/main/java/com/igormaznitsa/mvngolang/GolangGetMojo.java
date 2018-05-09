@@ -532,11 +532,29 @@ public class GolangGetMojo extends AbstractPackageGolangMojo {
         getLog().info("Loading external package list file : " + extFile.getAbsolutePath());
 
         try {
-          final String text = interpolate(FileUtils.readFileToString(extFile, "UTF-8"));
+          String text = FileUtils.readFileToString(extFile, "UTF-8");
           if (getLog().isDebugEnabled()) {
             getLog().debug(text);
           }
-          list.addAll(new PackageList(text).getPackages());
+          text = interpolate(text);
+          list.addAll(new PackageList(extFile, text, new PackageList.ContentProvider() {
+            @Override
+            @Nonnull
+            public String readContent(@Nonnull final File contentFile) throws IOException {
+              if (!contentFile.isFile()) {
+                throw new IOException("Can't find file : " + contentFile.getAbsolutePath());
+              }
+              try {
+                String text = FileUtils.readFileToString(contentFile, "UTF-8");
+                if (getLog().isDebugEnabled()) {
+                  getLog().debug(text);
+                }
+                return interpolate(text);
+              } catch (InterpolationException ex) {
+                throw new IOException("Can't interpolate text for error", ex);
+              }
+            }
+          }).getPackages());
         } catch (InterpolationException ex) {
           throw new MojoExecutionException("Interpolation error with file : " + extFile, ex);
         } catch (IOException ex) {

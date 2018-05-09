@@ -15,37 +15,51 @@
  */
 package com.igormaznitsa.mvngolang.utils;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
+import javax.annotation.Nonnull;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class PackageListTest {
-  
+
+  private static final File FAKE_FILE = new File(".");
+
+  private static final PackageList.ContentProvider STUB_CP = new PackageList.ContentProvider() {
+    @Override
+    @Nonnull
+    public String readContent(@Nonnull final File file) throws IOException {
+      throw new Error("Must not be called");
+    }
+  };
+
   @Test
   public void testEmptyText() throws Exception {
-    assertEquals(0, new PackageList("").getPackages().size());
+    assertEquals(0, new PackageList(FAKE_FILE, "", STUB_CP).getPackages().size());
   }
-  
+
   @Test
   public void testOnlyCommentLine() throws Exception {
-    assertEquals(0, new PackageList("// comment").getPackages().size());
+    assertEquals(0, new PackageList(FAKE_FILE, "// comment", STUB_CP).getPackages().size());
   }
-  
+
   @Test
   public void testOnlyPackageName() throws Exception {
-    final PackageList parsed = new PackageList("// text\npackage: github.com/gizak/termui");
+    final PackageList parsed = new PackageList(FAKE_FILE, "// text\npackage: github.com/gizak/termui", STUB_CP);
     assertEquals(1, parsed.getPackages().size());
     assertEquals("github.com/gizak/termui", parsed.getPackages().get(0).getPackage());
     assertNull(parsed.getPackages().get(0).getBranch());
     assertNull(parsed.getPackages().get(0).getRevision());
     assertNull(parsed.getPackages().get(0).getTag());
   }
-  
+
   @Test
   public void testTwoPackages() throws Exception {
-    final PackageList parsed = new PackageList("// text\n"
+    final PackageList parsed = new PackageList(FAKE_FILE, "// text\n"
             + "package: github.com/gizak/termui // ,tag:mustbeignored\n"
-            + "package: some/pack , branch:445566, tag:sometag, revision: r.33.3434342323");
+            + "package: some/pack , branch:445566, tag:sometag, revision: r.33.3434342323", STUB_CP);
     assertEquals(2, parsed.getPackages().size());
 
     assertEquals("github.com/gizak/termui", parsed.getPackages().get(0).getPackage());
@@ -58,25 +72,42 @@ public class PackageListTest {
     assertEquals("sometag", parsed.getPackages().get(1).getTag());
     assertEquals("r.33.3434342323", parsed.getPackages().get(1).getRevision());
   }
+
+  @Test
+  public void testInclude() throws Exception {
+    final PackageList parsed = new PackageList(FAKE_FILE, "#include \"./another\"//testinclude\npackage: one\npackage: two", new PackageList.ContentProvider() {
+      @Override
+      @Nonnull
+      public String readContent(@Nonnull final File pathElements) throws IOException {
+        assertEquals("another", FilenameUtils.normalize(pathElements.getPath()));
+        return "package: external"; 
+      }
+    });
+    
+    assertEquals(3,parsed.getPackages().size());
+    assertEquals("external", parsed.getPackages().get(0).getPackage());
+    assertEquals("one", parsed.getPackages().get(1).getPackage());
+    assertEquals("two", parsed.getPackages().get(2).getPackage());
+  }
   
-  @Test (expected = ParseException.class)
+  @Test(expected = ParseException.class)
   public void testWrongFormat_NoKey() throws Exception {
-    new PackageList(":jjj");
+    new PackageList(FAKE_FILE, ":jjj", STUB_CP);
   }
-  
-  @Test (expected = ParseException.class)
+
+  @Test(expected = ParseException.class)
   public void testWrongFormat_OnlyKey() throws Exception {
-    new PackageList("package:");
+    new PackageList(FAKE_FILE, "package:", STUB_CP);
   }
-  
-  @Test (expected = IllegalArgumentException.class)
+
+  @Test(expected = IllegalArgumentException.class)
   public void testWrongFormat_WrongKey() throws Exception {
-    new PackageList("packge: some");
+    new PackageList(FAKE_FILE, "packge: some", STUB_CP);
   }
-  
-  @Test (expected = ParseException.class)
+
+  @Test(expected = ParseException.class)
   public void testWrongFormat_DoubleQuotes() throws Exception {
-    new PackageList("package: some/pack , branch:445566, tag:sometag,, revision: r.33.3434342323");
+    new PackageList(FAKE_FILE, "package: some/pack , branch:445566, tag:sometag,, revision: r.33.3434342323", STUB_CP);
   }
-  
+
 }

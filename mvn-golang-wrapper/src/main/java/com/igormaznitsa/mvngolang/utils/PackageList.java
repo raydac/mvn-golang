@@ -17,6 +17,8 @@ package com.igormaznitsa.mvngolang.utils;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.Assertions;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
@@ -38,6 +40,12 @@ import javax.annotation.Nullable;
  * @since 2.1.9
  */
 public final class PackageList {
+
+  public interface ContentProvider {
+
+    @Nonnull
+    String readContent(@Nonnull File contentFile) throws IOException;
+  }
 
   /**
    * Container of package information.
@@ -66,10 +74,7 @@ public final class PackageList {
     }
 
     private Package(@Nonnull String textLine) throws ParseException {
-      final int startComment = textLine.indexOf("//");
-      if (startComment >= 0) {
-        textLine = textLine.substring(0, startComment);
-      }
+      textLine = removeComment(textLine, false);
 
       final Matcher matcher = PATTERN.matcher(textLine);
 
@@ -151,22 +156,66 @@ public final class PackageList {
 
   private final List<Package> packages;
 
-  /**
-   * Constructor parsing multi-line text. Each package must be described on new
-   * string, comment started from '#' as the first line char
-   *
-   * @param text multi-line text
-   * @throws ParseException thrown if format exception
-   * @throws IllegalArgumentException if content problems
-   */
-  public PackageList(@Nonnull final String text) throws ParseException {
+  private static final String DIRECTIVE_INCLUDE = "#include";
+
+  private static String removeComment(@Nonnull final String text, final boolean ignoreInString) {
+    int pos = -1;
+    boolean quot = false;
+    boolean found = false;
+    for (int i = 0; i < text.length() && !found; i++) {
+      switch (text.charAt(i)) {
+        case '\"': {
+          quot = !quot;
+          pos = -1;
+        }
+        break;
+        case '/': {
+          if (ignoreInString && quot) {
+            pos = -1;
+          } else {
+            if (pos < 0) {
+              pos = i;
+            } else {
+              found = true;
+            }
+          }
+        }
+        break;
+        default: {
+          pos = -1;
+        }
+        break;
+      }
+    }
+    return found ? text.substring(0, pos) : text;
+  }
+
+  @Nonnull
+  private static String unquote(@Nonnull final String text) {
+    String result = text;
+    if (text.length() > 1 && text.startsWith("\"") && text.endsWith("\"")) {
+      result = text.substring(1, text.length() - 1);
+    }
+    return result;
+  }
+
+  public PackageList(@Nonnull @MustNotContainNull final File file, @Nonnull final String text, @Nonnull final ContentProvider contentProvider) throws ParseException, IOException {
     final List<Package> list = new ArrayList<>();
 
     for (final String s : text.split("\\n")) {
       final String trimmed = s.trim();
 
       if (!trimmed.isEmpty() && !trimmed.startsWith("//")) {
-        list.add(new Package(trimmed));
+        if (trimmed.startsWith(DIRECTIVE_INCLUDE)) {
+          final String filePath = unquote(removeComment(trimmed.substring(DIRECTIVE_INCLUDE.length()).trim(), true));
+
+          final File includeFile = new File(file, filePath);
+
+          final String includedText = contentProvider.readContent(includeFile);
+          list.addAll(new PackageList(includeFile, includedText, contentProvider).getPackages());
+        } else {
+          list.add(new Package(trimmed));
+        }
       }
     }
 
