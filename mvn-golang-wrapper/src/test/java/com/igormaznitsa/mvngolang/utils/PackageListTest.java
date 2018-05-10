@@ -36,6 +36,42 @@ public class PackageListTest {
   };
 
   @Test
+  public void testRemoveQuotes() {
+    assertEquals("", PackageList.removeQuotes(""));
+    assertEquals("\"", PackageList.removeQuotes("\""));
+    assertEquals("", PackageList.removeQuotes("\"\""));
+    assertEquals("a", PackageList.removeQuotes("\"a\""));
+    assertEquals("a\"", PackageList.removeQuotes("a\""));
+    assertEquals("\"", PackageList.removeQuotes("\"\"\""));
+  }
+  
+  @Test
+  public void testRemoveComment_CheckQuotes_False() {
+    assertEquals("", PackageList.removeComment("//",false));
+    assertEquals("a", PackageList.removeComment("a//",false));
+    assertEquals("a", PackageList.removeComment("a//b",false));
+    assertEquals("a ", PackageList.removeComment("a //b",false));
+    assertEquals("#include", PackageList.removeComment("#include//dddd",false));
+    assertEquals("#include a/b/c", PackageList.removeComment("#include a/b/c//dddd",false));
+    assertEquals("#include \"a/b/c", PackageList.removeComment("#include \"a/b/c//dddd\"",false));
+    assertEquals("#include \"a/b/c", PackageList.removeComment("#include \"a/b/c//dddd\" // jjj",false));
+    assertEquals("#include \"a/b/c\"", PackageList.removeComment("#include \"a/b/c\"//dddd\"",false));
+  }
+  
+  @Test
+  public void testRemoveComment_CheckQuotes_True() {
+    assertEquals("", PackageList.removeComment("//",true));
+    assertEquals("a", PackageList.removeComment("a//",true));
+    assertEquals("a", PackageList.removeComment("a//b",true));
+    assertEquals("a ", PackageList.removeComment("a //b",true));
+    assertEquals("#include", PackageList.removeComment("#include//dddd",true));
+    assertEquals("#include a/b/c", PackageList.removeComment("#include a/b/c//dddd",true));
+    assertEquals("#include \"a/b/c//dddd\"", PackageList.removeComment("#include \"a/b/c//dddd\"",true));
+    assertEquals("#include \"a/b/c//dddd\" ", PackageList.removeComment("#include \"a/b/c//dddd\" // kkkk",true));
+    assertEquals("#include \"a/b/c\"", PackageList.removeComment("#include \"a/b/c\"//dddd\"",true));
+  }
+  
+  @Test
   public void testEmptyText() throws Exception {
     assertEquals(0, new PackageList(FAKE_FILE, "", STUB_CP).getPackages().size());
   }

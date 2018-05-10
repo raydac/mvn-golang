@@ -158,7 +158,7 @@ public final class PackageList {
 
   private static final String DIRECTIVE_INCLUDE = "#include";
 
-  private static String removeComment(@Nonnull final String text, final boolean ignoreInString) {
+  static String removeComment(@Nonnull final String text, final boolean checkQuotes) {
     int pos = -1;
     boolean quot = false;
     boolean found = false;
@@ -170,7 +170,7 @@ public final class PackageList {
         }
         break;
         case '/': {
-          if (ignoreInString && quot) {
+          if (checkQuotes && quot) {
             pos = -1;
           } else {
             if (pos < 0) {
@@ -191,7 +191,7 @@ public final class PackageList {
   }
 
   @Nonnull
-  private static String unquote(@Nonnull final String text) {
+  static String removeQuotes(@Nonnull final String text) {
     String result = text;
     if (text.length() > 1 && text.startsWith("\"") && text.endsWith("\"")) {
       result = text.substring(1, text.length() - 1);
@@ -207,7 +207,7 @@ public final class PackageList {
 
       if (!trimmed.isEmpty() && !trimmed.startsWith("//")) {
         if (trimmed.startsWith(DIRECTIVE_INCLUDE)) {
-          final String filePath = unquote(removeComment(trimmed.substring(DIRECTIVE_INCLUDE.length()).trim(), true));
+          final String filePath = removeQuotes(removeComment(trimmed.substring(DIRECTIVE_INCLUDE.length()).trim(), true));
 
           final File includeFile = new File(file, filePath);
 
