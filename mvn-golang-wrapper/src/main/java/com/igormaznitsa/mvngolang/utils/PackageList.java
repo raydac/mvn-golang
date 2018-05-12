@@ -158,6 +158,7 @@ public final class PackageList {
 
   private static final String DIRECTIVE_INCLUDE = "#include";
 
+  @Nonnull
   static String removeComment(@Nonnull final String text, final boolean checkQuotes) {
     int pos = -1;
     boolean quot = false;
