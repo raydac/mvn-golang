@@ -13,7 +13,7 @@
     
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <go.sdk.version>${gosdk}</go.sdk.version>
+    <mvn.golang.go.version>${gosdk}</mvn.golang.go.version>
     <go.wrapper.plugin.version>${gowrapper}</go.wrapper.plugin.version>
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <mvn.version>3.0</mvn.version>

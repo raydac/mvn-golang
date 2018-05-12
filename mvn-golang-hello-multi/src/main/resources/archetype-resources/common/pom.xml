@@ -38,9 +38,6 @@
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${dollar}{go.wrapper.plugin.version}</version>
         <extensions>true</extensions>
-        <configuration>
-          <goVersion>${dollar}{go.sdk.version}</goVersion>
-        </configuration>
         <executions>
           <execution>
             <id>default-build</id>

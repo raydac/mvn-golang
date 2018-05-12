@@ -16,7 +16,8 @@
   <url>https://github.com/raydac/mvn-golang</url>
 
   <properties>
-    <go.sdk.version>${gosdk}</go.sdk.version>
+    <mvn.golang.go.version>${gosdk}</mvn.golang.go.version>
+    <mvn.golang.get.packages.file>${dollar}{basedir}${dollar}{file.separator}packages.txt</mvn.golang.get.packages.file>
     <go.wrapper.plugin.version>${gowrapper}</go.wrapper.plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
@@ -43,41 +44,12 @@
       <id>windows-profile</id>
       <activation>
         <os>
-          <family>Windows</family>
+          <family>windows</family>
         </os>
       </activation>
       <properties>
         <final.extension>.exe</final.extension>
       </properties>
-    </profile>
-    <!-- The Profile allows to remove all IDE specific data from project folder -->
-    <profile>
-      <id>clean-ide-config</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-clean-plugin</artifactId>
-            <version>3.0.0</version>
-            <configuration>
-              <followSymLinks>false</followSymLinks>
-              <excludeDefaultDirectories>true</excludeDefaultDirectories>
-              <filesets>
-                <fileset>
-                  <directory>${dollar}{basedir}${dollar}{file.separator}.idea</directory>
-                </fileset>
-                <fileset>
-                  <directory>${dollar}{basedir}</directory>
-                  <includes>
-                    <include>*.iml</include>
-                    <include>nbactions.xml</include>
-                  </includes>
-                </fileset>
-              </filesets>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 
@@ -98,26 +70,11 @@
         <version>${dollar}{go.wrapper.plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
-          <goVersion>${dollar}{go.sdk.version}</goVersion>
           <!--<goPath>${dollar}{basedir}</goPath>-->
           <!--<enforceGoPathToEnd>true</enforceGoPathToEnd>-->
           <!--<verbose>true</verbose>-->
         </configuration>
         <executions>
-          <!-- Example of dependency          
-          <execution>
-            <id>default-get</id>
-            <configuration>
-              <buildFlags>
-                <flag>-u</flag>
-              </buildFlags>
-              <packages>
-                <package>github.com/gizak/termui</package>
-              </packages>
-              <branch>v2</branch>
-            </configuration>
-          </execution>          
-          -->
           <execution>
             <id>default-build</id>
             <configuration>

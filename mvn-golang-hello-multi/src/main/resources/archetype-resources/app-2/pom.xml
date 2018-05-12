@@ -35,7 +35,6 @@
         <version>${dollar}{go.wrapper.plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
-          <goVersion>${dollar}{go.sdk.version}</goVersion>
           <addToGoPath>
             <common>${dollar}{basedir}${dollar}{file.separator}..${dollar}{file.separator}common</common>
           </addToGoPath>

@@ -1,0 +1,5 @@
+// this fle can contain dependencies in format
+// package: <NAME> [,branch: <BRANCH>][, tag: <TAG>][, revision: <REVISION>]
+// example:
+//   package:github.com/gizak/termui, branch:v2
+

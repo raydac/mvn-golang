@@ -10,7 +10,7 @@
       <defaultValue>main</defaultValue>
     </requiredProperty>
     <requiredProperty key="gowrapper">
-      <defaultValue>2.1.9-SNAPSHOT</defaultValue>
+      <defaultValue>2.2.0-SNAPSHOT</defaultValue>
     </requiredProperty>
     <requiredProperty key="gosdk">
       <defaultValue>1.10.2</defaultValue>
@@ -79,14 +79,6 @@
     
     <fileSet filtered="true" packaged="false">
       <directory></directory>
-      <includes>
-        <include>*.iml</include>
-        <include>*.xml</include>
-      </includes>
-    </fileSet>
-    
-    <fileSet filtered="true" packaged="false">
-      <directory>.idea</directory>
       <includes>
         <include>*.xml</include>
       </includes>
