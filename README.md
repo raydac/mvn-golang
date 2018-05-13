@@ -38,7 +38,7 @@ __Taste Go in just two commands!__
 mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.2.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello/pom.xml package
 ```
-it will generate a maven project with extra configuration files to make the project compatible with NetBeans IDE and Intellij IDEA Golang plugin, they can be removed with `mvn clean -Pclean-ide-config`    
+The First command in th snippet above generates a maven project with some test files and the second command builds the project.
 [Also you can take a look at the example `Hello world` project using the plugin](https://github.com/raydac/mvn-golang-example)
 
 If you want to generate a multi-module project, then you can use such snippet
@@ -67,6 +67,8 @@ To save time, examples excluded from the main build process and activated throug
 ```
 mvn clean install -Pexamples
 ```
+# Important note about automatic Golang SDK load
+If you have some problems with certificates during Golang SDK load, then just add `<disableSSLcheck>true</disableSSLcheck>` into plugin configuration to ignore check of certificates. 
 
 # How to add the plugin into maven project?
 Below described build section for simple golang project which keeps source in `src` forlder and result should be placed into `bin` folder. Because it is golang project and mvn-golang plugin provides its own lifecycle, packaging for the project should be `<packaging>mvn-golang</packaging>`
