@@ -1,6 +1,6 @@
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Java 7.0+](https://img.shields.io/badge/java-7.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.1.8|jar)
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.2.0|jar)
 [![Maven 3.0.3+](https://img.shields.io/badge/maven-3.0.3%2b-green.svg)](https://maven.apache.org/)
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-red.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
 [![Yandex.Money donation](https://img.shields.io/badge/donation-Я.деньги-yellow.svg)](http://yasobe.ru/na/iamoss)
@@ -8,7 +8,7 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
-__2.2.0 (SNAPSHOT)__
+__2.2.0 (13-may-2018)__
  - added property `mvn.golang.go.version` to define value for `goVersion` configuration parameter, it allows decrease configuration section dramatically, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui/pom.xml)
  - added `externalPackageFile` (property `mvn.golang.get.packages.file`) option to the `get` mojo, it allows to keep package list in external file, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)
  - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
@@ -35,7 +35,7 @@ __2.1.7 (18-feb-2018)__
 # GO start!
 __Taste Go in just two commands!__
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.1.8 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.2.0 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello/pom.xml package
 ```
 it will generate a maven project with extra configuration files to make the project compatible with NetBeans IDE and Intellij IDEA Golang plugin, they can be removed with `mvn clean -Pclean-ide-config`    
@@ -43,7 +43,7 @@ it will generate a maven project with extra configuration files to make the proj
 
 If you want to generate a multi-module project, then you can use such snippet
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.1.8 -DgroupId=com.go.test -DartifactId=gohello-multi -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.2.0 -DgroupId=com.go.test -DartifactId=gohello-multi -Dversion=1.0-SNAPSHOT
 ```
 
 # Introduction
@@ -79,7 +79,7 @@ Below described build section for simple golang project which keeps source in `s
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>2.1.8</version>
+        <version>2.2.0</version>
         <extensions>true</extensions>
         <configuration>
           <goVersion>1.10.1</goVersion>
@@ -103,7 +103,18 @@ Below described build section for simple golang project which keeps source in `s
 
 # How to work with dependencies?
 
-The Plug-in doesn't work with standard maven dependencies andf they must be defined through task of the plugin, the example of easiest case of dependencies is
+Since 2.2.0 version you can dramatically decrease configuration section to work with dependencies, now you can just define some external file contains package info through system property `mvn.golang.get.packages.file`, the file will be loaded and parsed and its definitions will be added into package depedencies.
+Format of the file is very easy. Each package described on a line in format `package: <PACKAGE_NAME>[,branch: <BRANCH>][,tag: <TAG>][,revision: <REVISION>]` also it supports single line comments through `//` and directive `#include <FILE_NAME>` to load packages from some external file. Also it supports interpolation of properties defined in format `${property.name}` and provide access to maven, system and environment variables.   
+Example:   
+```
+// example package file
+#include "${basedir}/external/file.txt"
+package:github.com/maruel/panicparse,tag:v1.0.2 // added because latest changes in panicparse is incompatible with termui
+package:github.com/gizak/termui,branch:v2 
+```
+This mechanism just makes work with dependencies easier and if you want to provide some specific flags and scripts to process CVS folders you have to define configuration parameters in pom.xml, pacages defined in the external file and in the pom.xml will be mixed.
+
+The Plug-in doesn't work with standard maven dependencies and they must be defined through task of the plugin, the example of easiest case of dependencies is
 ```
 <execution>
    <id>default-get</id>
