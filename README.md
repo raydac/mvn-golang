@@ -156,7 +156,7 @@ if you want to have several dependencies with different tag and branch then take
     <packages>
       <package>github.com/some/framework</package>
     </packages>
-    <tag>1.0.1<tag>
+    <tag>1.0.1</tag>
   </configuration>
 </execution>
 <execution>
