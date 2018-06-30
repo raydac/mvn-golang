@@ -2,6 +2,9 @@ package main
 
 import "fmt"
 
+var Buildstamp string
+var svnRevision string
+
 func main() {
-	fmt.Printf("Hello, world.\n")
+	fmt.Printf(Buildstamp + " " + svnRevision + "\n")
 }
