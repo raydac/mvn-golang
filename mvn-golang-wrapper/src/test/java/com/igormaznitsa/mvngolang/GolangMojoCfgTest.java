@@ -27,7 +27,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.junit.Test;
 
 import java.io.File;
-import org.apache.maven.execution.MavenSession;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -68,6 +67,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
+    assertFalse(customMojo.isCheckSdkHash());
     assertFalse(customMojo.isDisableSslCheck());
     assertFalse(customMojo.isUseMavenProxy());
     assertFalse(customMojo.getSupposeSdkArchiveFileName());
@@ -96,6 +96,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCleanMojoConfiguration() throws Exception {
     final GolangCleanMojo cleanMojo = findMojo(GolangCleanMojo.class, "mojoClean.xml", "clean");
+    assertTrue(cleanMojo.isCheckSdkHash());
     assertTrue(cleanMojo.isUseMavenProxy());
     assertFalse(cleanMojo.isSkip());
     assertNull(cleanMojo.getProxy());

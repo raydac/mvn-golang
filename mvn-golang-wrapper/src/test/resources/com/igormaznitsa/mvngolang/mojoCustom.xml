@@ -20,6 +20,7 @@
                 </goals>
                 <configuration>
                     <useMavenProxy>false</useMavenProxy>
+                    <checkSdkHash>false</checkSdkHash>
                     <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>
                     <customCommand>someCustomCommand</customCommand>
                     <target386>387</target386>
