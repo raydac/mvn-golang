@@ -23,6 +23,8 @@ import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,6 +39,43 @@ public final class IOUtils {
 
   }
 
+  /**
+   * Print text progress bar.
+   * @param text title of the bar
+   * @param value value to be rendered
+   * @param maxValue max value to be rendered
+   * @param progressBarWidth width of bar
+   * @param lastValue value which was rendered last time, if the same then it will not be rendered
+   * @return rendered value
+   * @since 2.2.1
+   */
+  public static int printTextProgressBar(@Nonnull final String text, final long value, final long maxValue, final int progressBarWidth, final int lastValue) {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("\r\u001B[?25l");
+    builder.append(text);
+    builder.append("[");
+
+    final int progress = max(0, min(progressBarWidth, (int) Math.round(progressBarWidth * ((double) value / (double) maxValue))));
+    int nextValue = progress;
+
+    for (int i = 0; i < progress; i++) {
+      builder.append('▒');
+    }
+    for (int i = progress; i < progressBarWidth; i++) {
+      builder.append('-');
+    }
+    builder.append("]\u001B[?25h");
+
+    if (nextValue != lastValue) {
+      System.out.print(builder.toString());
+      System.out.flush();
+    }
+
+    return nextValue;
+  }
+
+
+  
   /**
    * Make file path appropriate for current OS.
    *

@@ -582,6 +582,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         methodGet.setConfig(config);
 
         boolean errorsDuringLoading = true;
+        boolean showProgressBar = false;
 
         try {
           if (!archiveFile.isFile()) {
@@ -606,9 +607,48 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
               throw new IOException("Unsupported content type : " + contentType.getValue());
             }
 
+            final long size = entity.getContentLength();
             final InputStream inStream = entity.getContent();
+
+            showProgressBar = size > 0L && !this.session.isParallel();
+
             instance.getLog().info("Downloading SDK archive into file : " + archiveFile);
-            FileUtils.copyInputStreamToFile(inStream, archiveFile);
+
+            long loadedCounter = 0L;
+            final byte[] buffer = new byte[1024 * 1024];
+
+            int lastRenderedValue = -1;
+
+            final int PROGRESSBAR_WIDTH = 10;
+            final String LOADING_TITLE = "Loading " + Long.toString(size / (1024L * 1024L)) + " Mb ";
+
+            if (showProgressBar) {
+              lastRenderedValue = IOUtils.printTextProgressBar(LOADING_TITLE, 0, size, PROGRESSBAR_WIDTH, lastRenderedValue);
+            }
+
+            final OutputStream fileOutStream = new BufferedOutputStream(new FileOutputStream(archiveFile), 128 * 16384);
+            try {
+              while (!Thread.currentThread().isInterrupted()) {
+                final int readCounter = inStream.read(buffer);
+                if (readCounter < 0) {
+                  break;
+                }
+                fileOutStream.write(buffer, 0, readCounter);
+                loadedCounter += readCounter;
+                if (showProgressBar) {
+                  lastRenderedValue = IOUtils.printTextProgressBar(LOADING_TITLE, loadedCounter, size, PROGRESSBAR_WIDTH, lastRenderedValue);
+                }
+              }
+            } finally {
+              if (showProgressBar) {
+                System.out.println();
+              }
+              IOUtils.closeSilently(fileOutStream);
+            }
+
+            if (Thread.currentThread().isInterrupted()) {
+              throw new MojoExecutionException("Interrupted");
+            }
 
             instance.getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
 
@@ -1036,6 +1076,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       }
 
       builder.setUserAgent("mvn-golang-wrapper-agent/1.0");
+      builder.disableCookieManagement();
 
       if (this.isDisableSslCheck()) {
         try {

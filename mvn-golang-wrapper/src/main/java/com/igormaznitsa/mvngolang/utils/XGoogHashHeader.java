@@ -21,12 +21,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.CRC32C;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.cli.Digest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
@@ -223,10 +221,10 @@ public class XGoogHashHeader {
       if (this.hasMd5()) {
         try (final InputStream in = new FileInputStream(file)) {
           final String calculated = DigestUtils.md5Hex(in);
-          log.debug("Check MD5 hash (etalon "+this.md5+"): "+calculated);
+          log.debug("Check MD5 hash (etalon " + this.md5 + "): " + calculated);
           return this.md5.equalsIgnoreCase(calculated);
         }
-      }  else if (this.hasCrc32c()) {
+      } else if (this.hasCrc32c()) {
         try (final InputStream in = new BufferedInputStream(new FileInputStream(file), 16384)) {
           final Crc32c crc = new Crc32c();
           crc.update(in);
