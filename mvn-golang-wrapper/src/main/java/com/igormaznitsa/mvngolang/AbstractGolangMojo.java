@@ -582,7 +582,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         methodGet.setConfig(config);
 
         boolean errorsDuringLoading = true;
-        boolean showProgressBar = false;
+        boolean showProgressBar;
 
         try {
           if (!archiveFile.isFile()) {
