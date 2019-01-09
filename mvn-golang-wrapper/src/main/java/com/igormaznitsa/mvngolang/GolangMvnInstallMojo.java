@@ -27,8 +27,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.artifact.install.ArtifactInstaller;
-import org.apache.maven.shared.repository.RepositoryManager;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.annotation.Nonnull;
@@ -36,6 +34,8 @@ import javax.annotation.Nullable;
 import java.io.*;
 import java.util.Locale;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
 
 /**
  * The Mojo packs all found source and resource project folders and create new artifact in the local repository.

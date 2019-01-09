@@ -20,16 +20,56 @@ import com.igormaznitsa.meta.annotation.MayContainNull;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.meta.common.utils.StrUtils;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 import com.igormaznitsa.mvngolang.utils.WildCardMatcher;
+import com.igormaznitsa.mvngolang.utils.XGoogHashHeader;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.net.InetAddress;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -67,27 +107,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
-
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import com.igormaznitsa.mvngolang.utils.XGoogHashHeader;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
@@ -533,6 +552,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     synchronized (AbstractGolangMojo.class) {
       final File sdkFolder = new File(cacheFolder, baseSdkName);
 
+      if (sdkFolder.isDirectory()) {
+        return sdkFolder;
+      }
+
       final File lockFile = new File(cacheFolder, ".lck_load_" + baseSdkName);
       lockFile.deleteOnExit();
       try {
@@ -575,6 +598,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           linkForDownloading = predefinedLink;
           instance.logOptionally("Using predefined URL to download SDK : " + linkForDownloading);
           instance.logOptionally("Detected extension of archive : " + extension);
+        }
+
+        if (archiveFile.exists()) {
+          instance.logOptionally("Detected existing archive " + archiveFile + ", deleting it and reload");
+          if (!archiveFile.delete()) {
+            throw new IOException("Can't delete archive file: " + archiveFile);
+          }
         }
 
         final HttpGet methodGet = new HttpGet(linkForDownloading);
@@ -679,7 +709,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
           errorsDuringLoading = false;
 
-          return instance.unpackArchToFolder(archiveFile, "go", sdkFolder);
+          final File interFolder = instance.unpackArchToFolder(archiveFile, "go", new File(cacheFolder, ".#" + baseSdkName));
+
+          instance.getLog().info("Renaming " + interFolder.getName() + " to " + sdkFolder.getName());
+          if (interFolder.renameTo(sdkFolder)) {
+            instance.logOptionally("Renamed successfully: " + interFolder + " -> " + sdkFolder);
+          } else {
+            throw new IOException("Can't rename temp GoSDK folder: " + interFolder + " -> " + sdkFolder);
+          }
+
+          return sdkFolder;
         } finally {
           methodGet.releaseConnection();
           if (errorsDuringLoading || !instance.isKeepSdkArchive()) {
@@ -690,7 +729,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           }
         }
       } finally {
-        FileUtils.deleteQuietly(lockFile);
+        final boolean deleted = FileUtils.deleteQuietly(lockFile);
+        instance.getLog().debug("Lock file " + lockFile + " deleted : " + deleted);
       }
     }
   }
@@ -1216,6 +1256,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     this.consoleOutBuffer = new ByteArrayOutputStream();
   }
 
+  @ReturnsOriginal
   @Nonnull
   private File unpackArchToFolder(@Nonnull final File archiveFile, @Nonnull final String folderInArchive, @Nonnull final File destinationFolder) throws IOException {
     getLog().info(String.format("Unpacking archive %s to folder %s", archiveFile.getName(), destinationFolder.getName()));
