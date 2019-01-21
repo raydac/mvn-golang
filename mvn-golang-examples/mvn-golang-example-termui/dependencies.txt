@@ -1,2 +1,1 @@
-package:github.com/maruel/panicparse,tag:v1.0.2 // added because latest changes in panicparse is incompatible with termui
-package:github.com/gizak/termui,branch:v2
+package:github.com/gizak/termui,tag:v2.3.0
