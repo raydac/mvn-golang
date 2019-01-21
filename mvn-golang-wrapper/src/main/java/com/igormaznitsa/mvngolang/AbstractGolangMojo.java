@@ -1529,14 +1529,21 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     if (errLogNotEmpty) {
-      getLog().error("");
-      getLog().error("---------Exec.Err---------");
-      for (final String str : errLog.split("\n")) {
-        getLog().error(StrUtils.trimRight(str));
+      if (forcePrint) {
+        getLog().error("");
+        getLog().error("---------Exec.Err---------");
+        for (final String str : errLog.split("\n")) {
+          getLog().error(StrUtils.trimRight(str));
+        }
+        getLog().error("");
+      } else {
+        getLog().debug("---------Exec.Err---------");
+        for (final String str : errLog.split("\n")) {
+          getLog().debug(StrUtils.trimRight(str));
+        }
       }
-      getLog().error("");
     } else {
-      getLog().debug("There is not any log error from the process");
+      getLog().debug("Error log buffer is empty");
     }
 
   }
