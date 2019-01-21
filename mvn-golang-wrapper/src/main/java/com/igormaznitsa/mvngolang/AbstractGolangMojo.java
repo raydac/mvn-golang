@@ -442,6 +442,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String sdkDownloadUrl;
 
   /**
+   * Timeout for HTTP connection in milliseconds.
+   *
+   * @since 2.2.1
+   */
+  @Parameter(name = "connectionTimeout", defaultValue = "60000")
+  private int connectionTimeout = 60000;
+
+  /**
    * Keep unpacked wrongly SDK folder.
    */
   @Parameter(name = "keepUnarchFolderIfError", defaultValue = "false")
@@ -548,7 +556,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private File loadSDKAndUnpackIntoCache(@Nonnull final AbstractGolangMojo instance, @Nullable final ProxySettings proxySettings, @Nonnull final File cacheFolder, @Nonnull final String baseSdkName, final boolean dontLoadIfNotInCache) throws IOException, MojoExecutionException {
+  private File loadSDKAndUnpackIntoCache(@Nullable final ProxySettings proxySettings, @Nonnull final File cacheFolder, @Nonnull final String baseSdkName, final boolean dontLoadIfNotInCache) throws IOException, MojoExecutionException {
     synchronized (AbstractGolangMojo.class) {
       final File sdkFolder = new File(cacheFolder, baseSdkName);
 
@@ -556,11 +564,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         return sdkFolder;
       }
 
-      final File lockFile = new File(cacheFolder, ".lck_load_" + baseSdkName);
+      final File lockFile = new File(cacheFolder, ".lck" + baseSdkName);
       lockFile.deleteOnExit();
       try {
         if (!lockFile.createNewFile()) {
-          instance.getLog().info("Detected SDK loading, waiting for the process end");
+          this.getLog().info("Detected SDK loading, waiting for the process end");
           while (lockFile.exists()) {
             try {
               Thread.sleep(100L);
@@ -568,47 +576,47 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
               throw new IOException("Wait of SDK loading is interrupted", ex);
             }
           }
-          instance.getLog().info("Loading process has been completed");
+          this.getLog().info("Loading process has been completed");
           return sdkFolder;
         }
 
         if (sdkFolder.isDirectory()) {
-          if (instance.verbose || instance.getLog().isDebugEnabled()) {
-            instance.getLog().info("SDK cache folder : " + sdkFolder);
+          if (this.isVerbose() || this.getLog().isDebugEnabled()) {
+            this.getLog().info("SDK cache folder : " + sdkFolder);
           }
           return sdkFolder;
         } else if (dontLoadIfNotInCache || this.session.isOffline()) {
-          getLog().error("Can't find cached Golang SDK and downloading is disabled or Maven in offline mode");
+          this.getLog().error("Can't find cached Golang SDK and downloading is disabled or Maven in offline mode");
           throw new IOException("Can't find " + baseSdkName + " in the cache but loading is directly disabled");
         }
 
-        final String predefinedLink = instance.getSdkDownloadUrl();
+        final String predefinedLink = this.getSdkDownloadUrl();
 
         final File archiveFile;
         final String linkForDownloading;
 
         if (isSafeEmpty(predefinedLink)) {
-          instance.logOptionally("There is not any predefined SDK URL");
-          final String sdkFileName = instance.findSdkArchiveFileName(proxySettings, baseSdkName);
+          this.logOptionally("There is not any predefined SDK URL");
+          final String sdkFileName = this.findSdkArchiveFileName(proxySettings, baseSdkName);
           archiveFile = new File(cacheFolder, sdkFileName);
-          linkForDownloading = instance.getSdkSite() + sdkFileName;
+          linkForDownloading = this.getSdkSite() + sdkFileName;
         } else {
           final String extension = extractExtensionOfArchive(assertNotNull(predefinedLink));
           archiveFile = new File(cacheFolder, baseSdkName + '.' + extension);
           linkForDownloading = predefinedLink;
-          instance.logOptionally("Using predefined URL to download SDK : " + linkForDownloading);
-          instance.logOptionally("Detected extension of archive : " + extension);
+          this.logOptionally("Using predefined URL to download SDK : " + linkForDownloading);
+          this.logOptionally("Detected extension of archive : " + extension);
         }
 
         if (archiveFile.exists()) {
-          instance.logOptionally("Detected existing archive " + archiveFile + ", deleting it and reload");
+          this.logOptionally("Detected existing archive " + archiveFile + ", deleting it and reload");
           if (!archiveFile.delete()) {
             throw new IOException("Can't delete archive file: " + archiveFile);
           }
         }
 
         final HttpGet methodGet = new HttpGet(linkForDownloading);
-        final RequestConfig config = instance.processRequestConfig(proxySettings, RequestConfig.custom()).build();
+        final RequestConfig config = this.processRequestConfig(proxySettings, this.getConnectionTimeout(), RequestConfig.custom()).build();
         methodGet.setConfig(config);
 
         boolean errorsDuringLoading = true;
@@ -616,19 +624,19 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
         try {
           if (!archiveFile.isFile()) {
-            instance.getLog().warn("Loading SDK archive with URL : " + linkForDownloading);
+            this.getLog().warn("Loading SDK archive with URL : " + linkForDownloading);
 
-            final HttpResponse response = instance.getHttpClient(proxySettings).execute(methodGet);
+            final HttpResponse response = this.getHttpClient(proxySettings).execute(methodGet);
             final StatusLine statusLine = response.getStatusLine();
 
-            instance.getLog().debug("HttpResponse: " + response);
+            this.getLog().debug("HttpResponse: " + response);
 
             if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
               throw new IOException(String.format("Can't load SDK archive from %s : %d %s", linkForDownloading, statusLine.getStatusCode(), statusLine.getReasonPhrase()));
             }
 
             final XGoogHashHeader xGoogHash = new XGoogHashHeader(response.getHeaders("x-goog-hash"));
-            instance.getLog().debug("XGoogHashHeader: " + xGoogHash);
+            this.getLog().debug("XGoogHashHeader: " + xGoogHash);
 
             final HttpEntity entity = response.getEntity();
             final Header contentType = entity.getContentType();
@@ -642,7 +650,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
             showProgressBar = size > 0L && !this.session.isParallel();
 
-            instance.getLog().info("Downloading SDK archive into file : " + archiveFile);
+            this.getLog().info("Downloading SDK archive into file : " + archiveFile);
 
             long loadedCounter = 0L;
             final byte[] buffer = new byte[1024 * 1024];
@@ -680,18 +688,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
               throw new MojoExecutionException("Interrupted");
             }
 
-            instance.getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
+            this.getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
 
             inStream.close();
 
             if (this.isCheckSdkHash()) {
               if (xGoogHash.isValid() && xGoogHash.hasData()) {
-                instance.getLog().debug("Checking hash of file");
-                final boolean fileHashOk = xGoogHash.isFileOk(instance.getLog(), archiveFile);
+                this.getLog().debug("Checking hash of file");
+                final boolean fileHashOk = xGoogHash.isFileOk(this.getLog(), archiveFile);
                 if (fileHashOk) {
-                  instance.getLog().info("Downloaded archive file hash is OK");
+                  this.getLog().info("Downloaded archive file hash is OK");
                 } else {
-                  instance.getLog().error("Downloaded archive file hash is BAD");
+                  this.getLog().error("Downloaded archive file hash is BAD");
                   throw new MojoExecutionException("Downloaded SDK archive has wrong hash");
                 }
               } else {
@@ -704,16 +712,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             }
 
           } else {
-            instance.getLog().info("Archive file of SDK has been found in the cache : " + archiveFile);
+            this.getLog().info("Archive file of SDK has been found in the cache : " + archiveFile);
           }
 
           errorsDuringLoading = false;
 
-          final File interFolder = instance.unpackArchToFolder(archiveFile, "go", new File(cacheFolder, ".#" + baseSdkName));
+          final File interFolder = this.unpackArchToFolder(archiveFile, "go", new File(cacheFolder, ".#" + baseSdkName));
 
-          instance.getLog().info("Renaming " + interFolder.getName() + " to " + sdkFolder.getName());
+          this.getLog().info("Renaming " + interFolder.getName() + " to " + sdkFolder.getName());
           if (interFolder.renameTo(sdkFolder)) {
-            instance.logOptionally("Renamed successfully: " + interFolder + " -> " + sdkFolder);
+            this.logOptionally("Renamed successfully: " + interFolder + " -> " + sdkFolder);
           } else {
             throw new IOException("Can't rename temp GoSDK folder: " + interFolder + " -> " + sdkFolder);
           }
@@ -721,16 +729,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           return sdkFolder;
         } finally {
           methodGet.releaseConnection();
-          if (errorsDuringLoading || !instance.isKeepSdkArchive()) {
-            instance.logOptionally("Deleting archive : " + archiveFile + (errorsDuringLoading ? " (because error during loading)" : ""));
+          if (errorsDuringLoading || !this.isKeepSdkArchive()) {
+            this.logOptionally("Deleting archive : " + archiveFile + (errorsDuringLoading ? " (because error during loading)" : ""));
             deleteFileIfExists(archiveFile);
           } else {
-            instance.logOptionally("Archive file is kept for special flag : " + archiveFile);
+            this.logOptionally("Archive file is kept for special flag : " + archiveFile);
           }
         }
       } finally {
         final boolean deleted = FileUtils.deleteQuietly(lockFile);
-        instance.getLog().debug("Lock file " + lockFile + " deleted : " + deleted);
+        this.getLog().debug("Lock file " + lockFile + " deleted : " + deleted);
       }
     }
   }
@@ -765,6 +773,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   public String getExecSubpath() {
     return ensureNoSurroundingSlashes(assertNotNull(this.execSubpath));
+  }
+
+  public int getConnectionTimeout() {
+    return this.connectionTimeout;
   }
 
   @Nonnull
@@ -1176,12 +1188,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @ReturnsOriginal
   @Nonnull
-  private RequestConfig.Builder processRequestConfig(@Nullable final ProxySettings proxySettings, @Nonnull final RequestConfig.Builder config) {
+  private RequestConfig.Builder processRequestConfig(@Nullable final ProxySettings proxySettings, final int timeout, @Nonnull final RequestConfig.Builder config) {
+    this.getLog().debug("Connection(timeout=" + timeout + "ms, proxySettings=" + proxySettings + ')');
     if (proxySettings != null) {
       final HttpHost proxyHost = new HttpHost(proxySettings.host, proxySettings.port, proxySettings.protocol);
       config.setProxy(proxyHost);
     }
-    return config;
+    return config.setConnectTimeout(timeout).setSocketTimeout(timeout);
   }
 
   @Nonnull
@@ -1191,7 +1204,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     getLog().warn("Loading list of available GoLang SDKs from " + sdksite);
     final HttpGet get = new HttpGet(sdksite);
 
-    final RequestConfig config = processRequestConfig(proxySettings, RequestConfig.custom()).build();
+    final RequestConfig config = processRequestConfig(proxySettings, this.getConnectionTimeout(), RequestConfig.custom()).build();
     get.setConfig(config);
 
     get.addHeader("Accept", "application/xml");
@@ -1389,7 +1402,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
         final String sdkBaseName = String.format(NAME_PATTERN, sdkVersion, this.getOs(), this.getArch(), isSafeEmpty(definedOsxVersion) ? "" : "-" + definedOsxVersion);
         warnIfContainsUC("Prefer usage of lower case chars only for SDK base name", sdkBaseName);
-        result = loadSDKAndUnpackIntoCache(this, proxySettings, cacheFolder, sdkBaseName, isDisableSdkLoad());
+        result = loadSDKAndUnpackIntoCache(proxySettings, cacheFolder, sdkBaseName, isDisableSdkLoad());
       } else {
         logOptionally("Detected predefined SDK root folder : " + predefinedGoRoot);
         result = new File(predefinedGoRoot);

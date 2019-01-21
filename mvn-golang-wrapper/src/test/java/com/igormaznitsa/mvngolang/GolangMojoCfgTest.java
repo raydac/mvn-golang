@@ -67,6 +67,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
+    assertEquals(60000,customMojo.getConnectionTimeout());
     assertFalse(customMojo.isCheckSdkHash());
     assertFalse(customMojo.isDisableSslCheck());
     assertFalse(customMojo.isUseMavenProxy());
@@ -96,6 +97,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCleanMojoConfiguration() throws Exception {
     final GolangCleanMojo cleanMojo = findMojo(GolangCleanMojo.class, "mojoClean.xml", "clean");
+    assertEquals(60000, cleanMojo.getConnectionTimeout());
     assertTrue(cleanMojo.isCheckSdkHash());
     assertTrue(cleanMojo.isUseMavenProxy());
     assertFalse(cleanMojo.isSkip());
@@ -124,6 +126,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangFixMojoConfiguration() throws Exception {
     final GolangFixMojo fixMojo = findMojo(GolangFixMojo.class, "mojoFix.xml", "fix");
+    assertEquals(60000, fixMojo.getConnectionTimeout());
     assertTrue(fixMojo.isDisableSslCheck());
     assertTrue(fixMojo.isUseMavenProxy());
     assertFalse(fixMojo.isSkip());
@@ -143,6 +146,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangFmtMojoConfiguration() throws Exception {
     final GolangFmtMojo fmtMojo = findMojo(GolangFmtMojo.class, "mojoFmt.xml", "fmt");
+    assertEquals(60000, fmtMojo.getConnectionTimeout());
     assertTrue(fmtMojo.isUseMavenProxy());
     assertFalse(fmtMojo.isSkip());
     assertNull(fmtMojo.getProxy());
@@ -161,6 +165,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangGenerateMojoConfiguration() throws Exception {
     final GolangGenerateMojo genMojo = findMojo(GolangGenerateMojo.class, "mojoGenerate.xml", "generate");
+    assertEquals(60000, genMojo.getConnectionTimeout());
     assertTrue(genMojo.isUseMavenProxy());
     assertFalse(genMojo.isSkip());
     assertNull(genMojo.getProxy());
@@ -179,6 +184,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangInstallMojoConfiguration() throws Exception {
     final GolangInstallMojo instMojo = findMojo(GolangInstallMojo.class, "mojoInstall.xml", "install");
+    assertEquals(60000, instMojo.getConnectionTimeout());
     assertTrue(instMojo.isUseMavenProxy());
     assertFalse(instMojo.isSkip());
     assertNull(instMojo.getProxy());
@@ -197,6 +203,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangVetMojoConfiguration() throws Exception {
     final GolangVetMojo vetMojo = findMojo(GolangVetMojo.class, "mojoVet.xml", "vet");
+    assertEquals(60000, vetMojo.getConnectionTimeout());
     assertTrue(vetMojo.isUseMavenProxy());
     assertFalse(vetMojo.isSkip());
     assertNull(vetMojo.getProxy());
@@ -215,6 +222,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangTestMojoConfiguration() throws Exception {
     final GolangTestMojo testMojo = findMojo(GolangTestMojo.class, "mojoTest.xml", "test");
+    assertEquals(60000, testMojo.getConnectionTimeout());
     assertTrue(testMojo.isUseMavenProxy());
     assertNull(testMojo.getProxy());
     assertFalse(testMojo.isSkip());
@@ -235,6 +243,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangToolMojoConfiguration() throws Exception {
     final GolangToolMojo toolMojo = findMojo(GolangToolMojo.class, "mojoTool.xml", "tool");
+    assertEquals(60000, toolMojo.getConnectionTimeout());
     assertTrue(toolMojo.isUseMavenProxy());
     assertNull(toolMojo.getProxy());
     assertFalse(toolMojo.isSkip());
@@ -255,6 +264,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangRunMojoConfiguration() throws Exception {
     final GolangRunMojo runMojo = findMojo(GolangRunMojo.class, "mojoRun.xml", "run");
+    assertEquals(60000, runMojo.getConnectionTimeout());
     assertTrue(runMojo.isUseMavenProxy());
     assertNull(runMojo.getProxy());
     assertFalse(runMojo.isSkip());
@@ -278,6 +288,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     final ProxySettings proxy = getMojo.getProxy();
 
     final CustomScript script = getMojo.getCustomScript();
+    assertEquals(123000, getMojo.getConnectionTimeout());
     assertEquals("some/test/script", script.path);
     assertTrue(script.ignoreFail);
     assertArrayEquals(new String[]{"some1", "some2", "some3"}, script.options);
@@ -319,6 +330,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangBuildMojoConfiguration() throws Exception {
     final GolangBuildMojo buildMojo = findMojo(GolangBuildMojo.class, "mojoBuild.xml", "build");
+    assertEquals(60000, buildMojo.getConnectionTimeout());
     assertTrue(buildMojo.isUseMavenProxy());
     assertNull(buildMojo.getProxy());
     assertNotNull(buildMojo);
