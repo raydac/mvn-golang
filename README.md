@@ -12,6 +12,7 @@ __2.2.1 (SNAPSHOT)__
  - added `connectionTimeout` property to provide timeout (milliseconds) for HTTP connections, default 60000 ms
  - [#55](https://github.com/raydac/mvn-golang/issues/55) print log error stream into debug if command status is not error
  - added check of hash for downloaded SDK archive, can be disabled by `false` in parameter `checkSdkHash`, it checks hash provided in response header `x-goog-hash`
+ - improved GoSDK loading
 
 __2.2.0 (13-may-2018)__
  - added property `mvn.golang.go.version` to define value for `goVersion` configuration parameter, it allows decrease configuration section dramatically, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui/pom.xml)
