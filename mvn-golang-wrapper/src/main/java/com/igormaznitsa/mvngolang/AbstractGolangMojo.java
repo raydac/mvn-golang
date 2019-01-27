@@ -61,6 +61,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -1263,7 +1264,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  private void initConsoleBuffers() {
+  protected void initConsoleBuffers() {
     getLog().debug("Initing console out and console err buffers");
     this.consoleErrBuffer = new ByteArrayOutputStream();
     this.consoleOutBuffer = new ByteArrayOutputStream();
@@ -1376,7 +1377,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private File findGoRoot(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException, MojoExecutionException {
+  protected File findGoRoot(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException, MojoExecutionException {
     final File result;
     LOCKER.lock();
     try {
@@ -1582,7 +1583,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   @MustNotContainNull
-  public abstract String[] getTailArguments();
+  public String[] getTailArguments() {
+    throw new NotImplementedException("Must be overriden");
+  }
 
   @Nonnull
   @MustNotContainNull
@@ -1596,11 +1599,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public abstract String getGoCommand();
+  public String getGoCommand(){
+    throw new NotImplementedException("Must be overriden");
+  }
 
   @Nonnull
   @MustNotContainNull
-  public abstract String[] getCommandFlags();
+  public String[] getCommandFlags(){
+    throw new NotImplementedException("Must be overriden");
+  }
 
   private void addEnvVar(@Nonnull final ProcessExecutor executor, @Nonnull final String name, @Nonnull final String value) {
     logOptionally(" $" + name + " = " + value);
@@ -1608,7 +1615,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nullable
-  private ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException, MojoExecutionException {
+  protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException, MojoExecutionException {
     initConsoleBuffers();
 
     final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
@@ -1684,11 +1691,33 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     logOptionally("");
+    
+    registerEnvVars(result, detectedRoot, gobin, sourcesFile, gopathParts);
+    
+    logOptionally("........................");
+
+    registerOutputBuffers(result);
+    
+    return result;
+  }
+
+  protected void registerOutputBuffers(@Nonnull final ProcessExecutor executor) {
+    executor.redirectOutput(this.consoleOutBuffer);
+    executor.redirectError(this.consoleErrBuffer);
+  }
+  
+  protected void registerEnvVars(
+          @Nonnull final ProcessExecutor result, 
+          @Nonnull final File theGoRoot, 
+          @Nullable final String theGoBin, 
+          @Nonnull final File sourcesFile,
+          @MustNotContainNull @Nonnull final File [] goPathParts
+  )throws IOException {
     logOptionally("....Environment vars....");
 
-    addEnvVar(result, "GOROOT", detectedRoot.getAbsolutePath());
+    addEnvVar(result, "GOROOT", theGoRoot.getAbsolutePath());
 
-    String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(gopathParts);
+    String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(goPathParts);
     if (isEnforceGoPathToEnd()) {
       preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd(), preparedGoPath);
     } else {
@@ -1696,10 +1725,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
     addEnvVar(result, "GOPATH", preparedGoPath);
 
-    if (gobin == null) {
+    if (theGoBin == null) {
       getLog().warn("GOBIN is disabled by direct order");
     } else {
-      addEnvVar(result, "GOBIN", gobin);
+      addEnvVar(result, "GOBIN", theGoBin);
     }
 
     final String trgtOs = this.getTargetOS();
@@ -1729,21 +1758,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     String thePath = GetUtils.ensureNonNullStr(System.getenv("PATH"));
-    thePath = IOUtils.makeOsFilePathWithoutDuplications(thePath, (detectedRoot + File.separator + getExecSubpath()), gobin);
+    thePath = IOUtils.makeOsFilePathWithoutDuplications(thePath, (theGoRoot + File.separator + getExecSubpath()), theGoBin);
     addEnvVar(result, "PATH", thePath);
 
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
       addEnvVar(result, record.getKey().toString(), record.getValue().toString());
     }
-
-    logOptionally("........................");
-
-    result.redirectOutput(this.consoleOutBuffer);
-    result.redirectError(this.consoleErrBuffer);
-
-    return result;
   }
-
+  
   @Nonnull
   protected String getExtraPathToAddToGoPathToEnd() {
     return "";

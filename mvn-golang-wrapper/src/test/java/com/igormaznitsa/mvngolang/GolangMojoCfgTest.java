@@ -95,6 +95,38 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   }
 
   @Test
+  public void testGolangJfrogCliMojoConfiguration() throws Exception {
+    final GolangJfrogCliMojo jfrogCliMojo = findMojo(GolangJfrogCliMojo.class, "mojoJFrogCli.xml", "jfrog-cli");
+    assertEquals(60000,jfrogCliMojo.getConnectionTimeout());
+    assertFalse(jfrogCliMojo.isCheckSdkHash());
+    assertFalse(jfrogCliMojo.isDisableSslCheck());
+    assertFalse(jfrogCliMojo.isUseMavenProxy());
+    assertFalse(jfrogCliMojo.getSupposeSdkArchiveFileName());
+    assertFalse(jfrogCliMojo.isSkip());
+    assertNull(jfrogCliMojo.getProxy());
+    assertNull(jfrogCliMojo.getTargetArch());
+    assertNull(jfrogCliMojo.getTargetOS());
+    assertFalse(jfrogCliMojo.isEnforceGoPathToEnd());
+    assertNull(jfrogCliMojo.getTargetArm());
+    assertFalse(jfrogCliMojo.isUseEnvVars());
+    assertFalse(jfrogCliMojo.isVerbose());
+    assertTrue(jfrogCliMojo.isHideBanner());
+    assertEqualsPath("some/sources", jfrogCliMojo.getSources(false).getPath());
+    assertEqualsPath("some/root", jfrogCliMojo.getGoRoot());
+    assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(jfrogCliMojo.findGoPath(false)));
+    assertNull(jfrogCliMojo.getErrLogFile());
+    assertNull(jfrogCliMojo.getOutLogFile());
+    assertNotNull(jfrogCliMojo.getReportsFolder());
+    assertFalse(jfrogCliMojo.isIgnoreErrorExitCode());
+    assertEquals("387", jfrogCliMojo.getTarget386());
+    
+    assertEqualsPath("some/jfrog", jfrogCliMojo.getCliPath());
+    assertEquals("mc", jfrogCliMojo.getTarget());
+    assertEquals("s", jfrogCliMojo.getCommand());
+    assertArrayEquals(new String[]{"add", "ARTIFACTORY", "my-arti", "--service-url=http://10.100.1.127", "--service-user=admin", "--service-password=password"}, jfrogCliMojo.getArguments().toArray());
+  }
+
+  @Test
   public void testGolangCleanMojoConfiguration() throws Exception {
     final GolangCleanMojo cleanMojo = findMojo(GolangCleanMojo.class, "mojoClean.xml", "clean");
     assertEquals(60000, cleanMojo.getConnectionTimeout());

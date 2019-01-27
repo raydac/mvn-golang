@@ -35,6 +35,7 @@
   <name>examples</name>
   <description>Set of examples for mvn-golang-wrapper</description>
   <modules>
+    <module>mvn-golang-example-jfrog-cli</module>
     <module>mvn-golang-example-helloworld</module>
     <module>mvn-golang-example-helloworld-multisrc</module>
     <module>mvn-golang-example-plugin</module>
@@ -67,6 +68,7 @@
           <filesets>
             <fileset>
               <directory>${basedir}${file.separator}pkg</directory>
+              <directory>${basedir}${file.separator}.jfrog</directory>
             </fileset>
           </filesets>
         </configuration>
