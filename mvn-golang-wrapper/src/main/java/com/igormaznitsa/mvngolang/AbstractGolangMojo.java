@@ -1641,6 +1641,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       for (final String s : path.split("\\" + File.pathSeparator)) {
         if (filter && GOBINFOLDER_PATTERN.matcher(s).find()) {
           getLog().debug("Removing item '" + s + "' from PATH because it looks like go/bin");
+          continue;
         }
         if (buffer.length() > 0) {
           buffer.append(File.pathSeparator);
