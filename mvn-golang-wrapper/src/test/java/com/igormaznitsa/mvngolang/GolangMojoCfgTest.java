@@ -67,6 +67,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
+    assertTrue(customMojo.isFilterEnvPath());
     assertEquals(60000,customMojo.getConnectionTimeout());
     assertFalse(customMojo.isCheckSdkHash());
     assertFalse(customMojo.isDisableSslCheck());
@@ -320,6 +321,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     final ProxySettings proxy = getMojo.getProxy();
 
     final CustomScript script = getMojo.getCustomScript();
+    assertFalse(getMojo.isFilterEnvPath());
     assertEquals(123000, getMojo.getConnectionTimeout());
     assertEquals("some/test/script", script.path);
     assertTrue(script.ignoreFail);

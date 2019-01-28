@@ -51,6 +51,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
@@ -141,6 +142,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
   private MavenSession session;
+
+  /**
+   * Flag shows that environment PATH variable should be filtered for footsteps
+   * of go/bin folder.
+   *
+   * @since 2.2.1
+   */
+  @Parameter(defaultValue = "true", name = "filterEnvPath")
+  private boolean filterEnvPath = true;
 
   /**
    * Check hash for downloaded SDK archive.
@@ -470,6 +480,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @LazyInited
   private ByteArrayOutputStream consoleOutBuffer;
 
+  private static final Pattern GOBINFOLDER_PATTERN = Pattern.compile("(?:^|\\W)go(?:[0-9]+.*)?(?:\\\\|/)bin(?:\\\\|/)?$", Pattern.CASE_INSENSITIVE);
+
   @Nonnull
   private static String ensureNoSurroundingSlashes(@Nonnull final String str) {
     String result = str;
@@ -742,6 +754,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         this.getLog().debug("Lock file " + lockFile + " deleted : " + deleted);
       }
     }
+  }
+
+  public boolean isFilterEnvPath() {
+    return this.filterEnvPath;
   }
 
   public boolean isSkip() {
@@ -1599,14 +1615,45 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public String getGoCommand(){
+  public String getGoCommand() {
     throw new NotImplementedException("Must be overriden");
   }
 
   @Nonnull
   @MustNotContainNull
-  public String[] getCommandFlags(){
+  public String[] getCommandFlags() {
     throw new NotImplementedException("Must be overriden");
+  }
+
+  @Nullable
+  private String getEnvPath() {
+    String path = System.getenv("PATH");
+    if (path == null) {
+      this.getLog().warn("Can't find any defined PATH in environment");
+    } else {
+      this.getLog().debug("Found env.PATH: " + path);
+    }
+
+    final boolean filter = this.isFilterEnvPath();
+
+    if (path != null) {
+      final StringBuilder buffer = new StringBuilder();
+      for (final String s : path.split("\\" + File.pathSeparator)) {
+        if (filter && GOBINFOLDER_PATTERN.matcher(s).find()) {
+          getLog().debug("Removing item '" + s + "' from PATH because it looks like go/bin");
+        }
+        if (buffer.length() > 0) {
+          buffer.append(File.pathSeparator);
+        }
+        buffer.append(path);
+        getLog().debug("Add item '" + s + "' to PATH");
+      }
+      path = buffer.toString();
+    }
+
+    this.getLog().debug("Prepared PATH var content:" + path);
+
+    return path;
   }
 
   private void addEnvVar(@Nonnull final ProcessExecutor executor, @Nonnull final String name, @Nonnull final String value) {
@@ -1691,13 +1738,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     logOptionally("");
-    
+
     registerEnvVars(result, detectedRoot, gobin, sourcesFile, gopathParts);
-    
+
     logOptionally("........................");
 
     registerOutputBuffers(result);
-    
+
     return result;
   }
 
@@ -1705,14 +1752,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     executor.redirectOutput(this.consoleOutBuffer);
     executor.redirectError(this.consoleErrBuffer);
   }
-  
+
   protected void registerEnvVars(
-          @Nonnull final ProcessExecutor result, 
-          @Nonnull final File theGoRoot, 
-          @Nullable final String theGoBin, 
+          @Nonnull final ProcessExecutor result,
+          @Nonnull final File theGoRoot,
+          @Nullable final String theGoBin,
           @Nonnull final File sourcesFile,
-          @MustNotContainNull @Nonnull final File [] goPathParts
-  )throws IOException {
+          @MustNotContainNull @Nonnull final File[] goPathParts
+  ) throws IOException {
     logOptionally("....Environment vars....");
 
     addEnvVar(result, "GOROOT", theGoRoot.getAbsolutePath());
@@ -1757,7 +1804,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
     }
 
-    String thePath = GetUtils.ensureNonNullStr(System.getenv("PATH"));
+    String thePath = GetUtils.ensureNonNull(getEnvPath(), "");
     thePath = IOUtils.makeOsFilePathWithoutDuplications(thePath, (theGoRoot + File.separator + getExecSubpath()), theGoBin);
     addEnvVar(result, "PATH", thePath);
 
@@ -1765,7 +1812,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, record.getKey().toString(), record.getValue().toString());
     }
   }
-  
+
   @Nonnull
   protected String getExtraPathToAddToGoPathToEnd() {
     return "";

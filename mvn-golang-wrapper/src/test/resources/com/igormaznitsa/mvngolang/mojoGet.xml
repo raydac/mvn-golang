@@ -27,6 +27,7 @@
                         <password>verysecretpassword</password>
                         <nonProxyHosts>127.0.0.1|127.0.0.2|127.0.0.3</nonProxyHosts>
                     </proxy>
+                    <filterEnvPath>false</filterEnvPath>
                     <connectionTimeout>123000</connectionTimeout>
                     <externalPackageFile>test.txt</externalPackageFile>
                     <useMavenProxy>false</useMavenProxy>
