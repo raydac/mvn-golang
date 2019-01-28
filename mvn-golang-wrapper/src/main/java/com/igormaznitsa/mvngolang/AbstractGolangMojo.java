@@ -145,7 +145,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   /**
    * Flag shows that environment PATH variable should be filtered for footsteps
-   * of go/bin folder.
+   * of other go/bin folders to prevent conflicts.
    *
    * @since 2.2.1
    */
@@ -1806,7 +1806,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     String thePath = GetUtils.ensureNonNull(getEnvPath(), "");
-    thePath = IOUtils.makeOsFilePathWithoutDuplications(thePath, (theGoRoot + File.separator + getExecSubpath()), theGoBin);
+    thePath = IOUtils.makeOsFilePathWithoutDuplications((theGoRoot + File.separator + getExecSubpath()), thePath, theGoBin);
     addEnvVar(result, "PATH", thePath);
 
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
