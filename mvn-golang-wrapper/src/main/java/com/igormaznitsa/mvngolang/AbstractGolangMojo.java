@@ -1646,7 +1646,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         if (buffer.length() > 0) {
           buffer.append(File.pathSeparator);
         }
-        buffer.append(path);
+        buffer.append(s);
         getLog().debug("Add item '" + s + "' to PATH");
       }
       path = buffer.toString();
