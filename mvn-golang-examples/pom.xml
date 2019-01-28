@@ -37,6 +37,7 @@
   <modules>
     <module>mvn-golang-example-jfrog-cli</module>
     <module>mvn-golang-example-helloworld</module>
+    <module>mvn-golang-example-helloworld-gomod</module>
     <module>mvn-golang-example-helloworld-multisrc</module>
     <module>mvn-golang-example-plugin</module>
     <module>mvn-golang-example-genbindata</module>
