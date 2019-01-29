@@ -480,7 +480,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @LazyInited
   private ByteArrayOutputStream consoleOutBuffer;
 
-  private static final Pattern GOBINFOLDER_PATTERN = Pattern.compile("(?:^|\\W)go(?:[0-9]+.*)?(?:\\\\|/)bin(?:\\\\|/)?$", Pattern.CASE_INSENSITIVE);
+  private static final Pattern GOBINFOLDER_PATTERN = Pattern.compile("(?:\\\\|/)go[0-9\\-\\+.]*(?:\\\\|/)bin(?:\\\\|/)?$", Pattern.CASE_INSENSITIVE);
 
   @Nonnull
   private static String ensureNoSurroundingSlashes(@Nonnull final String str) {
