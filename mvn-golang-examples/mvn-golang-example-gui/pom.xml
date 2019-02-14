@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>com.igormaznitsa</groupId>
     <artifactId>mvn-golang-examples</artifactId>
@@ -14,7 +14,11 @@
 
   <name>GUI example</name>
   <description>Example of minimalistic GUI application.</description>
-  
+
+  <properties>
+    <mvn.golang.get.packages.file>${basedir}${file.separator}dependencies.txt</mvn.golang.get.packages.file>
+  </properties>
+
   <build>
     <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
     <directory>${basedir}${file.separator}bin</directory>
@@ -24,24 +28,12 @@
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${main-project-version}</version>
         <extensions>true</extensions>
-
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
+          <echoWarn>
+            <echo>LINUX: if build complains about GTK 3.0 then use sudo apt-get install libgtk-3-dev</echo>
+          </echoWarn>
         </configuration>
-        
-        <executions>
-          <execution>
-            <id>default-get</id>
-            <configuration>
-              <packages>
-                <package>github.com/andlabs/ui</package>
-              </packages>
-              <echoWarn>
-                <echo>LINUX: if build complains about GTK 3.0 then use sudo apt-get install libgtk-3-dev</echo>
-              </echoWarn>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
