@@ -67,8 +67,7 @@
         <version>${main-project-version}</version>
         <extensions>true</extensions>
         <configuration>
-          <!--<goVersion>${go.sdk.version}</goVersion>-->
-          <goVersion>1.11.1</goVersion>
+          <goVersion>${go.sdk.version}</goVersion>
           <env>
             <GO111MODULE>on</GO111MODULE>
           </env>
