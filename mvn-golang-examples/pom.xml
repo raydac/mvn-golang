@@ -53,6 +53,7 @@
     <module>mvn-golang-example-termboxgo</module>
     <module>mvn-golang-example-antlr</module>
     <module>mvn-golang-example-kubernetes</module>
+    <module>mvn-golang-example-maven-repository</module>
     <module>test-git-cvs</module>
     <module>test-hg-cvs</module>
   </modules>

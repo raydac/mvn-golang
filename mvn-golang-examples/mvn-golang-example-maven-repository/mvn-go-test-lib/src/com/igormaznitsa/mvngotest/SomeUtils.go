@@ -6,5 +6,5 @@ var Buildstamp string
 var svnRevision string
 
 func SomeTestMethod() {
-	fmt.Printf("Some Test Method call\n")
+	fmt.Printf("Hello from mvn-go-test-lib module!\n")
 }
