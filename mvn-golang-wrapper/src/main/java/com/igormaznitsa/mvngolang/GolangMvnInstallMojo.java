@@ -62,6 +62,11 @@ public class GolangMvnInstallMojo extends AbstractMojo {
   @Parameter(readonly = true, required = true, defaultValue = "${session}")
   private MavenSession session;
 
+  /**
+   * Class replacing artifact extension by 'zip'.
+   *
+   * @since 2.2.1
+   */
   private class ZipExtensionArtifactHandlerAdapter implements ArtifactHandler {
 
     private final ArtifactHandler delegate;
