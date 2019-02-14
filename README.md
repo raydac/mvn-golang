@@ -9,6 +9,8 @@
 
 # Changelog
 __2.2.1 (SNAPSHOT)__
+ - added example [how to get and unpack mvn-golang artifact from maven repository](./mvn-golang-examples/mvn-golang-example-maven-repository)
+ - changed result artifact extension to `zip` during artifact installation into maven repository, it allows use [maven-dependency-plugin](https://maven.apache.org/plugins/maven-dependency-plugin/)
  - added `jfrog-cli` mojo to provide way make call to external [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) in tuned Go SDK environment, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-jfrog-cli).
  - added `connectionTimeout` property to provide timeout (milliseconds) for HTTP connections, default 60000 ms
  - [#55](https://github.com/raydac/mvn-golang/issues/55) print log error stream into debug if command status is not error
@@ -23,7 +25,7 @@ __2.2.0 (13-may-2018)__
 __2.1.8 (29-apr-2018)__
  - added support of `maven.deploy.skip` and `maven.install.skip` prperties in `install` and `deploy` mojos
  - [#48](https://github.com/raydac/mvn-golang/issues/48) improved processing of `install` and `deploy` to be more compatible with standard maven process
- - fixed dependency for [termui test project in examples](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)
+ - fixed dependency for [termui test project in examples](./mvn-golang-examples/mvn-golang-example-termui)
  - added `customScript` section into `get` to execute some custom script over package CVS folder 
 
 __2.1.7 (18-feb-2018)__

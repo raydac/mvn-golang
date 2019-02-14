@@ -1,5 +1,7 @@
 __2.2.1 (SNAPSHOT)__
- - added `jfrog-cli` mojo to provide way make call to external [JFrog CLI tool](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) in tuned Go SDK environment, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-jfrog-cli).
+ - added example [how to get and unpack mvn-golang artifact from maven repository](./mvn-golang-examples/mvn-golang-example-maven-repository)
+ - changed result artifact extension to `zip` during artifact installation into maven repository, it allows use [maven-dependency-plugin](https://maven.apache.org/plugins/maven-dependency-plugin/)
+ - added `jfrog-cli` mojo to provide way make call to external [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) in tuned Go SDK environment, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-jfrog-cli).
  - added `connectionTimeout` property to provide timeout (milliseconds) for HTTP connections, default 60000 ms
  - [#55](https://github.com/raydac/mvn-golang/issues/55) print log error stream into debug if command status is not error
  - added check of hash for downloaded SDK archive, can be disabled by `false` in parameter `checkSdkHash`, it checks hash provided in response header `x-goog-hash`
