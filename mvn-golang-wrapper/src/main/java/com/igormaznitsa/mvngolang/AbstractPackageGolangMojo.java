@@ -66,6 +66,19 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   @Parameter(name = "scanDependencies", defaultValue = "true")
   private boolean scanDependencies = true;
 
+  /**
+   * Path to the folder where all found mvn-golang dependencies will be unpacked.
+   * 
+   * @since 2.2.1
+   */
+  @Parameter(name = "unpackDependencyFolder", defaultValue = "${project.build.directory}${file.separator}.__deps__")
+  private String unpackDependencyFolder;
+  
+  @Nonnull
+  public String getUnpackDependencyFolder() {
+    return GetUtils.ensureNonNull(this.unpackDependencyFolder, this.getProject().getBuild().getDirectory()+File.separator+"$$$deps$$$");
+  }
+  
   @Nullable
   @MustNotContainNull
   protected String[] getDefaultPackages() {
@@ -130,7 +143,7 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
     if (this.isScanDependencies()) {
       final Set<File> foundArtifacts = this.scanForMvnGoArtifacts();
       getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
-      final File targetFolder = new File(this.getProject().getBuild().getDirectory(), "__dependencies__");
+      final File targetFolder = new File(this.getUnpackDependencyFolder());
       getLog().debug("Depedencies will be unpacked into folder: " + targetFolder);
       final List<File> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, targetFolder);
 
