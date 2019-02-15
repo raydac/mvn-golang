@@ -175,11 +175,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean useMavenProxy;
 
   /**
-   * Disable check of SSL certificate during HTTP request.
+   * Disable check of SSL certificate during HTTP request. Also can be changed by property 'mvngo.disable.ssl.check'
    *
    * @since 2.1.7
    */
-  @Parameter(name = "disableSSLcheck", defaultValue = "false")
+  @Parameter(name = "disableSSLcheck", defaultValue = "false", property = "mvngo.disable.ssl.check")
   private boolean disableSSLcheck;
 
   /**
