@@ -47,6 +47,13 @@ import org.apache.maven.shared.transfer.repository.RepositoryManager;
 @Mojo(name = "mvninstall", defaultPhase = LifecyclePhase.INSTALL, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangMvnInstallMojo extends AbstractMojo {
 
+  /**
+   * Name of special flag file which must be added into artifacts prepared by plugin to help identify them as mvn-golang artifacts.
+   * 
+   * @since 2.2.1
+   */
+  public static final String ARTIFACT_FLAG_FILE = ".mvn-golang";
+
   @Component
   protected RepositoryManager repositoryManager;
 
@@ -207,6 +214,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
       throw new IOException("Can't create temp folder : " + folderToPack);
     }
 
+    final File flagFile = new File(folderToPack, ARTIFACT_FLAG_FILE);
     try {
       saveEffectivePom(folderToPack);
 
@@ -225,9 +233,9 @@ public class GolangMvnInstallMojo extends AbstractMojo {
       if (getLog().isDebugEnabled()) {
         getLog().debug(String.format("Packing folder %s to %s", folderToPack.getAbsolutePath(), resultZip.getAbsolutePath()));
       }
-
+      
+      FileUtils.touch(flagFile);
       ZipUtil.pack(folderToPack, resultZip, Math.min(9, Math.max(1, this.compression)));
-
     } finally {
       FileUtils.deleteQuietly(folderToPack);
     }

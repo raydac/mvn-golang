@@ -19,6 +19,7 @@
                     <goal>test</goal>
                 </goals>
                 <configuration>
+                    <scanDependencies>false</scanDependencies>
                     <ignoreErrorExitCode>true</ignoreErrorExitCode>
                     <goRoot>some/root</goRoot>
                     <goPath>some/path</goPath>

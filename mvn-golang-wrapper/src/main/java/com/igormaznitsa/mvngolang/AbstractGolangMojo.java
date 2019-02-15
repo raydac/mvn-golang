@@ -96,6 +96,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -145,6 +146,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
   private MavenSession session;
 
+  @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
+  private MojoExecution execution;
+  
   /**
    * Flag shows that environment PATH variable should be filtered for footsteps
    * of other go/bin folders to prevent conflicts.
@@ -775,6 +779,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return this.project;
   }
 
+  @Nonnull
+  public MojoExecution getExecution() {
+    return this.execution;
+  }
+  
+  @Nonnull
+  public MavenSession getSession() {
+    return this.session;
+  }
+  
   public boolean isIgnoreErrorExitCode() {
     return this.ignoreErrorExitCode;
   }
@@ -1504,6 +1518,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
       printEcho();
 
+      doPrepare();
+      
       final ProxySettings proxySettings = extractProxySettings();
       beforeExecution(proxySettings);
 
@@ -1521,6 +1537,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
+  public void doPrepare() throws MojoFailureException, MojoExecutionException{
+    
+  }
+  
   public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
 
   }
@@ -1769,9 +1789,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(goPathParts);
     if (isEnforceGoPathToEnd()) {
-      preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd(), preparedGoPath);
+      preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getSpecialPartOfGoPath(), preparedGoPath);
     } else {
-      preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(preparedGoPath, makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getExtraPathToAddToGoPathToEnd());
+      preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(preparedGoPath, makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getSpecialPartOfGoPath());
     }
     addEnvVar(result, "GOPATH", preparedGoPath);
 
@@ -1816,8 +1836,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
+  /**
+   * Internal method which returns special part of GOPATH which can be formed by mojos. Must be either empty or contain folders divided by file path separator.
+   * @return special part of GOPATH, must not be null, by default must be empty
+   */
   @Nonnull
-  protected String getExtraPathToAddToGoPathToEnd() {
+  protected String getSpecialPartOfGoPath() {
     return "";
   }
 

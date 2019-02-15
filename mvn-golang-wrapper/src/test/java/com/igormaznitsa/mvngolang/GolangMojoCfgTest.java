@@ -67,6 +67,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
+    assertTrue(customMojo.isScanDependencies());
     assertTrue(customMojo.isFilterEnvPath());
     assertEquals(60000,customMojo.getConnectionTimeout());
     assertFalse(customMojo.isCheckSdkHash());
@@ -255,6 +256,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangTestMojoConfiguration() throws Exception {
     final GolangTestMojo testMojo = findMojo(GolangTestMojo.class, "mojoTest.xml", "test");
+    assertFalse(testMojo.isScanDependencies());
     assertEquals(60000, testMojo.getConnectionTimeout());
     assertTrue(testMojo.isUseMavenProxy());
     assertNull(testMojo.getProxy());

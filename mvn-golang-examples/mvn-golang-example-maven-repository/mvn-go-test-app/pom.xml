@@ -11,14 +11,12 @@
   <artifactId>mvn-go-test-app</artifactId>
   <packaging>mvn-golang</packaging>
 
-  <!-- the dependency section has been added just to show maven reactor that the app module depends on the lib module -->
   <dependencies>
     <dependency>
       <groupId>com.igormaznitsa</groupId>
       <artifactId>mvn-go-test-lib</artifactId>
       <version>1.0.0-SNAPSHOT</version>
       <type>zip</type>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -27,41 +25,12 @@
     <directory>${basedir}${file.separator}bin</directory>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.1</version>
-        <executions>
-          <execution>
-            <id>find-artifact-and-unpack-in-bin</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>mvn-go-test-lib</artifactId>
-                  <version>1.0.0-SNAPSHOT</version>
-                  <type>zip</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}${file.separator}mvn-go-test-lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${main-project-version}</version>
         <extensions>true</extensions>
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
-          <addToGoPath>
-            <path>${project.build.directory}${file.separator}mvn-go-test-lib</path>
-          </addToGoPath>
         </configuration>
         <executions>
         <execution>
