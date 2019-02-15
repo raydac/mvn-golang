@@ -17,13 +17,15 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>app-1</artifactId>
       <version>${project.version}</version>
-      <type>mvn-golang</type>
+      <type>zip</type>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>app-2</artifactId>
       <version>${project.version}</version>
-      <type>mvn-golang</type>
+      <type>zip</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

@@ -23,7 +23,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>cvs-hg-branch-v2</artifactId>
       <version>${project.version}</version>
-      <type>mvn-golang</type>
+      <type>zip</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
