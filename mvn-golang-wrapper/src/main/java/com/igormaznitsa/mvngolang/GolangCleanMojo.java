@@ -97,7 +97,7 @@ public class GolangCleanMojo extends AbstractPackageGolangMojo {
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
     if (!error) {
       final File directory;
-      if (getProject().getPackaging().equals("mvn-golang")) {
+      if (getProject().getPackaging().equals(GOARTIFACT_PACKAGING)) {
         directory = new File(getProject().getBasedir(), "bin");
       } else {
         directory = new File(getProject().getBuild().getDirectory());

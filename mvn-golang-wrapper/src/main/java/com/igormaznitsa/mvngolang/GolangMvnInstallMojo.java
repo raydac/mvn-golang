@@ -67,20 +67,25 @@ public class GolangMvnInstallMojo extends AbstractMojo {
    *
    * @since 2.2.1
    */
-  private class ZipExtensionArtifactHandlerAdapter implements ArtifactHandler {
+  private class ExtensionReplacingArtifactHandlerAdapter implements ArtifactHandler {
 
     private final ArtifactHandler delegate;
 
-    private ZipExtensionArtifactHandlerAdapter(@Nonnull final ArtifactHandler delegate) {
+    private ExtensionReplacingArtifactHandlerAdapter(@Nonnull final ArtifactHandler delegate) {
       this.delegate = delegate;
     }
 
     @Nonnull
     @Override
     public String getExtension() {
-      final String oldExtension = this.delegate.getExtension();
-      getLog().debug("Replacing artifact extension '" + oldExtension + "' by 'zip' extension");
-      return "zip";
+      String result = this.delegate.getExtension();
+      if (AbstractGolangMojo.GOARTIFACT_PACKAGING.equals(result)) {
+        getLog().debug("Replacing artifact extension to 'zip': " + result);
+        result = "zip";
+      } else {
+        getLog().debug("Artifact extension change is ignored because is not maven golang: " + result);
+      }
+      return result;
     }
 
     @Nonnull
@@ -152,7 +157,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
       try {
         final File archive = compressProjectFiles();
         this.project.getArtifact().setFile(archive);
-        this.project.getArtifact().setArtifactHandler(new ZipExtensionArtifactHandlerAdapter(this.project.getArtifact().getArtifactHandler()));
+        this.project.getArtifact().setArtifactHandler(new ExtensionReplacingArtifactHandlerAdapter(this.project.getArtifact().getArtifactHandler()));
       } catch (IOException ex) {
         throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
       }

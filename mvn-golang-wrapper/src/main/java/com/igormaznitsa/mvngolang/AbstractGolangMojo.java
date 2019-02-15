@@ -112,6 +112,8 @@ import org.zeroturnaround.exec.ProcessResult;
 
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
+  public static final String GOARTIFACT_PACKAGING = "mvn-golang";
+
   /**
    * VERSION, OS, PLATFORM,-OSXVERSION
    */
