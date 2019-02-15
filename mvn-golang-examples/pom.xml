@@ -28,6 +28,7 @@
         <module>mvn-golang-example-nes</module>
         <module>mvn-golang-example-gui</module>
         <module>mvn-golang-example-gui-nuklear</module>
+        <module>mvn-golang-example-plugin</module>
       </modules>
     </profile>
   </profiles>
@@ -39,7 +40,6 @@
     <module>mvn-golang-example-helloworld</module>
     <module>mvn-golang-example-helloworld-gomod</module>
     <module>mvn-golang-example-helloworld-multisrc</module>
-    <module>mvn-golang-example-plugin</module>
     <module>mvn-golang-example-genbindata</module>
     <module>mvn-golang-example-goexample</module>
     <module>mvn-golang-example-termui</module>
