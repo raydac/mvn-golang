@@ -142,6 +142,7 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   @Override
   public final void doPrepare() throws MojoFailureException, MojoExecutionException {
     if (this.isScanDependencies()) {
+      getLog().info("Scanning maven dependencies");
       final List<File> foundArtifacts = this.scanForMvnGoArtifacts();
       getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
       final File targetFolder = new File(this.getUnpackDependencyFolder());
@@ -151,6 +152,8 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
       final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolders.toArray(new File[0]));
       getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
       this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
+    } else {
+      getLog().info("Maven dependency scanning is off");
     }
   }
 
