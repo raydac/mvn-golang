@@ -1513,7 +1513,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
     if (this.isSkip()) {
-      getLog().info("Execution is skipped by flag");
+      getLog().info("Skipping mvn-golang execution");
     } else {
       if (!isHideBanner()) {
         printBanner();
