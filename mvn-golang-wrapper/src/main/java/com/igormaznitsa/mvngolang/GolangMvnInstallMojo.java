@@ -16,6 +16,19 @@
 package com.igormaznitsa.mvngolang;
 
 import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -25,18 +38,16 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.zeroturnaround.zip.ZipUtil;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.*;
-import java.util.Locale;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
+import org.zeroturnaround.zip.ZipUtil;
 
 /**
  * The Mojo packs all found source and resource project folders and create new
@@ -48,11 +59,11 @@ import org.apache.maven.shared.transfer.repository.RepositoryManager;
 public class GolangMvnInstallMojo extends AbstractMojo {
 
   /**
-   * Name of special flag file which must be added into artifacts prepared by plugin to help identify them as mvn-golang artifacts.
-   * 
+   * Special file contains list of mvn-golang artifacts which must be resolved and used in build.
+   *
    * @since 2.2.1
    */
-  public static final String ARTIFACT_FLAG_FILE = ".mvn-golang";
+  public static final String MVNGOLANG_DEPENDENCIES_FILE = ".mvn-golang-dependencies";
 
   @Component
   protected RepositoryManager repositoryManager;
@@ -68,67 +79,6 @@ public class GolangMvnInstallMojo extends AbstractMojo {
 
   @Parameter(readonly = true, required = true, defaultValue = "${session}")
   private MavenSession session;
-
-  /**
-   * Class replacing artifact extension by 'zip'.
-   *
-   * @since 2.2.1
-   */
-  private class ExtensionReplacingArtifactHandlerAdapter implements ArtifactHandler {
-
-    private final ArtifactHandler delegate;
-
-    private ExtensionReplacingArtifactHandlerAdapter(@Nonnull final ArtifactHandler delegate) {
-      this.delegate = delegate;
-    }
-
-    @Nonnull
-    @Override
-    public String getExtension() {
-      String result = this.delegate.getExtension();
-      if (AbstractGolangMojo.GOARTIFACT_PACKAGING.equals(result)) {
-        getLog().debug("Replacing artifact extension to 'zip': " + result);
-        result = "zip";
-      } else {
-        getLog().debug("Artifact extension change is ignored because is not maven golang: " + result);
-      }
-      return result;
-    }
-
-    @Nonnull
-    @Override
-    public String getDirectory() {
-      return this.delegate.getDirectory();
-    }
-
-    @Nonnull
-    @Override
-    public String getClassifier() {
-      return this.delegate.getClassifier();
-    }
-
-    @Nonnull
-    @Override
-    public String getPackaging() {
-      return this.delegate.getPackaging();
-    }
-
-    @Override
-    public boolean isIncludesDependencies() {
-      return this.delegate.isIncludesDependencies();
-    }
-
-    @Nonnull
-    @Override
-    public String getLanguage() {
-      return this.delegate.getLanguage();
-    }
-
-    @Override
-    public boolean isAddedToClasspath() {
-      return this.delegate.isAddedToClasspath();
-    }
-  }
 
   /**
    * Set this to 'true' to bypass artifact install.
@@ -164,7 +114,6 @@ public class GolangMvnInstallMojo extends AbstractMojo {
       try {
         final File archive = compressProjectFiles();
         this.project.getArtifact().setFile(archive);
-        this.project.getArtifact().setArtifactHandler(new ExtensionReplacingArtifactHandlerAdapter(this.project.getArtifact().getArtifactHandler()));
       } catch (IOException ex) {
         throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
       }
@@ -214,7 +163,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
       throw new IOException("Can't create temp folder : " + folderToPack);
     }
 
-    final File flagFile = new File(folderToPack, ARTIFACT_FLAG_FILE);
+    final File mvnGolangDependencyListFile = new File(folderToPack, MVNGOLANG_DEPENDENCIES_FILE);
     try {
       saveEffectivePom(folderToPack);
 
@@ -233,8 +182,32 @@ public class GolangMvnInstallMojo extends AbstractMojo {
       if (getLog().isDebugEnabled()) {
         getLog().debug(String.format("Packing folder %s to %s", folderToPack.getAbsolutePath(), resultZip.getAbsolutePath()));
       }
-      
-      FileUtils.touch(flagFile);
+
+      if (mvnGolangDependencyListFile.isFile()) {
+        this.getLog().warn("Skip dependency descriptor making because detected existing one: " + MVNGOLANG_DEPENDENCIES_FILE);
+      } else {
+        final List<Artifact> golangDependencies = new ArrayList<>();
+        MavenProject currentProject = this.project;
+        while (currentProject != null && !Thread.currentThread().isInterrupted()) {
+          final Set<Artifact> dependencies = currentProject.getDependencyArtifacts();
+          if (dependencies != null) {
+            for (final Artifact a : dependencies) {
+              if (AbstractGolangMojo.GOARTIFACT_PACKAGING.equals(a.getType())) {
+                golangDependencies.add(a);
+              }
+            }
+          }
+          currentProject = currentProject.getParent();
+        }
+
+        final StringBuilder buffer = new StringBuilder();
+        for(final Artifact a : golangDependencies){
+          buffer.append(MavenUtils.makeArtifactRecord(a)).append('\n');
+        }
+        final String flagFileContent = buffer.toString();
+        this.getLog().debug("Formed list of mvn-golang dependencies\n---------"+flagFileContent+"---------");
+        FileUtils.writeStringToFile(mvnGolangDependencyListFile, flagFileContent, StandardCharsets.UTF_8);
+      }
       ZipUtil.pack(folderToPack, resultZip, Math.min(9, Math.max(1, this.compression)));
     } finally {
       FileUtils.deleteQuietly(folderToPack);

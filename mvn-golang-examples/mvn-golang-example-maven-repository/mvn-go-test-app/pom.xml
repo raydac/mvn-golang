@@ -16,7 +16,7 @@
       <groupId>com.igormaznitsa</groupId>
       <artifactId>mvn-go-test-lib</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <type>zip</type>
+      <type>mvn-golang</type>
     </dependency>
   </dependencies>
 

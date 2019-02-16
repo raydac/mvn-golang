@@ -8,18 +8,8 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mvn-go-test-lib</artifactId>
+  <artifactId>mvn-go-test-metalib</artifactId>
   <packaging>mvn-golang</packaging>
-
- <dependencies>
-    <dependency>
-      <groupId>com.igormaznitsa</groupId>
-      <artifactId>mvn-go-test-metalib</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-      <type>mvn-golang</type>
-    </dependency>
-  </dependencies>
-
 
   <build>
     <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>

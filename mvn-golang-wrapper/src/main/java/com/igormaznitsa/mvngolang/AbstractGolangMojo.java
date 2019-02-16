@@ -94,15 +94,18 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -140,6 +143,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Parameter(defaultValue = "${settings}", readonly = true)
   protected Settings settings;
 
+  @Component
+  private ArtifactResolver artifactResolver;
+
+  @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
+  private List<ArtifactRepository> remoteRepositories;
+  
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;
 
@@ -488,6 +497,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   private static final Pattern GOBINFOLDER_PATTERN = Pattern.compile("(?:\\\\|/)go[0-9\\-\\+.]*(?:\\\\|/)bin(?:\\\\|/)?$", Pattern.CASE_INSENSITIVE);
 
+  @Nonnull
+  public ArtifactResolver getArtifactResolver() {
+    return assertNotNull("Artifact resolver component is not provided by Maven",this.artifactResolver);
+  }
+  
+  @Nonnull
+  @MustNotContainNull
+  public List<ArtifactRepository> getRemoteRepositories() {
+    return this.remoteRepositories;
+  }
+  
   @Nonnull
   private static String ensureNoSurroundingSlashes(@Nonnull final String str) {
     String result = str;
@@ -1518,10 +1538,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (!isHideBanner()) {
         printBanner();
       }
+      doInit();
 
       printEcho();
-
-      doPrepare();
       
       final ProxySettings proxySettings = extractProxySettings();
       beforeExecution(proxySettings);
@@ -1540,7 +1559,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  public void doPrepare() throws MojoFailureException, MojoExecutionException{
+  public void doInit() throws MojoFailureException, MojoExecutionException{
     
   }
   

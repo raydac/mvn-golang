@@ -21,13 +21,13 @@
       <groupId>${dollar}{project.groupId}</groupId>
       <artifactId>app-1</artifactId>
       <version>${dollar}{project.version}</version>
-      <type>zip</type>
+      <type>mvn-golang</type>
     </dependency>
     <dependency>
       <groupId>${dollar}{project.groupId}</groupId>
       <artifactId>app-2</artifactId>
       <version>${dollar}{project.version}</version>
-      <type>zip</type>
+      <type>mvn-golang</type>
     </dependency>
   </dependencies>
 

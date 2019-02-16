@@ -17,14 +17,14 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>app-1</artifactId>
       <version>${project.version}</version>
-      <type>zip</type>
+      <type>mvn-golang</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>app-2</artifactId>
       <version>${project.version}</version>
-      <type>zip</type>
+      <type>mvn-golang</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>

@@ -19,37 +19,21 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.zeroturnaround.zip.ZipUtil;
 
 public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
-
-  @Component
-  private ArtifactResolver artifactResolver;
-
-  @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
-  private List<ArtifactRepository> remoteRepositories;
 
   /**
    * List of packages.
@@ -132,26 +116,37 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
     return this.extraGoPathSectionInOsFormat;
   }
 
-  @Nonnull
-  private ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
-    final ProjectBuildingRequest result = new DefaultProjectBuildingRequest(this.getSession().getProjectBuildingRequest());
-    result.setRemoteRepositories(this.remoteRepositories);
-    return result;
-  }
-
   @Override
-  public final void doPrepare() throws MojoFailureException, MojoExecutionException {
+  public final void doInit() throws MojoFailureException, MojoExecutionException {
     if (this.isScanDependencies()) {
       getLog().info("Scanning maven dependencies");
-      final List<File> foundArtifacts = this.scanForMvnGoArtifacts();
-      getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
-      final File targetFolder = new File(this.getUnpackDependencyFolder());
-      getLog().debug("Depedencies will be unpacked into folder: " + targetFolder);
-      final List<File> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, targetFolder);
+      final List<File> foundArtifacts;
+      
+      try {
+        foundArtifacts = MavenUtils.scanForMvnGoArtifacts(
+                this.getProject(),
+                this,
+                this.getSession(),
+                this.getExecution(),
+                this.getArtifactResolver(),
+                this.getRemoteRepositories());
+      } catch (ArtifactResolverException ex) {
+        throw new MojoFailureException("Can't resolve artifact", ex);
+      }
+      
+      if (foundArtifacts.isEmpty()) {
+        getLog().debug("Mvn golang dependencies are not found");
+        this.extraGoPathSectionInOsFormat = "";
+      } else {
+        getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
+        final File targetFolder = new File(this.getUnpackDependencyFolder());
+        getLog().debug("Depedencies will be unpacked into folder: " + targetFolder);
+        final List<File> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, targetFolder);
 
-      final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolders.toArray(new File[0]));
-      getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
-      this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
+        final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolders.toArray(new File[0]));
+        getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
+        this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
+      }
     } else {
       getLog().info("Maven dependency scanning is off");
     }
@@ -182,56 +177,5 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
       }
     }
     return resultFolders;
-  }
-
-  protected boolean isTestPhase() {
-    final String phase = this.getExecution().getLifecyclePhase();
-    return phase != null && (phase.equals("test") || phase.equals("process-test-resources") || phase.equals("test-compile"));
-  }
-
-  @Nonnull
-  @MustNotContainNull
-  private List<File> scanForMvnGoArtifacts() throws MojoFailureException {
-    final List<File> result = new ArrayList<>();
-    final String phase = this.getExecution().getLifecyclePhase();
-
-    MavenProject currentProject = this.getProject();
-    while (currentProject != null && !Thread.currentThread().isInterrupted()) {
-      final Set<Artifact> dependencyArtifacts = currentProject.getDependencyArtifacts();
-      getLog().debug("Detected dependency artifacts: " + dependencyArtifacts);
-
-      if (dependencyArtifacts != null) {
-        for (final Artifact artifact : dependencyArtifacts) {
-          if (Artifact.SCOPE_TEST.equals(artifact.getScope()) && !isTestPhase()) {
-            continue;
-          }
-
-          if (artifact.getType().equals("zip")) {
-            try {
-              final ArtifactResult artifactResult = this.artifactResolver.resolveArtifact(newResolveArtifactProjectBuildingRequest(), artifact);
-              final File zipFillePath = artifactResult.getArtifact().getFile();
-
-              if (ZipUtil.containsEntry(zipFillePath, GolangMvnInstallMojo.ARTIFACT_FLAG_FILE)) {
-                getLog().debug("Detected MVN-GOLANG flag inside ZIP dependency: " + artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getVersion() + ':' + artifact.getType());
-                final File artifactFile = artifactResult.getArtifact().getFile();
-                getLog().debug("Artifact file: " + artifactFile);
-                if (result.contains(artifactFile)) {
-                  getLog().debug("Artifact file ignored as duplication: " + artifactFile);
-                } else {
-                  result.add(artifactFile);
-                }
-              } else {
-                getLog().warn("Detected ZIP dependency but there is not mvn-golang flag inside archive: " + artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getVersion());
-              }
-            } catch (ArtifactResolverException ex) {
-              throw new MojoFailureException("Can't resolve GoLang artifact: " + artifact, ex);
-            }
-          }
-        }
-      }
-      currentProject = currentProject.hasParent() ? currentProject.getParent() : null;
-    }
-
-    return result;
   }
 }

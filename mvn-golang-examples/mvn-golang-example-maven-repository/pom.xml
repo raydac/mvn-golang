@@ -15,6 +15,7 @@
   <description>Example how to use mvn-golang artifact saved in maven repository</description>
 
   <modules>
+    <module>mvn-go-test-metalib</module>
     <module>mvn-go-test-lib</module>
     <module>mvn-go-test-app</module>
   </modules>
