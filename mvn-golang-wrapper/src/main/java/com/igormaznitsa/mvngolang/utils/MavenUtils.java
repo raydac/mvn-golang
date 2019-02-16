@@ -184,7 +184,7 @@ public final class MavenUtils {
           if (ZipUtil.containsEntry(zipFillePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE)) {
             final byte[] artifactFlagFile = ZipUtil.unpackEntry(zipFillePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE, StandardCharsets.UTF_8);
 
-            for (final String str : new String(artifactFlagFile, StandardCharsets.UTF_8).split("\n")) {
+            for (final String str : new String(artifactFlagFile, StandardCharsets.UTF_8).split("\\R")) {
               if (str.trim().isEmpty() || alreadyFoundArtifactRecords.contains(str)) {
                 continue;
               }
