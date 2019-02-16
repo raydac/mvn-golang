@@ -200,7 +200,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private ProxySettings proxy;
 
   /**
-   * Skip execution of the mojo.
+   * Skip execution of the mojo. Also can be disabled through system property `mvngo.skip'
    *
    * @since 2.1.2
    */
@@ -767,7 +767,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isSkip() {
-    return this.skip;
+    final String systemValue = this.getSession().getSystemProperties().getProperty("mvngo.skip", null);
+    return systemValue == null ?  this.skip : Boolean.parseBoolean(systemValue);
   }
 
   public boolean isEnforceGoPathToEnd() {
