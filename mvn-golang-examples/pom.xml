@@ -18,7 +18,7 @@
 
   <profiles>
     <profile>
-      <id>underLinux</id>
+      <id>examples-under-unix</id>
       <activation>
         <os>
           <family>unix</family>
