@@ -11,6 +11,7 @@
 __2.2.1 (SNAPSHOT)__
  - __added `scanDependencies` flag (by default `true`) into package processing mojos to scan project dependencies and load Go artifact sources from maven repository! [example](./mvn-golang-examples/mvn-golang-example-maven-repository)__
  - __repository artifact extension changed to `zip` and the type must be used as dependency type__
+ - added support of system properties 'mvngo.skip' and `mvngo.disable.ssl.check`
  - added `jfrog-cli` mojo to provide way make call to external [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) in tuned Go SDK environment, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-jfrog-cli).
  - added `connectionTimeout` property to provide timeout (milliseconds) for HTTP connections, default 60000 ms
  - [#55](https://github.com/raydac/mvn-golang/issues/55) print log error stream into debug if command status is not error
