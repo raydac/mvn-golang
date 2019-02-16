@@ -17,6 +17,7 @@
   <modules>
     <module>mvn-go-test-metalib</module>
     <module>mvn-go-test-lib</module>
+    <module>mvn-go-test-libtwo</module>
     <module>mvn-go-test-app</module>
   </modules>
 
