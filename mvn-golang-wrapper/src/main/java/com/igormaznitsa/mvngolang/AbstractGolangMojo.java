@@ -162,7 +162,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * Flag shows that environment PATH variable should be filtered for footsteps
    * of other go/bin folders to prevent conflicts.
    *
-   * @since 2.2.1
+   * @since 2.3.0
    */
   @Parameter(defaultValue = "true", name = "filterEnvPath")
   private boolean filterEnvPath = true;
@@ -170,7 +170,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Check hash for downloaded SDK archive.
    *
-   * @since 2.2.1
+   * @since 2.3.0
    */
   @Parameter(name = "checkSdkHash", defaultValue = "true")
   private boolean checkSdkHash = true;
@@ -178,7 +178,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Use proxy server defined for maven.
    *
-   * @since 2.1.1
+   * @since 2.3.0
    */
   @Parameter(name = "useMavenProxy", defaultValue = "true")
   private boolean useMavenProxy;
@@ -470,7 +470,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Timeout for HTTP connection in milliseconds.
    *
-   * @since 2.2.1
+   * @since 2.3.0
    */
   @Parameter(name = "connectionTimeout", defaultValue = "60000")
   private int connectionTimeout = 60000;

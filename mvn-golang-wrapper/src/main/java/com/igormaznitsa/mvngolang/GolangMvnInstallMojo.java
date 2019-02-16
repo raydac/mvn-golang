@@ -61,7 +61,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
   /**
    * Special file contains list of mvn-golang artifacts which must be resolved and used in build.
    *
-   * @since 2.2.1
+   * @since 2.3.0
    */
   public static final String MVNGOLANG_DEPENDENCIES_FILE = ".mvn-golang-dependencies";
 

@@ -39,7 +39,7 @@ import org.zeroturnaround.exec.ProcessExecutor;
  * Documentation of the JFrog CLI can be found
  * <a href="https://www.jfrog.com/confluence/display/CLI/JFrog+CLI">here</a>.
  *
- * @since 2.2.1
+ * @since 2.3.0
  */
 @Mojo(name = "jfrog-cli", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
 public class GolangJfrogCliMojo extends AbstractGolangMojo {

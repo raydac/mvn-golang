@@ -49,7 +49,7 @@ import org.zeroturnaround.zip.ZipUtil;
 /**
  * Auxiliary methods to work with maven entities.
  *
- * @since 2.2.1
+ * @since 2.3.0
  */
 public final class MavenUtils {
 

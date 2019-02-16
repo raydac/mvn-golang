@@ -47,7 +47,7 @@ public final class IOUtils {
    * @param progressBarWidth width of bar
    * @param lastValue value which was rendered last time, if the same then it will not be rendered
    * @return rendered value
-   * @since 2.2.1
+   * @since 2.3.0
    */
   public static int printTextProgressBar(@Nonnull final String text, final long value, final long maxValue, final int progressBarWidth, final int lastValue) {
     final StringBuilder builder = new StringBuilder();

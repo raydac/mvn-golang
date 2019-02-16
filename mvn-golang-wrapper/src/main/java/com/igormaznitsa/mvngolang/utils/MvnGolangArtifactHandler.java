@@ -21,7 +21,7 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 /**
  * Artifact handler for mvn-golang artifacts.
  * 
- * @since 2.2.1
+ * @since 2.3.0
  */
 public final class MvnGolangArtifactHandler extends DefaultArtifactHandler {
 
