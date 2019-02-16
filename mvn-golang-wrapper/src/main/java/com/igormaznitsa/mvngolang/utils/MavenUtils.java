@@ -38,7 +38,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -47,6 +46,11 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverExcepti
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.zeroturnaround.zip.ZipUtil;
 
+/**
+ * Auxiliary methods to work with maven entities.
+ *
+ * @since 2.2.1
+ */
 public final class MavenUtils {
 
   private static final Pattern ARTIFACT_RECORD_PATTERN = Pattern.compile("^([^:]+)::([^:]+)::([^:]*)::([^:]*)::([^:]*)::([^:]*)$");
@@ -55,13 +59,24 @@ public final class MavenUtils {
 
   }
 
+  /**
+   * Check that execution in a test mode.
+   * @param execution maven execution object, must not be null
+   * @return true if a test mode is active, false otherwise
+   */
   public static boolean isTestPhase(@Nonnull final MojoExecution execution) {
     final String phase = execution.getLifecyclePhase();
     return phase != null && (phase.equals("test") || phase.equals("process-test-resources") || phase.equals("test-compile"));
   }
 
+  /**
+   * Make resolve artifact project building request.
+   * @param session maven session, must not be null
+   * @param remoteRepositories list of remote repositories, must not be null and can't contain null
+   * @return created request, must not be null
+   */
   @Nonnull
-  public static ProjectBuildingRequest newResolveArtifactProjectBuildingRequest(
+  public static ProjectBuildingRequest makeResolveArtifactProjectBuildingRequest(
           @Nonnull final MavenSession session,
           @Nonnull @MustNotContainNull final List<ArtifactRepository> remoteRepositories
   ) {
@@ -71,12 +86,20 @@ public final class MavenUtils {
     return result;
   }
 
+  /**
+   * Parse string containing artifact record
+   * @param record string containing record, must not be null
+   * @param handler artifact handler for created artifact, must not be null
+   * @return new created artifact from the record, must not be null
+   * @throws InvalidVersionSpecificationException  it will be thrown if version format is wrong
+   * @throws IllegalArgumentException it will be thrown if record can't be recognized as artifact record
+   */
   @Nonnull
-  public static Artifact restoreArtifactFromRecord(
+  public static Artifact parseArtifactRecord(
           @Nonnull final String record,
           @Nonnull final ArtifactHandler handler
   ) throws InvalidVersionSpecificationException {
-    final Matcher matcher = ARTIFACT_RECORD_PATTERN.matcher(record);
+    final Matcher matcher = ARTIFACT_RECORD_PATTERN.matcher(record.trim());
     if (matcher.find()) {
       return new DefaultArtifact(
               matcher.group(1),
@@ -90,6 +113,12 @@ public final class MavenUtils {
     throw new IllegalArgumentException("Can't recognize record as artifact: " + record);
   }
 
+  /**
+   * Make artifact record from a maven artifact
+   * @param artifact artifact to be converted into string, must not be null
+   * @return string representation of artifact, must not be null
+   * @see #parseArtifactRecord(java.lang.String, org.apache.maven.artifact.handler.ArtifactHandler) 
+   */
   @Nonnull
   public static String makeArtifactRecord(@Nonnull final Artifact artifact) {
     final StringBuilder buffer = new StringBuilder();
@@ -147,7 +176,7 @@ public final class MavenUtils {
         }
 
         if (artifact.getType().equals(AbstractGolangMojo.GOARTIFACT_PACKAGING)) {
-          final ArtifactResult artifactResult = resolver.resolveArtifact(newResolveArtifactProjectBuildingRequest(session, remoteRepositories), artifact);
+          final ArtifactResult artifactResult = resolver.resolveArtifact(makeResolveArtifactProjectBuildingRequest(session, remoteRepositories), artifact);
           final File zipFillePath = artifactResult.getArtifact().getFile();
 
           mojo.getLog().debug("Detected MVN-GOLANG marker inside ZIP dependency: " + artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getVersion() + ':' + artifact.getType());
@@ -162,7 +191,7 @@ public final class MavenUtils {
               mojo.getLog().debug("Adding mvn-golang dependency: " + str);
               alreadyFoundArtifactRecords.add(str);
               try {
-                artifacts.add(restoreArtifactFromRecord(str, new MvnGolangArtifactHandler()));
+                artifacts.add(parseArtifactRecord(str, new MvnGolangArtifactHandler()));
               } catch (Exception ex) {
                 throw new ArtifactResolverException("Can't make artifact: " + str, ex);
               }
