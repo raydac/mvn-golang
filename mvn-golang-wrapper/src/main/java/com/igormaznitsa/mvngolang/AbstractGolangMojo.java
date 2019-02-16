@@ -175,11 +175,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean useMavenProxy;
 
   /**
-   * Disable check of SSL certificate during HTTP request. Also can be changed by property 'mvngo.disable.ssl.check'
+   * Disable check of SSL certificate during HTTP request. Also can be changed by system property 'mvngo.disable.ssl.check'
    *
    * @since 2.1.7
    */
-  @Parameter(name = "disableSSLcheck", defaultValue = "false", property = "mvngo.disable.ssl.check")
+  @Parameter(name = "disableSSLcheck", defaultValue = "false")
   private boolean disableSSLcheck;
 
   /**
@@ -1033,7 +1033,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isDisableSslCheck() {
-    return this.disableSSLcheck;
+    final String systemValue = this.getSession().getSystemProperties().getProperty("mvngo.disable.ssl.check", null);
+    return systemValue == null ? this.disableSSLcheck : Boolean.parseBoolean(systemValue);
   }
 
   public void setDisableSslCheck(final boolean flag) {
@@ -1164,6 +1165,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       builder.disableCookieManagement();
 
       if (this.isDisableSslCheck()) {
+        this.getLog().warn("SSL certificate check is disabled");
         try {
           final SSLContext sslcontext = SSLContext.getInstance("TLS");
           X509TrustManager tm = new X509TrustManager() {
@@ -1192,11 +1194,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           builder.setConnectionManager(new BasicHttpClientConnectionManager(r));
           builder.setSSLSocketFactory(sslfactory);
           builder.setSSLContext(sslcontext);
-
-          getLog().warn("SSL certificate check has been disabled");
         } catch (final Exception ex) {
           throw new MojoExecutionException("Can't disable SSL certificate check", ex);
         }
+      } else {
+        this.getLog().debug("SSL check is enabled");
       }
       this.httpClient = builder.build();
     }
