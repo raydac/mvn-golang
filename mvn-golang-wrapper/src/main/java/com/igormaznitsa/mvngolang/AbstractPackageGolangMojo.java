@@ -51,6 +51,14 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   private boolean scanDependencies = true;
 
   /**
+   * Include test dependencies into scanning process activated if {@code scanDependencies=true}
+   * 
+   * @since 2.3.0
+   */
+  @Parameter(name = "includeTestDependencies", defaultValue = "true")
+  private boolean includeTestDependencies = true;
+  
+  /**
    * Path to the folder where all found mvn-golang dependencies will be
    * unpacked.
    *
@@ -92,6 +100,14 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
     this.scanDependencies = flag;
   }
 
+  public boolean isIncludeTestDependencies() {
+    return this.includeTestDependencies;
+  }
+  
+  public void setIncludeTestDependencies(final boolean value) {
+    this.includeTestDependencies = value;
+  }
+  
   public void setPackages(@Nullable @MustNotContainNull final String[] value) {
     this.packages = value;
   }
@@ -125,6 +141,7 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
       try {
         foundArtifacts = MavenUtils.scanForMvnGoArtifacts(
                 this.getProject(),
+                this.isIncludeTestDependencies(),
                 this,
                 this.getSession(),
                 this.getExecution(),

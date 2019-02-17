@@ -138,6 +138,7 @@ public final class MavenUtils {
    * project.
    *
    * @param mavenProject maven project, must not be null
+   * @param includeTestDependencies flag to process dependencies marked for test phases
    * @param mojo calling mojo, must not be null
    * @param session maven session, must not be null
    * @param execution maven execution, must not be null
@@ -151,6 +152,7 @@ public final class MavenUtils {
   @MustNotContainNull
   public static List<File> scanForMvnGoArtifacts(
           @Nonnull final MavenProject mavenProject,
+          final boolean includeTestDependencies,
           @Nonnull final AbstractMojo mojo,
           @Nonnull final MavenSession session,
           @Nonnull final MojoExecution execution,
@@ -171,7 +173,7 @@ public final class MavenUtils {
       while (!artifacts.isEmpty() && !Thread.currentThread().isInterrupted()) {
         final Artifact artifact = artifacts.remove(0);
 
-        if (Artifact.SCOPE_TEST.equals(artifact.getScope()) && !isTestPhase(execution)) {
+        if (Artifact.SCOPE_TEST.equals(artifact.getScope()) && !includeTestDependencies) {
           continue;
         }
 
