@@ -33,7 +33,7 @@ import java.util.List;
  * The Mojo wraps the 'test' command.
  */
 @Mojo(name = "test", defaultPhase = LifecyclePhase.TEST, threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
-public class GolangTestMojo extends AbstractPackageGolangMojo {
+public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     /**
      * List of test binary flags.

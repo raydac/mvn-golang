@@ -42,7 +42,7 @@ import org.zeroturnaround.exec.ProcessExecutor;
  * @since 2.3.0
  */
 @Mojo(name = "jfrog-cli", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
-public class GolangJfrogCliMojo extends AbstractGolangMojo {
+public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
 
   /**
    * Path to a JFrog CLI executable file. Must be defined.

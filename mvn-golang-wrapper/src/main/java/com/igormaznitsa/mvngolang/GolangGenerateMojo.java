@@ -29,7 +29,7 @@ import java.io.File;
  * The Mojo wraps the 'generate' command.
  */
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangGenerateMojo extends AbstractPackageGolangMojo {
+public class GolangGenerateMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     @Override
     @Nonnull

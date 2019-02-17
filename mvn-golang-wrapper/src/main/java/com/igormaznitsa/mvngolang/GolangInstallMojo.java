@@ -27,7 +27,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  * The Mojo wraps the 'install' command.
  */
 @Mojo(name = "install", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangInstallMojo extends AbstractPackageGolangMojo {
+public class GolangInstallMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     /**
     * Set this to 'true' to bypass artifact deploy

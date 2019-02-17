@@ -32,7 +32,7 @@ import java.util.List;
  * The Mojo wraps the 'tool' command.
  */
 @Mojo(name = "tool", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangToolMojo extends AbstractGolangMojo {
+public class GolangToolMojo extends AbstractGoDependencyAwareMojo {
 
     /**
      * The Command to be executed.

@@ -29,7 +29,7 @@ import java.io.File;
  * The Mojo wraps the 'fmt' command.
  */
 @Mojo(name = "fmt", defaultPhase = LifecyclePhase.PROCESS_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangFmtMojo extends AbstractPackageGolangMojo {
+public class GolangFmtMojo extends AbstractGoPackageAwareMojo {
 
     @Override
     @Nonnull

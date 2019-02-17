@@ -17,6 +17,7 @@ package com.igormaznitsa.mvngolang;
 
 import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,11 +32,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -56,10 +55,11 @@ import org.zeroturnaround.zip.ZipUtil;
  * @since 2.1.0
  */
 @Mojo(name = "mvninstall", defaultPhase = LifecyclePhase.INSTALL, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangMvnInstallMojo extends AbstractMojo {
+public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
 
   /**
-   * Special file contains list of mvn-golang artifacts which must be resolved and used in build.
+   * Special file contains list of mvn-golang artifacts which must be resolved
+   * and used in build.
    *
    * @since 2.3.0
    */
@@ -73,20 +73,6 @@ public class GolangMvnInstallMojo extends AbstractMojo {
 
   @Component
   protected MavenProjectHelper projectHelper;
-
-  @Parameter(readonly = true, required = true, defaultValue = "${project}")
-  private MavenProject project;
-
-  @Parameter(readonly = true, required = true, defaultValue = "${session}")
-  private MavenSession session;
-
-  /**
-   * Set this to 'true' to bypass artifact install.
-   *
-   * @since 2.1.8
-   */
-  @Parameter(property = "maven.install.skip", defaultValue = "false")
-  private boolean skip;
 
   /**
    * Compression level of zip file. Must be 1..9
@@ -104,20 +90,20 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     return this.compression;
   }
 
+  @Override
   public boolean isSkip() {
-    return this.skip;
+    return super.isSkip() || Boolean.parseBoolean(System.getProperty("maven.install.skip", "false"));
   }
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-    if (!this.isSkip()) {
-      try {
-        final File archive = compressProjectFiles();
-        this.project.getArtifact().setFile(archive);
-      } catch (IOException ex) {
-        throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
-      }
+  protected boolean doMainBusiness(@Nonnull final ProxySettings proxySettings, final int maxAttempts) throws InterruptedException, MojoFailureException, MojoExecutionException, IOException {
+    try {
+      final File archive = compressProjectFiles();
+      this.getProject().getArtifact().setFile(archive);
+    } catch (IOException ex) {
+      throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
     }
+    return true;
   }
 
   private void safeCopyDirectory(@Nullable final String src, @Nonnull final File dst) throws IOException {
@@ -134,7 +120,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
   }
 
   private void saveEffectivePom(@Nonnull final File folder) throws IOException {
-    final Model model = this.project.getModel();
+    final Model model = this.getProject().getModel();
     Writer writer = null;
     try {
       writer = new OutputStreamWriter(new FileOutputStream(new File(folder, "pom.xml"), false), "UTF-8");
@@ -149,8 +135,15 @@ public class GolangMvnInstallMojo extends AbstractMojo {
 
   @Nonnull
   private File compressProjectFiles() throws IOException {
-    final Artifact artifact = this.project.getArtifact();
-    final File resultZip = new File(this.project.getBuild().getDirectory(), artifact.getArtifactId() + '-' + artifact.getVersion() + '.' + artifact.getType());
+    final Artifact artifact = this.getProject().getArtifact();
+
+    File buildFolder = new File(this.getProject().getBuild().getDirectory());
+    if (!buildFolder.isDirectory() && !buildFolder.mkdirs()) {
+      this.getLog().error("Can't create build folder: " + buildFolder);
+      throw new IOException("Can't create build folder: " + buildFolder);
+    }
+
+    File resultZip = new File(buildFolder, artifact.getArtifactId() + '-' + artifact.getVersion() + '.' + artifact.getType());
     if (resultZip.isFile() && !resultZip.delete()) {
       throw new IOException("Can't delete file : " + resultZip);
     }
@@ -167,15 +160,15 @@ public class GolangMvnInstallMojo extends AbstractMojo {
     try {
       saveEffectivePom(folderToPack);
 
-      FileUtils.copyFileToDirectory(this.project.getFile(), folderToPack);
-      safeCopyDirectory(this.project.getBuild().getSourceDirectory(), folderToPack);
-      safeCopyDirectory(this.project.getBuild().getTestSourceDirectory(), folderToPack);
+      FileUtils.copyFileToDirectory(this.getProject().getFile(), folderToPack);
+      safeCopyDirectory(this.getProject().getBuild().getSourceDirectory(), folderToPack);
+      safeCopyDirectory(this.getProject().getBuild().getTestSourceDirectory(), folderToPack);
 
-      for (final Resource res : this.project.getBuild().getResources()) {
+      for (final Resource res : this.getProject().getBuild().getResources()) {
         safeCopyDirectory(res.getDirectory(), folderToPack);
       }
 
-      for (final Resource res : this.project.getBuild().getTestResources()) {
+      for (final Resource res : this.getProject().getBuild().getTestResources()) {
         safeCopyDirectory(res.getDirectory(), folderToPack);
       }
 
@@ -187,7 +180,7 @@ public class GolangMvnInstallMojo extends AbstractMojo {
         this.getLog().warn("Skip dependency descriptor making because detected existing one: " + MVNGOLANG_DEPENDENCIES_FILE);
       } else {
         final List<Artifact> golangDependencies = new ArrayList<>();
-        MavenProject currentProject = this.project;
+        MavenProject currentProject = this.getProject();
         while (currentProject != null && !Thread.currentThread().isInterrupted()) {
           final Set<Artifact> dependencies = currentProject.getDependencyArtifacts();
           if (dependencies != null) {
@@ -201,11 +194,11 @@ public class GolangMvnInstallMojo extends AbstractMojo {
         }
 
         final StringBuilder buffer = new StringBuilder();
-        for(final Artifact a : golangDependencies){
+        for (final Artifact a : golangDependencies) {
           buffer.append(MavenUtils.makeArtifactRecord(a)).append('\n');
         }
         final String flagFileContent = buffer.toString();
-        this.getLog().debug("Formed list of mvn-golang dependencies\n---------"+flagFileContent+"---------");
+        this.getLog().debug("Formed list of mvn-golang dependencies\n---------" + flagFileContent + "---------");
         FileUtils.writeStringToFile(mvnGolangDependencyListFile, flagFileContent, StandardCharsets.UTF_8);
       }
       ZipUtil.pack(folderToPack, resultZip, Math.min(9, Math.max(1, this.compression)));

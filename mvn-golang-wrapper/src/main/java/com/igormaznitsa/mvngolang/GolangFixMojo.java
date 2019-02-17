@@ -29,7 +29,7 @@ import java.io.File;
  * The Mojo wraps the 'fix' command.
  */
 @Mojo(name = "fix", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangFixMojo extends AbstractPackageGolangMojo {
+public class GolangFixMojo extends AbstractGoPackageAwareMojo {
 
     @Override
     public boolean isSourceFolderRequired() {

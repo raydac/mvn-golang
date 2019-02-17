@@ -35,7 +35,7 @@ import java.util.List;
  */
 @SuppressWarnings("SpellCheckingInspection")
 @Mojo(name = "run", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangRunMojo extends AbstractPackageGolangMojo {
+public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**
    * If the parameter is defined then <b>-exec</b> will be used with the parameter value.

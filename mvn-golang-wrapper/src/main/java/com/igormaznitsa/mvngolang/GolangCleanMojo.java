@@ -34,7 +34,7 @@ import java.io.IOException;
  * The Mojo wraps the 'clean' command.
  */
 @Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangCleanMojo extends AbstractPackageGolangMojo {
+public class GolangCleanMojo extends AbstractGoPackageAwareMojo {
 
   /**
    * Clean the Go Path folder if it exists.
