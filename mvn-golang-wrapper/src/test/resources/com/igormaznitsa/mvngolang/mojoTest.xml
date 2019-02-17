@@ -20,7 +20,8 @@
                 </goals>
                 <configuration>
                     <scanDependencies>false</scanDependencies>
-                    <includeTestDependencies>fakse</includeTestDependencies>
+                    <includeTestDependencies>false</includeTestDependencies>
+                    <dependencyTempFolder>some/someTempFolder</dependencyTempFolder>
                     <ignoreErrorExitCode>true</ignoreErrorExitCode>
                     <goRoot>some/root</goRoot>
                     <goPath>some/path</goPath>

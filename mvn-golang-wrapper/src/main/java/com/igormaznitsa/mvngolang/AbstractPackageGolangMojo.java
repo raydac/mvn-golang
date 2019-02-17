@@ -17,6 +17,7 @@ package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
@@ -51,25 +52,31 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   private boolean scanDependencies = true;
 
   /**
-   * Include test dependencies into scanning process activated if {@code scanDependencies=true}
-   * 
+   * Include test dependencies into scanning process activated if
+   * {@code scanDependencies=true}
+   *
    * @since 2.3.0
    */
   @Parameter(name = "includeTestDependencies", defaultValue = "true")
   private boolean includeTestDependencies = true;
-  
+
   /**
-   * Path to the folder where all found mvn-golang dependencies will be
-   * unpacked.
+   * Path to the folder where resolved mvn-golang dependency artifacts will be
+   * temporary unpacked and those paths will be added into GOPATH, activated if
+   * {@code scanDependencies=true}
    *
    * @since 2.3.0
    */
-  @Parameter(name = "unpackDependencyFolder", defaultValue = "${project.build.directory}${file.separator}.__deps__")
-  private String unpackDependencyFolder;
+  @Parameter(name = "dependencyTempFolder", defaultValue = "${project.build.directory}${file.separator}.__deps__")
+  private String dependencyTempFolder;
 
   @Nonnull
-  public String getUnpackDependencyFolder() {
-    return GetUtils.ensureNonNull(this.unpackDependencyFolder, this.getProject().getBuild().getDirectory() + File.separator + "$$$deps$$$");
+  public String getDependencyTempFolder() {
+    return this.dependencyTempFolder;
+  }
+
+  public void setDependencyTempFolder(@Nonnull final String path) {
+    this.dependencyTempFolder = assertNotNull(path);
   }
 
   @Nullable
@@ -103,11 +110,11 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
   public boolean isIncludeTestDependencies() {
     return this.includeTestDependencies;
   }
-  
+
   public void setIncludeTestDependencies(final boolean value) {
     this.includeTestDependencies = value;
   }
-  
+
   public void setPackages(@Nullable @MustNotContainNull final String[] value) {
     this.packages = value;
   }
@@ -137,7 +144,7 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
     if (this.isScanDependencies()) {
       getLog().info("Scanning maven dependencies");
       final List<File> foundArtifacts;
-      
+
       try {
         foundArtifacts = MavenUtils.scanForMvnGoArtifacts(
                 this.getProject(),
@@ -150,15 +157,15 @@ public abstract class AbstractPackageGolangMojo extends AbstractGolangMojo {
       } catch (ArtifactResolverException ex) {
         throw new MojoFailureException("Can't resolve artifact", ex);
       }
-      
+
       if (foundArtifacts.isEmpty()) {
         getLog().debug("Mvn golang dependencies are not found");
         this.extraGoPathSectionInOsFormat = "";
       } else {
         getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
-        final File targetFolder = new File(this.getUnpackDependencyFolder());
-        getLog().debug("Depedencies will be unpacked into folder: " + targetFolder);
-        final List<File> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, targetFolder);
+        final File dependencyTempTargetFolder = new File(this.getDependencyTempFolder());
+        getLog().debug("Depedencies will be unpacked into folder: " + dependencyTempTargetFolder);
+        final List<File> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
 
         final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolders.toArray(new File[0]));
         getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);

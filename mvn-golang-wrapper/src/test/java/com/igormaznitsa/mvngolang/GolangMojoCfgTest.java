@@ -49,6 +49,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     final File pomFile = new File(GolangMojoCfgTest.class.getResource(pomName).toURI());
     final MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
     final ProjectBuildingRequest buildingRequest = executionRequest.getProjectBuildingRequest();
+    buildingRequest.setSystemProperties(System.getProperties());
     final ProjectBuilder projectBuilder = this.lookup(ProjectBuilder.class);
     final MavenProject project = projectBuilder.build(pomFile, buildingRequest).getProject();
     return klazz.cast(this.lookupConfiguredMojo(project, goal));
@@ -67,6 +68,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
+    assertTrue(customMojo.getDependencyTempFolder().endsWith(".__deps__"));
     assertTrue(customMojo.isScanDependencies());
     assertTrue(customMojo.isIncludeTestDependencies());
     assertTrue(customMojo.isFilterEnvPath());
@@ -122,7 +124,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertNotNull(jfrogCliMojo.getReportsFolder());
     assertFalse(jfrogCliMojo.isIgnoreErrorExitCode());
     assertEquals("387", jfrogCliMojo.getTarget386());
-    
+
     assertEqualsPath("some/jfrog", jfrogCliMojo.getCliPath());
     assertEquals("mc", jfrogCliMojo.getTarget());
     assertEquals("s", jfrogCliMojo.getCommand());
@@ -257,6 +259,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangTestMojoConfiguration() throws Exception {
     final GolangTestMojo testMojo = findMojo(GolangTestMojo.class, "mojoTest.xml", "test");
+    assertEquals("some/someTempFolder", testMojo.getDependencyTempFolder());
     assertFalse(testMojo.isScanDependencies());
     assertFalse(testMojo.isIncludeTestDependencies());
     assertEquals(60000, testMojo.getConnectionTimeout());
