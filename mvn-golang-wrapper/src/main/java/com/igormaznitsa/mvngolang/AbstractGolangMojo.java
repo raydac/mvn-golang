@@ -307,7 +307,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * The Go SDK version. It plays role if goRoot is undefined. Can be defined
    * through system property 'mvn.golang.go.version'
    */
-  @Parameter(name = "goVersion", required = true, property = "mvn.golang.go.version")
+  @Parameter(name = "goVersion", defaultValue = "1.11.5", property = "mvn.golang.go.version")
   private String goVersion;
 
   /**
@@ -787,7 +787,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isSkip() {
-    final String systemValue = this.getSession().getSystemProperties().getProperty("mvngo.skip", null);
+    final String systemValue = this.getSession().getSystemProperties().getProperty("mvn.golang.skip", null);
     return systemValue == null ?  this.skip : Boolean.parseBoolean(systemValue);
   }
 
@@ -1054,7 +1054,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isDisableSslCheck() {
-    final String systemValue = this.getSession().getSystemProperties().getProperty("mvngo.disable.ssl.check", null);
+    final String systemValue = this.getSession().getSystemProperties().getProperty("mvn.golang.disable.ssl.check", null);
     return systemValue == null ? this.disableSSLcheck : Boolean.parseBoolean(systemValue);
   }
 
