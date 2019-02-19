@@ -184,7 +184,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean useMavenProxy;
 
   /**
-   * Disable check of SSL certificate during HTTP request. Also can be changed by system property 'mvngo.disable.ssl.check'
+   * Disable check of SSL certificate during HTTP request. Also can be changed by system property 'mvn.golang.disable.ssl.check'
    *
    * @since 2.1.7
    */
@@ -209,7 +209,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private ProxySettings proxy;
 
   /**
-   * Skip execution of the mojo. Also can be disabled through system property `mvngo.skip'
+   * Skip execution of the mojo. Also can be disabled through system property `mvn.golang.skip'
    *
    * @since 2.1.2
    */
@@ -787,8 +787,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isSkip() {
-    final String systemValue = this.getSession().getSystemProperties().getProperty("mvn.golang.skip", null);
-    return systemValue == null ?  this.skip : Boolean.parseBoolean(systemValue);
+    return this.skip || Boolean.getBoolean("mvn.golang.skip");
   }
 
   public boolean isEnforceGoPathToEnd() {
@@ -1054,8 +1053,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isDisableSslCheck() {
-    final String systemValue = this.getSession().getSystemProperties().getProperty("mvn.golang.disable.ssl.check", null);
-    return systemValue == null ? this.disableSSLcheck : Boolean.parseBoolean(systemValue);
+    return this.disableSSLcheck || Boolean.getBoolean("mvn.golang.disable.ssl.check");
   }
 
   public void setDisableSslCheck(final boolean flag) {

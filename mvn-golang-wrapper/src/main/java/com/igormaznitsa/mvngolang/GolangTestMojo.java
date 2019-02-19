@@ -35,74 +35,79 @@ import java.util.List;
 @Mojo(name = "test", defaultPhase = LifecyclePhase.TEST, threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
-    /**
-     * List of test binary flags.
-     */
-    @Parameter(name = "testFlags")
-    private String[] testFlags;
+  /**
+   * List of test binary flags.
+   */
+  @Parameter(name = "testFlags")
+  private String[] testFlags;
 
-    @Nonnull
-    private String ensureGoExtension(@Nonnull final String name) {
-        return name.endsWith(".go") ? name : name + ".go";
-    }
+  @Nonnull
+  private String ensureGoExtension(@Nonnull final String name) {
+    return name.endsWith(".go") ? name : name + ".go";
+  }
 
-    @Override
-    @Nullable
-    @MustNotContainNull
-    protected String[] getDefaultPackages() {
-        final String definedTest = System.getProperty("test");
-        if (definedTest != null) {
-            final int index = definedTest.indexOf('#');
-            final String[] name;
-            if (index >= 0) {
-                name = new String[]{definedTest.substring(0, index), definedTest.substring(index + 1)};
-            } else {
-                name = new String[]{definedTest};
-            }
-            final List<String> result = new ArrayList<>();
-            result.add(ensureGoExtension(name[0]));
-            if (definedTest.length() > 1) {
-                result.add("-run");
-                result.add(name[1]);
-            }
-            return result.toArray(new String[result.size()]);
-        } else {
-            return new String[]{'.' + File.separator + "..."};
-        }
-    }
+  @Override
+  public boolean isSkip() {
+    return super.isSkip() || Boolean.getBoolean("skipTests") || Boolean.getBoolean("maven.test.skip");
+  }
 
-    @Override
-    public boolean isIgnoreErrorExitCode() {
-        return Boolean.parseBoolean(System.getProperty("maven.test.failure.ignore")) || super.isIgnoreErrorExitCode();
+  @Override
+  @Nullable
+  @MustNotContainNull
+  protected String[] getDefaultPackages() {
+    final String definedTest = System.getProperty("test");
+    if (definedTest != null) {
+      final int index = definedTest.indexOf('#');
+      final String[] name;
+      if (index >= 0) {
+        name = new String[]{definedTest.substring(0, index), definedTest.substring(index + 1)};
+      } else {
+        name = new String[]{definedTest};
+      }
+      final List<String> result = new ArrayList<>();
+      result.add(ensureGoExtension(name[0]));
+      if (definedTest.length() > 1) {
+        result.add("-run");
+        result.add(name[1]);
+      }
+      return result.toArray(new String[result.size()]);
+    } else {
+      return new String[]{'.' + File.separator + "..."};
     }
+  }
 
-    @Nullable
-    @MustNotContainNull
-    public String[] getTestFlags() {
-        return this.testFlags == null ? null : this.testFlags.clone();
-    }
+  @Override
+  public boolean isIgnoreErrorExitCode() {
+    return Boolean.parseBoolean(System.getProperty("maven.test.failure.ignore")) || super.isIgnoreErrorExitCode();
+  }
 
-    @Override
-    public boolean isSourceFolderRequired() {
-        return true;
-    }
+  @Nullable
+  @MustNotContainNull
+  public String[] getTestFlags() {
+    return this.testFlags == null ? null : this.testFlags.clone();
+  }
 
-    @Override
-    @Nonnull
-    @MustNotContainNull
-    public String[] getOptionalExtraTailArguments() {
-        return GetUtils.ensureNonNull(this.testFlags, ArrayUtils.EMPTY_STRING_ARRAY);
-    }
+  @Override
+  public boolean isSourceFolderRequired() {
+    return true;
+  }
 
-    @Override
-    @Nonnull
-    public String getGoCommand() {
-        return "test";
-    }
+  @Override
+  @Nonnull
+  @MustNotContainNull
+  public String[] getOptionalExtraTailArguments() {
+    return GetUtils.ensureNonNull(this.testFlags, ArrayUtils.EMPTY_STRING_ARRAY);
+  }
 
-    @Override
-    public boolean enforcePrintOutput() {
-        return true;
-    }
+  @Override
+  @Nonnull
+  public String getGoCommand() {
+    return "test";
+  }
+
+  @Override
+  public boolean enforcePrintOutput() {
+    return true;
+  }
 
 }
