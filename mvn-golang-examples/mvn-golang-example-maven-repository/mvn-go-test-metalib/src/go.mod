@@ -1,1 +1,1 @@
-module com.igormaznitsa/mvngotestmeta
+module com/igormaznitsa/mvngotestmeta
