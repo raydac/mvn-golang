@@ -135,11 +135,4 @@ public class GolangCleanMojo extends AbstractGoPackageAwareMojo {
       }
     }
   }
-
-  @Override
-  protected boolean processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
-    return false;
-  }
-
-
 }

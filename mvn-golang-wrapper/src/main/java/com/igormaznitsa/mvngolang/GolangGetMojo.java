@@ -744,6 +744,11 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
+  public boolean isCommandSupportVerbose() {
+    return true;
+  }
+
+  @Override
   protected boolean doesNeedOneMoreAttempt(@Nonnull final ProcessResult processResult, @Nonnull final String consoleOut, @Nonnull final String consoleErr) throws IOException, MojoExecutionException {
     boolean result = false;
     if (processResult.getExitValue() != 0) {

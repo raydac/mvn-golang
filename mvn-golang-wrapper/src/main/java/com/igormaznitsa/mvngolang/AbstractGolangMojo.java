@@ -148,7 +148,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
   private List<ArtifactRepository> remoteRepositories;
-  
+
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;
 
@@ -157,7 +157,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
   private MojoExecution execution;
-  
+
   /**
    * Flag shows that environment PATH variable should be filtered for footsteps
    * of other go/bin folders to prevent conflicts.
@@ -184,7 +184,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean useMavenProxy;
 
   /**
-   * Disable check of SSL certificate during HTTP request. Also can be changed by system property 'mvn.golang.disable.ssl.check'
+   * Disable check of SSL certificate during HTTP request. Also can be changed
+   * by system property 'mvn.golang.disable.ssl.check'
    *
    * @since 2.1.7
    */
@@ -209,7 +210,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private ProxySettings proxy;
 
   /**
-   * Skip execution of the mojo. Also can be disabled through system property `mvn.golang.skip'
+   * Skip execution of the mojo. Also can be disabled through system property
+   * `mvn.golang.skip'
    *
    * @since 2.1.2
    */
@@ -499,15 +501,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   public ArtifactResolver getArtifactResolver() {
-    return assertNotNull("Artifact resolver component is not provided by Maven",this.artifactResolver);
+    return assertNotNull("Artifact resolver component is not provided by Maven", this.artifactResolver);
   }
-  
+
   @Nonnull
   @MustNotContainNull
   public List<ArtifactRepository> getRemoteRepositories() {
     return this.remoteRepositories;
   }
-  
+
   @Nonnull
   private static String ensureNoSurroundingSlashes(@Nonnull final String str) {
     String result = str;
@@ -803,12 +805,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public MojoExecution getExecution() {
     return this.execution;
   }
-  
+
   @Nonnull
   public MavenSession getSession() {
     return this.session;
   }
-  
+
   public boolean isIgnoreErrorExitCode() {
     return this.ignoreErrorExitCode;
   }
@@ -1508,9 +1510,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         getLog().debug("ERR_LOG: " + errLog);
       }
 
-      if (error || this.processConsoleOut(resultCode, outLog, errLog)) {
-        printLogs(error || enforcePrintOutput(), outLog, errLog);
-      }
+      this.processConsoleOut(resultCode, outLog, errLog);
+      printLogs(error || enforcePrintOutput() || (this.isVerbose() && this.isCommandSupportVerbose()), error, outLog, errLog);
 
       if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
         if (iterations > maxAttempts) {
@@ -1539,7 +1540,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       doInit();
 
       printEcho();
-      
+
       final ProxySettings proxySettings = extractProxySettings();
       beforeExecution(proxySettings);
 
@@ -1557,10 +1558,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  public void doInit() throws MojoFailureException, MojoExecutionException{
-    
+  public void doInit() throws MojoFailureException, MojoExecutionException {
+
   }
-  
+
   public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
 
   }
@@ -1583,7 +1584,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return new String(this.consoleErrBuffer.toByteArray(), Charset.defaultCharset());
   }
 
-  protected void printLogs(final boolean forcePrint, @Nonnull final String outLog, @Nonnull final String errLog) {
+  protected void printLogs(final boolean forcePrint, final boolean errorDetected, @Nonnull final String outLog, @Nonnull final String errLog) {
     final boolean outLogNotEmpty = !outLog.isEmpty();
     final boolean errLogNotEmpty = !errLog.isEmpty();
 
@@ -1602,12 +1603,21 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (errLogNotEmpty) {
       if (forcePrint) {
-        getLog().error("");
-        getLog().error("---------Exec.Err---------");
-        for (final String str : errLog.split("\n")) {
-          getLog().error(StrUtils.trimRight(str));
+        if (errorDetected) {
+          getLog().error("");
+          getLog().error("---------Exec.Err---------");
+          for (final String str : errLog.split("\n")) {
+            getLog().error(StrUtils.trimRight(str));
+          }
+          getLog().error("");
+        } else {
+          getLog().warn("");
+          getLog().warn("---------Exec.Err---------");
+          for (final String str : errLog.split("\n")) {
+            getLog().warn(StrUtils.trimRight(str));
+          }
+          getLog().warn("");
         }
-        getLog().error("");
       } else {
         getLog().debug("---------Exec.Err---------");
         for (final String str : errLog.split("\n")) {
@@ -1740,8 +1750,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       commandLine.add(getGoCommand());
     }
 
+    boolean verboseAdded = false;
+
     for (final String s : getCommandFlags()) {
+      if (s.equals("-v")) {
+        verboseAdded = true;
+      }
       commandLine.add(s);
+    }
+    if (this.isVerbose() && !verboseAdded && isCommandSupportVerbose()) {
+      commandLine.add("-v");
     }
 
     for (final String s : getBuildFlags()) {
@@ -1857,7 +1875,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   /**
-   * Internal method which returns special part of GOPATH which can be formed by mojos. Must be either empty or contain folders divided by file path separator.
+   * Internal method which returns special part of GOPATH which can be formed by
+   * mojos. Must be either empty or contain folders divided by file path
+   * separator.
+   *
    * @return special part of GOPATH, must not be null, by default must be empty
    */
   @Nonnull
@@ -1874,7 +1895,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return result;
   }
 
-  protected boolean processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
+  public boolean isCommandSupportVerbose() {
+    return false;
+  }
+
+  protected void processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
     final File reportsFolderFile = new File(this.getReportsFolder());
 
     final String fileOut = this.getOutLogFile();
@@ -1908,8 +1933,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         throw new MojoExecutionException("Can't save console error log into file : " + fileToWriteErr, ex);
       }
     }
-
-    return true;
   }
 
 }
