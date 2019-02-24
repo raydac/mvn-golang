@@ -1,0 +1,1 @@
+module com.igormaznitsa/mvngotestmeta

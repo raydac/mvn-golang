@@ -44,6 +44,9 @@
             <goal>run</goal>
           </goals>
           <configuration>
+            <env>
+              <GO111MODULE>off</GO111MODULE>
+            </env>
             <packages>
               <package>main.go</package>
             </packages>
