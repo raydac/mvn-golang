@@ -1,7 +1,7 @@
 package mvngotesttwo
 
 import (
-	meta "com/igormaznitsa/mvngotestmeta"
+	meta "com.igormaznitsa/mvngotestmeta"
 	"fmt"
 )
 

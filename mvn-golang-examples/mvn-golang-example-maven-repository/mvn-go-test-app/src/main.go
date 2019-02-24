@@ -1,8 +1,8 @@
 package main
 
 import (
-	"com/igormaznitsa/mvngotest"
-	"com/igormaznitsa/mvngotesttwo"
+	"com.igormaznitsa/mvngotest"
+	"com.igormaznitsa/mvngotesttwo"
 )
 
 func main() {

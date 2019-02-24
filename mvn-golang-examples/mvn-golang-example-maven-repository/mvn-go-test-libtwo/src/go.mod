@@ -1,3 +1,3 @@
-module com/igormaznitsa/mvngotesttwo
+module com.igormaznitsa/mvngotesttwo
 
-require com/igormaznitsa/mvngotestmeta v0.0.0
+require com.igormaznitsa/mvngotestmeta v1.0.0
