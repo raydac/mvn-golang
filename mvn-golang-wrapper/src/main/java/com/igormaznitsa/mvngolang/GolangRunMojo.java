@@ -97,7 +97,7 @@ public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
-  public boolean enforcePrintOutput() {
+  public boolean isEnforcePrintOutput() {
     return true;
   }
 

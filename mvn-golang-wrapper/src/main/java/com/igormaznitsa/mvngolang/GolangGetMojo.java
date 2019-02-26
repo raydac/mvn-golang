@@ -129,7 +129,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   private String[] customCvsOptions;
 
   /**
-   * Custom executable file to be executed for branch, tag and revision
+   * Custom executable CVS file to be executed for branch, tag and revision
    * operations.
    *
    * @since 2.1.1
@@ -389,7 +389,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
-  public boolean enforcePrintOutput() {
+  public boolean isEnforcePrintOutput() {
     return true;
   }
 

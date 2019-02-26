@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import com.igormaznitsa.meta.common.utils.GetUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -22,27 +23,27 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import javax.annotation.Nonnull;
 
-
 /**
- * The Mojo allows to process commands which are not covered by MOJOs of the plug-in.
+ * The Mojo allows to process commands which are not covered by MOJOs of the
+ * plug-in.
  */
 @Mojo(name = "custom", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangCustomMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
-    /**
-     * Command for Go tool to be executed
-     */
-    @Parameter(name = "customCommand")
-    private String customCommand;
+  /**
+   * Command for Go tool to be executed
+   */
+  @Parameter(name = "customCommand", required = true)
+  private String customCommand;
 
-    @Override
-    @Nonnull
-    public String getGoCommand() {
-        return this.customCommand == null ? "" : this.customCommand;
-    }
+  @Override
+  @Nonnull
+  public String getGoCommand() {
+    return GetUtils.ensureNonNull(this.customCommand, "");
+  }
 
-    @Override
-    public boolean enforcePrintOutput() {
-        return true;
-    }
+  @Override
+  public boolean isEnforcePrintOutput() {
+    return true;
+  }
 }

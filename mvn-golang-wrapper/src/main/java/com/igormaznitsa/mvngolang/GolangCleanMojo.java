@@ -37,7 +37,7 @@ import java.io.IOException;
 public class GolangCleanMojo extends AbstractGoPackageAwareMojo {
 
   /**
-   * Clean the Go Path folder if it exists.
+   * Clean all folders provided by Go Path. <b>Be careful with the flag!</b>
    *
    * @since 2.1.1
    */
@@ -45,7 +45,7 @@ public class GolangCleanMojo extends AbstractGoPackageAwareMojo {
   private boolean cleanGoPath;
 
   /**
-   * Delete whole the Store folder.
+   * Delete plugin Golang store folder It is folder where the plugin keeps cached SDKs and packages.
    *
    * @since 2.1.1
    */

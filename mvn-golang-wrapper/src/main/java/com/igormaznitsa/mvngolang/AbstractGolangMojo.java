@@ -1511,7 +1511,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       }
 
       this.processConsoleOut(resultCode, outLog, errLog);
-      printLogs(error || enforcePrintOutput() || (this.isVerbose() && this.isCommandSupportVerbose()), error, outLog, errLog);
+      printLogs(error || isEnforcePrintOutput() || (this.isVerbose() && this.isCommandSupportVerbose()), error, outLog, errLog);
 
       if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
         if (iterations > maxAttempts) {
@@ -1570,7 +1570,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   }
 
-  public boolean enforcePrintOutput() {
+  public boolean isEnforcePrintOutput() {
     return false;
   }
 

@@ -50,7 +50,7 @@ public class GolangFmtMojo extends AbstractGoPackageAwareMojo {
     }
 
     @Override
-    public boolean enforcePrintOutput() {
+    public boolean isEnforcePrintOutput() {
         return true;
     }
 
