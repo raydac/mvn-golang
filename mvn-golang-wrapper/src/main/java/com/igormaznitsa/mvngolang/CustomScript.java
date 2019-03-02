@@ -20,7 +20,16 @@ package com.igormaznitsa.mvngolang;
  * @since 2.1.8
  */
 public class CustomScript {
+  /**
+   * Path to the script.
+   */
   public String path;
+  /**
+   * Options to be provided to the script.
+   */
   public String[] options;
+  /**
+   * If true then to not recognize execution error as fail.
+   */
   public boolean ignoreFail = false;
 }

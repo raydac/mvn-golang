@@ -32,10 +32,11 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
- * Minimalistic mojo provides way to call external JFrog CLI executable tool with environment
- * provided by the Golang wrapper and wrapped GoSDK.
- * JFrog CLI executable file can be downloaded
- * from <a href="https://jfrog.com/getcli/">the web page</a>
+ * Minimalistic mojo provides way to call external JFrog CLI executable tool
+ * with environment provided by the Golang wrapper and wrapped GoSDK.<b>JFrog
+ * CLI tool must be provided externally!</b>
+ * JFrog CLI executable file can be downloaded from
+ * <a href="https://jfrog.com/getcli/">the web page</a>
  * Documentation of the JFrog CLI can be found
  * <a href="https://www.jfrog.com/confluence/display/CLI/JFrog+CLI">here</a>.
  *
@@ -100,7 +101,7 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
   @Override
   protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException, MojoExecutionException {
     this.initConsoleBuffers();
-    
+
     final File goRoot = this.findGoRoot(proxySettings);
     final String gobin = this.getGoBin();
     final File[] gopathParts = findGoPath(true);
@@ -111,10 +112,10 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
     cliList.add(this.getTarget());
     cliList.add(this.getCommand());
 
-    this.getLog().info("JFrog CLI: "+ this.getCliPath());
-    this.getLog().info("   Target: "+ this.getTarget());
-    this.getLog().info("  Command: "+ this.getCommand());
-    
+    this.getLog().info("JFrog CLI: " + this.getCliPath());
+    this.getLog().info("   Target: " + this.getTarget());
+    this.getLog().info("  Command: " + this.getCommand());
+
     for (final String option : this.getArguments()) {
       cliList.add(option);
     }
@@ -132,7 +133,7 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
 
     this.registerEnvVars(result, goRoot, gobin, sourcesFile, gopathParts);
     this.registerOutputBuffers(result);
-    
+
     return result;
   }
 
