@@ -22,24 +22,7 @@ __2.2.0 (13-may-2018)__
  - added property `mvn.golang.go.version` to define value for `goVersion` configuration parameter, it allows decrease configuration section dramatically, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui/pom.xml)
  - added `externalPackageFile` (property `mvn.golang.get.packages.file`) option to the `get` mojo, it allows to keep package list in external file, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)
  - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
-
-__2.1.8 (29-apr-2018)__
- - added support of `maven.deploy.skip` and `maven.install.skip` prperties in `install` and `deploy` mojos
- - [#48](https://github.com/raydac/mvn-golang/issues/48) improved processing of `install` and `deploy` to be more compatible with standard maven process
- - fixed dependency for [termui test project in examples](./mvn-golang-examples/mvn-golang-example-termui)
- - added `customScript` section into `get` to execute some custom script over package CVS folder
-
-__2.1.7 (18-feb-2018)__
- - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
- - added `target386` to provide value for `$GO386` environment variable
- - improved GOPATH value processing, multi-folder value allowed
- - added flag to disable SSL certificate check for HTTPS connections, `disableSSLcheck`, by default it is `false`
- - improved Golang SDK list load [#24](https://github.com/raydac/mvn-golang/issues/24)
- - added `args` attribute to the `run` mojo to provide tail command line arguments.
- - added processing of maven session offline mode
- - improved proxy server settings processing to process NTLM authorisation
- - removed maven-enforcer-plugin because it throws NPE for old maven versions
-
+   
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
 # GO start!
