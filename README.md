@@ -66,7 +66,7 @@ On start the plug-in makes below steps:
 - analyzing the current platform to generate needed distributive name (it can be defined directly through properties)
 - check that needed Golang SDK is already cached, if it is not cached then needed SDK will be loaded and unpacked from the main Golang SDK site
 - execute needed go lang tool `bin/go` with defined command, the source folder will be set as current folder
-- since 2.1.0 version, all folders of the project which are visible for maven (source folder, test folder, resource folders and test resource folders) will be zipped and saved as artifact into local maven repository as a file with mvn-golang extension
+- all folders of the project which are visible for maven (source folder, test folder, resource folders and test resource folders) are archived in ZIP archive and saved as a maven artifact into local maven repository. ZIP artifact also contains information about dependencies which can be recognized by the plugin.
 
 # How to build
 Because it is maven plugin, to build the plugin just use
@@ -78,7 +78,7 @@ To save time, examples excluded from the main build process and activated throug
 mvn clean install -Pexamples
 ```
 # Important note about automatic Golang SDK load
-If you have some problems with certificates during Golang SDK load, then just add `<disableSSLcheck>true</disableSSLcheck>` into plugin configuration to ignore check of certificates. 
+If you have some problems with certificates during Golang SDK load, then just add `<disableSSLcheck>true</disableSSLcheck>` into plugin configuration to ignore check of certificates (also you can use property 'mvn.golang.disable.ssl.check'). 
 
 # How to add the plugin into maven project?
 Below described build section for simple golang project which keeps source in `src` forlder and result should be placed into `bin` folder. Because it is golang project and mvn-golang plugin provides its own lifecycle, packaging for the project should be `<packaging>mvn-golang</packaging>`
@@ -126,17 +126,18 @@ Plugin supports work with maven repository and can install and load dependencies
 </dependency>
 
 ```
-Plugin makes some trick in work with Golang dependencies, it downloads Golang artifacts from repository and unpack them into temporary folder, then all unpacked dependencies are added to `$GOPATH`. You can take a look at [example project which has two level dependency hierarchy](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-repository).
+Plugin makes some trick in work with Maven Golang dependencies, it downloads Golang artifacts from repository and unpack them into temporary folder, then all unpacked dependencies are added to `$GOPATH`. You can take a look at [example project which has two level dependency hierarchy](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-repository).
 Dependency mechanism is enabled by default for all goals which need it, but it can be off with `<scanDependencies>false</scanDependencies>`. If there is any conflicts or errors in Golang for Go modules then you can turn off Go modules with
 ```
 <env>
   <GO111MODULE>off</GO111MODULE>
-</env>
+</env> 
 ```
+__Keep in mind that it is impossible use links to Github and Bitbucket libraries through `<dependencies>` maven mechanism, links to such dependencies should be processed by standard `GET` command and information about it you can find below.__
 
 ## Wrapped GET command
 
-Since 2.2.0 version you can dramatically decrease configuration section to work with dependencies, now you can just define some external file contains package info through system property `mvn.golang.get.packages.file`, the file will be loaded and parsed and its definitions will be added into package depedencies.
+Plugin provides wrapper for Golang GET command and you can just define some external file contains package info through system property `mvn.golang.get.packages.file`, the file will be loaded and parsed and its definitions will be added into package depedencies.
 Format of the file is very easy. Each package described on a line in format `package: <PACKAGE_NAME>[,branch: <BRANCH>][,tag: <TAG>][,revision: <REVISION>]` also it supports single line comments through `//` and directive `#include <FILE_NAME>` to load packages from some external file. Also it supports interpolation of properties defined in format `${property.name}` and provide access to maven, system and environment variables.   
 Example:   
 ```
@@ -206,7 +207,7 @@ if you want to have several dependencies with different tag and branch then take
 sometime GIT can produce cache errors and in the case you can try to turn on auto-fix of such errors with `<autofixGitCache>true</autofixGitCache>` flag.   
 
 # How to save generated artifact in repository?
-The Wrapper during `install` phase collects all sources ande resources from folders defined in maven configuration and pack them as zip file, then the archive is saved in the local maven repository as new artifact with extension `mvn-golang`.   
+The Wrapper during `install` phase collects all sources ande resources from folders defined in maven configuration and pack them as zip file, then the archive is saved in the local maven repository as new artifact with zip extension and `mvn-golang` type.   
 If you want to save generated artifact then you can use snippet below
 ```
 <plugin>
