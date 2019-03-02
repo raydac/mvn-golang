@@ -27,7 +27,7 @@ __2.1.8 (29-apr-2018)__
  - added support of `maven.deploy.skip` and `maven.install.skip` prperties in `install` and `deploy` mojos
  - [#48](https://github.com/raydac/mvn-golang/issues/48) improved processing of `install` and `deploy` to be more compatible with standard maven process
  - fixed dependency for [termui test project in examples](./mvn-golang-examples/mvn-golang-example-termui)
- - added `customScript` section into `get` to execute some custom script over package CVS folder 
+ - added `customScript` section into `get` to execute some custom script over package CVS folder
 
 __2.1.7 (18-feb-2018)__
  - fixed target file extension in maven archetypes [#44](https://github.com/raydac/mvn-golang/issues/44)
@@ -66,7 +66,7 @@ On start the plug-in makes below steps:
 - analyzing the current platform to generate needed distributive name (it can be defined directly through properties)
 - check that needed Golang SDK is already cached, if it is not cached then needed SDK will be loaded and unpacked from the main Golang SDK site
 - execute needed go lang tool `bin/go` with defined command, the source folder will be set as current folder
-- all folders of the project which are visible for maven (source folder, test folder, resource folders and test resource folders) are archived in ZIP archive and saved as a maven artifact into local maven repository. ZIP artifact also contains information about dependencies which can be recognized by the plugin.
+- all folders of the project which are visible for maven (source folder, test folder, resource folders and test resource folders) are archived in ZIP file and the file is saved as a maven artifact into local maven repository (or remote maven repository). The generated ZIP artifact also contains information about dependencies which can be recognized by the plugin. In opposite to Java, Golang produces platform-dependent artifacts so that it doesn't make sense to share them through maven central but only resources and sources.  
 
 # How to build
 Because it is maven plugin, to build the plugin just use
@@ -78,7 +78,7 @@ To save time, examples excluded from the main build process and activated throug
 mvn clean install -Pexamples
 ```
 # Important note about automatic Golang SDK load
-If you have some problems with certificates during Golang SDK load, then just add `<disableSSLcheck>true</disableSSLcheck>` into plugin configuration to ignore check of certificates (also you can use property 'mvn.golang.disable.ssl.check'). 
+If you have some problems with certificates during Golang SDK load, then just add `<disableSSLcheck>true</disableSSLcheck>` into plugin configuration to ignore check of certificates (also you can use property 'mvn.golang.disable.ssl.check').
 
 # How to add the plugin into maven project?
 Below described build section for simple golang project which keeps source in `src` forlder and result should be placed into `bin` folder. Because it is golang project and mvn-golang plugin provides its own lifecycle, packaging for the project should be `<packaging>mvn-golang</packaging>`
@@ -131,7 +131,7 @@ Dependency mechanism is enabled by default for all goals which need it, but it c
 ```
 <env>
   <GO111MODULE>off</GO111MODULE>
-</env> 
+</env>
 ```
 __Keep in mind that it is impossible use links to Github and Bitbucket libraries through `<dependencies>` maven mechanism, links to such dependencies should be processed by standard `GET` command and information about it you can find below.__
 
@@ -144,7 +144,7 @@ Example:
 // example package file
 #include "${basedir}/external/file.txt"
 package:github.com/maruel/panicparse,tag:v1.0.2 // added because latest changes in panicparse is incompatible with termui
-package:github.com/gizak/termui,branch:v2 
+package:github.com/gizak/termui,branch:v2
 ```
 This mechanism just makes work with dependencies easier and if you want to provide some specific flags and scripts to process CVS folders you have to define configuration parameters in pom.xml, pacages defined in the external file and in the pom.xml will be mixed.
 
@@ -207,46 +207,21 @@ if you want to have several dependencies with different tag and branch then take
 sometime GIT can produce cache errors and in the case you can try to turn on auto-fix of such errors with `<autofixGitCache>true</autofixGitCache>` flag.   
 
 # How to save generated artifact in repository?
-The Wrapper during `install` phase collects all sources ande resources from folders defined in maven configuration and pack them as zip file, then the archive is saved in the local maven repository as new artifact with zip extension and `mvn-golang` type.   
-If you want to save generated artifact then you can use snippet below
-```
-<plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-install-plugin</artifactId>
-    <version>2.5.2</version>
-    <executions>
-      <execution>
-        <id>save-result-as-artifact</id>
-        <phase>install</phase>
-        <goals>
-          <goal>install-file</goal>
-        </goals>
-        <configuration>
-          <file>${basedir}${file.separator}bin${file.separator}${project.build.finalName}</file>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>${project.artifactId}-result</artifactId>
-          <version>${project.version}</version>
-          <!-- NB! packaging allows to select extension  -->
-          <packaging>bin</packaging>
-        </configuration>
-      </execution>
-    </executions>
-</plugin>
-```
-if you want to disable creation of artifact then you can use standard maven properties
+By default, artifact will be installed into maven repository automatically during `install` phase if you want to turn off artifact installation then you can use standard maven properties
 ```
 <properties>
     <maven.install.skip>true</maven.install.skip>
     <maven.deploy.skip>true</maven.deploy.skip>
 </properties>
 ```
-or disable mojo execution
+or disable plugin mojo execution
 ```
 <execution>
   <id>default-mvninstall</id>
   <phase>none</phase>
 </execution>
 ```
+
 # Configuration
 
 About configuration parameters, you can read at [the wiki page](https://github.com/raydac/mvn-golang/wiki/PluginConfigParameters).
@@ -277,6 +252,7 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
 ```
 
 # Some Examples
+ - __[Maven repository dependencies example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-repository)__
  - __["Hello world!" console application.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-helloworld)__
  - __[Console application with embedded text resource prepared with the `go-bindata` utility.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-genbindata)__
  - __[Console application with `termui` library (it needs installation of some native libraries!).](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)__
@@ -285,5 +261,3 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
  - __[Multimodule project.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-multimodule)__
  - __[Preprocessing.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-preprocessing)__
  - __[Versioning of dependencies](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/test-git-cvs)__
-
-Because NetBeans IDE is very well in its processing of Maven projects and strongly supports them just out of the box, I have made [small plugin for NetBeans IDE](https://github.com/raydac/nb-mvn-golang-plugin) which makes some automation of processing maven projects with the mvn golang plugin.
