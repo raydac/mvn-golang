@@ -1,4 +1,4 @@
-# __2.3.0 (SNAPSHOT)__
+# __2.3.0 (02-mar-2019)__
  - __added support of work with mvn-golang dependencies in maven repository, so now they can be used as just maven dependencies, it can be disabled through `scanDependencies` property. [example](./mvn-golang-examples/mvn-golang-example-maven-repository)__
  - __repository artifact extension changed to `zip` to provide way to be processed by standard maven plugins__
  - added support of system properties 'mvngo.skip' and `mvngo.disable.ssl.check`
