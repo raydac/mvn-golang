@@ -22,7 +22,7 @@ __2.2.0 (13-may-2018)__
  - added property `mvn.golang.go.version` to define value for `goVersion` configuration parameter, it allows decrease configuration section dramatically, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui/pom.xml)
  - added `externalPackageFile` (property `mvn.golang.get.packages.file`) option to the `get` mojo, it allows to keep package list in external file, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)
  - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
-   
+
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
 # GO start!
@@ -68,17 +68,16 @@ Below described build section for simple golang project which keeps source in `s
 
 ```
 <build>
+    <!--Changing standard Maven project source structure to make it Go compatible-->
     <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
     <directory>${basedir}${file.separator}bin</directory>
+
     <plugins>
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>2.3.0</version>
         <extensions>true</extensions>
-        <configuration>
-          <goVersion>1.12</goVersion>
-        </configuration>
         <executions>
           <execution>
             <goals>
