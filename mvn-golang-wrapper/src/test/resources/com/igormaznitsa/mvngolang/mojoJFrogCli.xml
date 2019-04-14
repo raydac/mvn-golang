@@ -26,6 +26,7 @@
                   <goRoot>some/root</goRoot>
                   <goPath>some/path</goPath>
                   <sources>some/sources</sources>
+                  <goCache>some/path/cache</goCache>
 
                   <cliPath>some/jfrog</cliPath>
                   <target>mc</target>

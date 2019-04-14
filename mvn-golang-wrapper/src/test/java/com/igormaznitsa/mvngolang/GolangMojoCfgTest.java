@@ -68,6 +68,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangCustomMojoConfiguration() throws Exception {
     final GolangCustomMojo customMojo = findMojo(GolangCustomMojo.class, "mojoCustom.xml", "custom");
+    assertTrue(customMojo.getGoCache().contains("${file.separator}"));
     assertTrue(customMojo.getDependencyTempFolder().endsWith(".__deps__"));
     assertTrue(customMojo.isScanDependencies());
     assertTrue(customMojo.isIncludeTestDependencies());
@@ -103,6 +104,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   public void testGolangJfrogCliMojoConfiguration() throws Exception {
     final GolangJfrogCliMojo jfrogCliMojo = findMojo(GolangJfrogCliMojo.class, "mojoJFrogCli.xml", "jfrog-cli");
     assertEquals(60000,jfrogCliMojo.getConnectionTimeout());
+    assertEquals(jfrogCliMojo.getGoCache(), "some/path/cache");
     assertFalse(jfrogCliMojo.isCheckSdkHash());
     assertFalse(jfrogCliMojo.isDisableSslCheck());
     assertFalse(jfrogCliMojo.isUseMavenProxy());

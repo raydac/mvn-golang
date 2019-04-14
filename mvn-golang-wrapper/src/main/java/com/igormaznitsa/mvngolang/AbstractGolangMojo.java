@@ -313,6 +313,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String goVersion;
 
   /**
+   * Cache directory to keep build data. It affects GOCACHE environment
+   * variable. By default it is turned off by value `off`
+   *
+   * @since 2.3.1
+   */
+  @Parameter(name = "goCache", defaultValue = "${project.build.directory}${file.separator}.goBuildCache")
+  private String goCache;
+
+  /**
    * The Go home folder. It can be undefined and in the case the plug-in will
    * make automatic business to find SDK in its cache or download it.
    */
@@ -1008,6 +1017,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nullable
   public String getGoRoot() {
     return getValueOrEnv("GOROOT", this.goRoot);
+  }
+
+  @Nullable
+  public String getGoCache() {
+    return getValueOrEnv("GOCACHE", this.goCache);
   }
 
   @Nullable
@@ -1721,6 +1735,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
     final File detectedRoot = findGoRoot(proxySettings);
     final String gobin = getGoBin();
+    final String gocache = getGoCache();
     final File[] gopathParts = findGoPath(true);
 
     if (isMojoMustNotBeExecuted()) {
@@ -1800,7 +1815,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     logOptionally("");
 
-    registerEnvVars(result, detectedRoot, gobin, sourcesFile, gopathParts);
+    registerEnvVars(result, detectedRoot, gobin, gocache, sourcesFile, gopathParts);
 
     logOptionally("........................");
 
@@ -1818,6 +1833,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           @Nonnull final ProcessExecutor result,
           @Nonnull final File theGoRoot,
           @Nullable final String theGoBin,
+          @Nullable final String theGoCache,
           @Nonnull final File sourcesFile,
           @MustNotContainNull @Nonnull final File[] goPathParts
   ) throws IOException {
@@ -1839,6 +1855,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       addEnvVar(result, "GOBIN", theGoBin);
     }
 
+    if (theGoBin == null) {
+      getLog().warn("GOCACHE is not provided by direct order");
+    } else {
+      addEnvVar(result, "GOCACHE", theGoCache);
+    }
+    
     final String trgtOs = this.getTargetOS();
     final String trgtArch = this.getTargetArch();
     final String trgtArm = this.getTargetArm();

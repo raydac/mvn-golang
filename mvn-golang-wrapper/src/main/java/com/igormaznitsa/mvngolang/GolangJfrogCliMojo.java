@@ -104,6 +104,7 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
 
     final File goRoot = this.findGoRoot(proxySettings);
     final String gobin = this.getGoBin();
+    final String gocache = this.getGoCache();
     final File[] gopathParts = findGoPath(true);
 
     final List<String> cliList = new ArrayList<>();
@@ -131,7 +132,7 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
       result.directory(sourcesFile);
     }
 
-    this.registerEnvVars(result, goRoot, gobin, sourcesFile, gopathParts);
+    this.registerEnvVars(result, goRoot, gobin, gocache, sourcesFile, gopathParts);
     this.registerOutputBuffers(result);
 
     return result;
