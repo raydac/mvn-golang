@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * The Mojo wraps the 'build' command.
@@ -198,9 +199,11 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
       }
       flags.add(buffer.toString());
     }
-
-    flags.add("-o");
-    flags.add(getResultFile().getAbsolutePath());
+    // multiple packages fix - go build: cannot use -o with multiple packages
+    if (requireNonNull(getPackages()).length < 2) {
+      flags.add("-o");
+      flags.add(getResultFile().getAbsolutePath());
+    }
 
     return flags.toArray(new String[flags.size()]);
   }

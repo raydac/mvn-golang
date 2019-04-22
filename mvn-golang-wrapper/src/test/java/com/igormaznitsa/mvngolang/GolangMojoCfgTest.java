@@ -28,6 +28,12 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static java.util.Arrays.asList;
+import static java.util.Arrays.copyOfRange;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 
 public class GolangMojoCfgTest extends AbstractMojoTestCase {
@@ -401,6 +407,15 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("somevalue", buildMojo.getEnv().get("somekey"));
     assertEquals("bin/misc", buildMojo.getExecSubpath());
     assertEquals("gomobile", buildMojo.getExec());
+    // multiple package test
+    assertEquals(2, buildMojo.getPackages().length);
+    assertThat(asList(buildMojo.getCommandFlags()), not(hasItem("-o")));
+    assertThat(asList(buildMojo.getCommandFlags()), not(hasItem(endsWith("targetName"))));
+    // single package test
+    buildMojo.setPackages(copyOfRange(buildMojo.getPackages(), 0, 1));
+    assertEquals(1, buildMojo.getPackages().length);
+    assertThat(asList(buildMojo.getCommandFlags()), hasItem("-o"));
+    assertThat(asList(buildMojo.getCommandFlags()), hasItem(endsWith("targetName")));
   }
 
 }
