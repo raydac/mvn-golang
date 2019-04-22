@@ -16,23 +16,20 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import static java.util.Objects.requireNonNull;
 
 /**
  * The Mojo wraps the 'build' command.
@@ -154,7 +151,12 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     final String[] currentPackages = this.getPackages();
 
     if (currentPackages != null && currentPackages.length > 1) {
-      this.getLog().warn("Target file is ignored because allowed only when compiling a single package,");
+      getLog().warn(String.format(
+              "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%n"
+              + "!Result file output is ignored because non-single package!%n"
+              + "!            see: 'go help build' for more info          !%n"
+              + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+      );
     }
   }
 
@@ -215,7 +217,9 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
       flags.add(buffer.toString());
     }
 
-    if (requireNonNull(getPackages()).length < 2) {
+    final String[] selectedPackages = this.getPackages();
+
+    if (selectedPackages == null || selectedPackages.length < 2) {
       flags.add("-o");
       flags.add(getResultFile().getAbsolutePath());
     }
