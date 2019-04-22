@@ -120,9 +120,17 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return assertNotNull(this.resultFolder);
   }
 
+  public void setResultFolder(@Nonnull final String folder) {
+    this.resultFolder = assertNotNull(folder);
+  }
+
   @Nonnull
   public String getResultName() {
     return assertNotNull(this.resultName);
+  }
+
+  public void setResultName(@Nonnull final String resultName) {
+    this.resultName = assertNotNull(resultName);
   }
 
   @Override
@@ -134,12 +142,19 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Override
   public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException {
     final File folder = new File(getResultFolder());
+
     if (!folder.isDirectory() && !folder.mkdirs()) {
       throw new MojoFailureException("Can't create folder : " + folder);
     }
 
     if (isVerbose() || !"default".equals(this.buildMode)) {
       getLog().info("Build mode : " + this.buildMode);
+    }
+
+    final String[] currentPackages = this.getPackages();
+
+    if (currentPackages != null && currentPackages.length > 1) {
+      this.getLog().warn("Target file is ignored because allowed only when compiling a single package,");
     }
   }
 
@@ -199,7 +214,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
       }
       flags.add(buffer.toString());
     }
-    // multiple packages fix - go build: cannot use -o with multiple packages
+
     if (requireNonNull(getPackages()).length < 2) {
       flags.add("-o");
       flags.add(getResultFile().getAbsolutePath());

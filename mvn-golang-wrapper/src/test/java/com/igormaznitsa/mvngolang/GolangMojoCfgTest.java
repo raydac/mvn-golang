@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.mvngolang.utils.IOUtils;
@@ -28,12 +27,6 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static java.util.Arrays.asList;
-import static java.util.Arrays.copyOfRange;
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 
 public class GolangMojoCfgTest extends AbstractMojoTestCase {
@@ -79,7 +72,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertTrue(customMojo.isScanDependencies());
     assertTrue(customMojo.isIncludeTestDependencies());
     assertTrue(customMojo.isFilterEnvPath());
-    assertEquals(60000,customMojo.getConnectionTimeout());
+    assertEquals(60000, customMojo.getConnectionTimeout());
     assertFalse(customMojo.isCheckSdkHash());
     assertFalse(customMojo.isDisableSslCheck());
     assertFalse(customMojo.isUseMavenProxy());
@@ -97,8 +90,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", customMojo.getSources(false).getPath());
     assertEqualsPath("some/root", customMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(customMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, customMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, customMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, customMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, customMojo.getBuildFlags());
     assertNull(customMojo.getErrLogFile());
     assertNull(customMojo.getOutLogFile());
     assertNotNull(customMojo.getReportsFolder());
@@ -109,7 +102,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
   @Test
   public void testGolangJfrogCliMojoConfiguration() throws Exception {
     final GolangJfrogCliMojo jfrogCliMojo = findMojo(GolangJfrogCliMojo.class, "mojoJFrogCli.xml", "jfrog-cli");
-    assertEquals(60000,jfrogCliMojo.getConnectionTimeout());
+    assertEquals(60000, jfrogCliMojo.getConnectionTimeout());
     assertEquals(jfrogCliMojo.getGoCache(), "some/path/cache");
     assertFalse(jfrogCliMojo.isCheckSdkHash());
     assertFalse(jfrogCliMojo.isDisableSslCheck());
@@ -157,8 +150,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", cleanMojo.getSources(false).getPath());
     assertEqualsPath("some/root", cleanMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(cleanMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, cleanMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, cleanMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, cleanMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, cleanMojo.getBuildFlags());
     assertNull(cleanMojo.getTarget386());
   }
 
@@ -184,8 +177,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", fixMojo.getSources(false).getPath());
     assertEqualsPath("some/root", fixMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(fixMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, fixMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, fixMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, fixMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, fixMojo.getBuildFlags());
   }
 
   @Test
@@ -203,8 +196,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", fmtMojo.getSources(false).getPath());
     assertEqualsPath("some/root", fmtMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(fmtMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, fmtMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, fmtMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, fmtMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, fmtMojo.getBuildFlags());
   }
 
   @Test
@@ -222,8 +215,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", genMojo.getSources(false).getPath());
     assertEqualsPath("some/root", genMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(genMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, genMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, genMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, genMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, genMojo.getBuildFlags());
   }
 
   @Test
@@ -241,8 +234,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", instMojo.getSources(false).getPath());
     assertEqualsPath("some/root", instMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(instMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, instMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, instMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, instMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, instMojo.getBuildFlags());
   }
 
   @Test
@@ -260,8 +253,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", vetMojo.getSources(false).getPath());
     assertEqualsPath("some/root", vetMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(vetMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, vetMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, vetMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, vetMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, vetMojo.getBuildFlags());
   }
 
   @Test
@@ -282,9 +275,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", testMojo.getSources(false).getPath());
     assertEqualsPath("some/root", testMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(testMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, testMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, testMojo.getBuildFlags());
-    assertArrayEquals(new String[] {"binFlag1", "binFlag2"}, testMojo.getTestFlags());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, testMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, testMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"binFlag1", "binFlag2"}, testMojo.getTestFlags());
     assertTrue(testMojo.isIgnoreErrorExitCode());
   }
 
@@ -304,9 +297,9 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("theCommand", toolMojo.getCommand());
     assertEqualsPath("some/root", toolMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(toolMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"theCommand", "arg1", "arg2"}, toolMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, toolMojo.getBuildFlags());
-    assertArrayEquals(new String[] {"arg1", "arg2"}, toolMojo.getArgs());
+    assertArrayEquals(new String[]{"theCommand", "arg1", "arg2"}, toolMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, toolMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"arg1", "arg2"}, toolMojo.getArgs());
   }
 
   @Test
@@ -325,8 +318,8 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("main.go", runMojo.getPackages()[0]);
     assertEqualsPath("some/root", runMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(runMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"arg1", "arg2"}, runMojo.getArgs());
-    assertArrayEquals(new String[] {"main.go", "arg1", "arg2"}, runMojo.getTailArguments());
+    assertArrayEquals(new String[]{"arg1", "arg2"}, runMojo.getArgs());
+    assertArrayEquals(new String[]{"main.go", "arg1", "arg2"}, runMojo.getTailArguments());
   }
 
   @Test
@@ -354,7 +347,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertTrue(getMojo.isDisableCvsAutosearch());
     assertEquals("some/relative/path", getMojo.getRelativePathToCvsFolder());
 
-    assertArrayEquals(new String[] {"one", "two", "three", "four"}, getMojo.getCustomCvsOptions());
+    assertArrayEquals(new String[]{"one", "two", "three", "four"}, getMojo.getCustomCvsOptions());
 
     assertEquals("some/custom/exe.exe", getMojo.getCvsExe());
     assertTrue(getMojo.isEnforceDeletePackageFiles());
@@ -370,7 +363,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/sources", getMojo.getSources(false).getPath());
     assertEqualsPath("some/root", getMojo.getGoRoot());
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(getMojo.findGoPath(false)));
-    assertArrayEquals(new String[] {"flag1", "flag2"}, getMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, getMojo.getBuildFlags());
 //    assertEquals("test.txt",getMojo.getExternalPackageFile());
     assertEquals("bin", getMojo.getExecSubpath());
     assertEquals("go", getMojo.getExec());
@@ -400,22 +393,13 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEqualsPath("some/path", IOUtils.makeOsFilePathWithoutDuplications(buildMojo.findGoPath(false)));
     assertEqualsPath("target/place", buildMojo.getResultFolder());
     assertEquals("targetName", buildMojo.getResultName());
-    assertArrayEquals(new String[] {"one_pack", "two_pack"}, buildMojo.getTailArguments());
-    assertArrayEquals(new String[] {"flag1", "flag2"}, buildMojo.getBuildFlags());
-    assertArrayEquals(new String[] {"-extldflags", "\"-static\""}, buildMojo.getLdflagsAsList().toArray());
+    assertArrayEquals(new String[]{"one_pack", "two_pack"}, buildMojo.getTailArguments());
+    assertArrayEquals(new String[]{"flag1", "flag2"}, buildMojo.getBuildFlags());
+    assertArrayEquals(new String[]{"-extldflags", "\"-static\""}, buildMojo.getLdflagsAsList().toArray());
     assertEquals(1, buildMojo.getEnv().size());
     assertEquals("somevalue", buildMojo.getEnv().get("somekey"));
     assertEquals("bin/misc", buildMojo.getExecSubpath());
     assertEquals("gomobile", buildMojo.getExec());
-    // multiple package test
-    assertEquals(2, buildMojo.getPackages().length);
-    assertThat(asList(buildMojo.getCommandFlags()), not(hasItem("-o")));
-    assertThat(asList(buildMojo.getCommandFlags()), not(hasItem(endsWith("targetName"))));
-    // single package test
-    buildMojo.setPackages(copyOfRange(buildMojo.getPackages(), 0, 1));
-    assertEquals(1, buildMojo.getPackages().length);
-    assertThat(asList(buildMojo.getCommandFlags()), hasItem("-o"));
-    assertThat(asList(buildMojo.getCommandFlags()), hasItem(endsWith("targetName")));
   }
 
 }
