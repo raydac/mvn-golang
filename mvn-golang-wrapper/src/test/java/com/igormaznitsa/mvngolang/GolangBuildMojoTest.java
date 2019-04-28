@@ -16,39 +16,43 @@
 package com.igormaznitsa.mvngolang;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import static java.util.Arrays.asList;
-import static java.util.Arrays.copyOfRange;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GolangBuildMojoTest {
 
-  private GolangBuildMojo makeBuildMojo() {
-    final GolangBuildMojo buildMojo = new GolangBuildMojo();
+  @Test
+  public void testPackageTest_Multiple() throws Exception {
+    final GolangBuildMojo buildMojo = new SpyGolangBuildMojo();
     buildMojo.setPackages(new String[]{"some.pack1", "some.pack2"});
     buildMojo.setResultFolder("some/folder");
     buildMojo.setResultName("targetName");
-    return buildMojo;
-  }
-
-  @Test
-  public void testPackageTest_Multiple() throws Exception {
-    final GolangBuildMojo buildMojo = makeBuildMojo();
     assertTrue(buildMojo.getPackages().length > 1);
+    // multiple packages should be install
+    assertEquals("install", buildMojo.getGoCommand());
     assertThat(asList(buildMojo.getCommandFlags()), not(hasItem("-o")));
     assertThat(asList(buildMojo.getCommandFlags()), not(hasItem(endsWith("targetName"))));
+    buildMojo.afterExecution(null, false);
   }
 
   @Test
   public void testPackageTest_Single() throws Exception {
-    final GolangBuildMojo buildMojo = makeBuildMojo();
-    buildMojo.setPackages(copyOfRange(buildMojo.getPackages(), 0, 1));
+    final GolangBuildMojo buildMojo = new SpyGolangBuildMojo();
+    buildMojo.setPackages(new String[]{"some.pack1"});
+    buildMojo.setResultFolder("some/folder");
+    buildMojo.setResultName("targetName");
     assertEquals(1, buildMojo.getPackages().length);
+    // single package should be build
+    assertEquals("build", buildMojo.getGoCommand());
     assertThat(asList(buildMojo.getCommandFlags()), hasItem("-o"));
     assertThat(asList(buildMojo.getCommandFlags()), hasItem(endsWith("targetName")));
+    buildMojo.afterExecution(null, false);
   }
 
 }

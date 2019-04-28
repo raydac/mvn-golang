@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static java.util.Arrays.copyOfRange;
 import static org.junit.Assert.assertArrayEquals;
 
 public class GolangMojoCfgTest extends AbstractMojoTestCase {
@@ -382,7 +383,6 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertEquals("someos", buildMojo.getTargetOS());
     assertEquals("5566677", buildMojo.getTargetArm());
     assertFalse(buildMojo.isUseEnvVars());
-    assertEquals("build", buildMojo.getGoCommand());
     assertEquals("someGo.bat", buildMojo.getUseGoTool());
     assertFalse(buildMojo.isVerbose());
     assertFalse(buildMojo.isHideBanner());

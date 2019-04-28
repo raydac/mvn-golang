@@ -133,7 +133,10 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Override
   @Nonnull
   public String getGoCommand() {
-    return "build";
+    if (isSinglePackage()) {
+      return "build";
+    }
+    return "install";
   }
 
   @Override
@@ -147,38 +150,52 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     if (isVerbose() || !"default".equals(this.buildMode)) {
       getLog().info("Build mode : " + this.buildMode);
     }
-
-    final String[] currentPackages = this.getPackages();
-
-    if (currentPackages != null && currentPackages.length > 1) {
-      getLog().warn(String.format(
-              "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%n"
-              + "!Result file output is ignored because non-single package!%n"
-              + "!            see: 'go help build' for more info          !%n"
-              + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-      );
-    }
   }
 
   @Override
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException {
     if (!error) {
-      final File resultFile = getResultFile();
-      // check that it exists
-      if (!resultFile.isFile()) {
-        throw new MojoFailureException("Can't find generated target file : " + resultFile);
+      File resultFile = getResultFile();
+      if (this.isSinglePackage()) {
+        afterExecutionResultFile(resultFile);
+        return;
       }
-      // softly try to make it executable
-      try {
-        if (!resultFile.setExecutable(true)) {
-          getLog().warn("Can't make result file executable : " + resultFile);
+      // check multiple packages
+      final String[] selectedPackages = this.getPackages();
+      assert selectedPackages != null;
+      for (String packagePath : selectedPackages) {
+        if (packagePath == null) {
+          continue;
         }
-      } catch (SecurityException ex) {
-        getLog().warn("Security exception during executable flag set : " + resultFile);
+        // get filename from path (ex. cmd/pack1)
+        int l = packagePath.lastIndexOf(File.separatorChar);
+        if (packagePath.length() > l && l > -1) {
+          resultFile = new File(getResultFolder(), packagePath.substring(l + 1));
+        }
+        else {
+          resultFile = new File(getResultFolder(), packagePath);
+        }
+        afterExecutionResultFile(resultFile);
       }
-
-      getLog().info("The Result file has been successfuly created : " + resultFile);
     }
+  }
+
+  //  @VisibleForTesting
+  protected void afterExecutionResultFile(@Nonnull File resultFile) throws MojoFailureException {
+    // check that it exists
+    if (!resultFile.isFile()) {
+      throw new MojoFailureException("Can't find generated target file : " + resultFile);
+    }
+    // softly try to make it executable
+    try {
+      if (!resultFile.setExecutable(true)) {
+        getLog().warn("Can't make result file executable : " + resultFile);
+      }
+    } catch (SecurityException ex) {
+      getLog().warn("Security exception during executable flag set : " + resultFile);
+    }
+
+    getLog().info("The Result file has been successfully created : " + resultFile);
   }
 
   @Override
@@ -217,9 +234,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
       flags.add(buffer.toString());
     }
 
-    final String[] selectedPackages = this.getPackages();
-
-    if (selectedPackages == null || selectedPackages.length < 2) {
+    if (isSinglePackage()) {
       flags.add("-o");
       flags.add(getResultFile().getAbsolutePath());
     }
@@ -227,4 +242,12 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return flags.toArray(new String[flags.size()]);
   }
 
+  /**
+   * isSinglePackage
+   * @return true if no packages or one package, otherwise false
+   */
+  private boolean isSinglePackage() {
+    final String[] selectedPackages = this.getPackages();
+    return (selectedPackages == null || selectedPackages.length < 2);
+  }
 }
