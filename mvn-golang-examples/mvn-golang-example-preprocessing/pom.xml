@@ -16,7 +16,7 @@
   <description>Example of Java Comment Preprocessor with GoLang.</description>
 
   <properties>
-    <src.preprocessed>${basedir}${file.separator}.preprocessed_src</src.preprocessed>
+    <src.preprocessed>${project.build.directory}${file.separator}.preprocessed_src</src.preprocessed>
   </properties>
 
   <build>
