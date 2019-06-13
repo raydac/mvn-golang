@@ -8,6 +8,9 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.3.2 SNAPSHOT__
+ - default version of GoSDK updated to 1.12.6
+
 __2.3.1 (14-apr-2019)__
  - default version of GoSDK updated to 1.12.4
  - added parameter `goCache` to provide `GOCACHE` environment variable, the default value is `${project.build.directory}/.goBuildCache`
