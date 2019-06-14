@@ -34,7 +34,7 @@ import java.util.List;
  * @since 2.0.0
  */
 @SuppressWarnings("SpellCheckingInspection")
-@Mojo(name = "run", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
+@Mojo(name = "run", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**
