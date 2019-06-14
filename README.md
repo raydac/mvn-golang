@@ -9,6 +9,7 @@
 
 # Changelog
 __2.3.2 SNAPSHOT__
+ - fixed `mvn-golang:vet does not have maven dependency resolution` [#59](https://github.com/raydac/mvn-golang/issues/59)
  - default version of GoSDK updated to 1.12.6
 
 __2.3.1 (14-apr-2019)__

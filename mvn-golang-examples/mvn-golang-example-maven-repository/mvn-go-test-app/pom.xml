@@ -39,20 +39,27 @@
           <goVersion>${go.sdk.version}</goVersion>
         </configuration>
         <executions>
-        <execution>
-          <goals>
-            <goal>run</goal>
-          </goals>
-          <configuration>
-            <env>
-              <GO111MODULE>off</GO111MODULE>
-            </env>
-            <packages>
-              <package>main.go</package>
-            </packages>
-          </configuration>
-        </execution>
-      </executions>
+          <execution>
+            <id>do-vet</id>
+            <goals>
+              <goal>vet</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>do-run</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <env>
+                <GO111MODULE>off</GO111MODULE>
+              </env>
+              <packages>
+                <package>main.go</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
