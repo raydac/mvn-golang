@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * The Mojo wraps the 'vet' command.
  */
-@Mojo(name = "vet", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
+@Mojo(name = "vet", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangVetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     @Override
