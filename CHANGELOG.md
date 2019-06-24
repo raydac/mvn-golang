@@ -1,4 +1,5 @@
-# __2.3.2 SNAPSHOT__
+# __2.3.2 (24-jun-2019)__
+ - updated maven archetypes
  - fixed `mvn-golang:vet does not have maven dependency resolution` [#59](https://github.com/raydac/mvn-golang/issues/59)
  - default version of GoSDK updated to 1.12.6
 
