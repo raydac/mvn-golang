@@ -16,16 +16,16 @@
       <directory>${project.basedir}/../app-1/bin</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
-        <include>app-1-${project.version}</include>
-        <include>app-1-${project.version}.exe</include>
+        <include>${artifactId}-app-1-${project.version}</include>
+        <include>${artifactId}-app-1-${project.version}.exe</include>
       </includes>
     </fileSet>
     <fileSet>
       <directory>${project.basedir}/../app-2/bin</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
-        <include>app-2-${project.version}</include>
-        <include>app-2-${project.version}.exe</include>
+        <include>${artifactId}-app-2-${project.version}</include>
+        <include>${artifactId}-app-2-${project.version}.exe</include>
       </includes>
     </fileSet>
   </fileSets>

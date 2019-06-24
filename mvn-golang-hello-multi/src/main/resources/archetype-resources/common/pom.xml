@@ -12,15 +12,10 @@
     <version>${version}</version>
   </parent>
 
-  <artifactId>common</artifactId>
+  <artifactId>${artifactId}-common</artifactId>
   <packaging>mvn-golang</packaging>
 
   <name>Common</name>
-
-  <properties>
-      <maven.install.skip>true</maven.install.skip>
-      <maven.deploy.skip>true</maven.deploy.skip>
-  </properties>
 
   <build>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
@@ -38,6 +33,11 @@
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${dollar}{go.wrapper.plugin.version}</version>
         <extensions>true</extensions>
+        <configuration>
+          <env>
+            <GO111MODULE>off</GO111MODULE>
+          </env>
+        </configuration>
         <executions>
           <execution>
             <id>default-build</id>

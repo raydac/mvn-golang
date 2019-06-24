@@ -12,10 +12,19 @@
     <version>${version}</version>
   </parent>
 
-  <artifactId>app-1</artifactId>
+  <artifactId>${artifactId}-app-1</artifactId>
   <packaging>mvn-golang</packaging>
 
   <name>App-1</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>${artifactId}-common</artifactId>
+      <version>${version}</version>
+      <type>mvn-golang</type>
+    </dependency>
+  </dependencies>
 
   <build>
     <sourceDirectory>${dollar}{basedir}${dollar}{file.separator}src</sourceDirectory>
@@ -35,9 +44,11 @@
         <version>${dollar}{go.wrapper.plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
-          <addToGoPath>
-            <common>${dollar}{basedir}${dollar}{file.separator}..${dollar}{file.separator}common</common>
-          </addToGoPath>
+          <configuration>
+            <env>
+              <GO111MODULE>off</GO111MODULE>
+            </env>
+          </configuration>
         </configuration>
       </plugin>
     </plugins>

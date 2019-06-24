@@ -11,7 +11,7 @@
     <version>${version}</version>
   </parent>
     
-  <artifactId>assembly-results</artifactId>
+  <artifactId>${artifactId}-assembly-results</artifactId>
   <packaging>pom</packaging>
     
   <name>Assembly results</name>
@@ -19,13 +19,13 @@
   <dependencies>
     <dependency>
       <groupId>${dollar}{project.groupId}</groupId>
-      <artifactId>app-1</artifactId>
+      <artifactId>${artifactId}-app-1</artifactId>
       <version>${dollar}{project.version}</version>
       <type>mvn-golang</type>
     </dependency>
     <dependency>
       <groupId>${dollar}{project.groupId}</groupId>
-      <artifactId>app-2</artifactId>
+      <artifactId>${artifactId}-app-2</artifactId>
       <version>${dollar}{project.version}</version>
       <type>mvn-golang</type>
     </dependency>
