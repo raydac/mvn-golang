@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
@@ -31,6 +32,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
@@ -64,6 +66,14 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
    * @since 2.3.0
    */
   public static final String MVNGOLANG_DEPENDENCIES_FILE = ".mvn-golang-dependencies";
+
+  /**
+   * Special file contains list of project source and resource folders which
+   * play role in project build.
+   *
+   * @since 2.3.3
+   */
+  public static final String MVNGOLANG_BUILD_FOLDERS_FILE = ".mvn-golang-build-folders";
 
   @Component
   protected RepositoryManager repositoryManager;
@@ -106,16 +116,18 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
     return true;
   }
 
-  private void safeCopyDirectory(@Nullable final String src, @Nonnull final File dst) throws IOException {
-    if (src == null || src.isEmpty()) {
-      return;
-    }
-    final File srcFile = new File(src);
-    if (srcFile.isDirectory()) {
-      if (getLog().isDebugEnabled()) {
-        getLog().debug(String.format("Copying %s => %s", srcFile.getAbsolutePath(), dst.getAbsolutePath()));
+  private void safeCopyDirectory(@Nullable final String src, @Nonnull final File dst, @Nullable @MustNotContainNull final List<File> dstList) throws IOException {
+    if (!(src == null || src.isEmpty())) {
+      final File srcFile = new File(src);
+      if (srcFile.isDirectory()) {
+        if (getLog().isDebugEnabled()) {
+          getLog().debug(String.format("Copying %s => %s", srcFile.getAbsolutePath(), dst.getAbsolutePath()));
+        }
+        FileUtils.copyDirectoryToDirectory(srcFile, dst);
+        if (dstList != null) {
+          dstList.add(new File(dst, srcFile.getName()));
+        }
       }
-      FileUtils.copyDirectoryToDirectory(srcFile, dst);
     }
   }
 
@@ -157,27 +169,54 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
     }
 
     final File mvnGolangDependencyListFile = new File(folderToPack, MVNGOLANG_DEPENDENCIES_FILE);
+    final File mvnGolangBuildFolderListFile = new File(folderToPack, MVNGOLANG_BUILD_FOLDERS_FILE);
     try {
       saveEffectivePom(folderToPack);
 
-      FileUtils.copyFileToDirectory(this.getProject().getFile(), folderToPack);
-      safeCopyDirectory(this.getProject().getBuild().getSourceDirectory(), folderToPack);
-      safeCopyDirectory(this.getProject().getBuild().getTestSourceDirectory(), folderToPack);
+      final List<File> buildFolders = new ArrayList<>();
 
-      for (final Resource res : this.getProject().getBuild().getResources()) {
-        safeCopyDirectory(res.getDirectory(), folderToPack);
-      }
+      FileUtils.copyFileToDirectory(this.getProject().getFile(), folderToPack);
+
+      safeCopyDirectory(this.getProject().getBuild().getTestSourceDirectory(), folderToPack, null);
 
       for (final Resource res : this.getProject().getBuild().getTestResources()) {
-        safeCopyDirectory(res.getDirectory(), folderToPack);
+        safeCopyDirectory(res.getDirectory(), folderToPack, null);
       }
 
+      for (final Resource res : this.getProject().getBuild().getResources()) {
+        safeCopyDirectory(res.getDirectory(), folderToPack, buildFolders);
+      }
+
+      safeCopyDirectory(this.getSources(false).getAbsolutePath(), folderToPack, buildFolders);
+      
       if (getLog().isDebugEnabled()) {
         getLog().debug(String.format("Packing folder %s to %s", folderToPack.getAbsolutePath(), resultZip.getAbsolutePath()));
       }
 
+      if (mvnGolangBuildFolderListFile.isFile()) {
+        this.getLog().warn("Skip build source folder list descriptor create because detected existing one: " + MVNGOLANG_BUILD_FOLDERS_FILE);
+      } else {
+        if (buildFolders.isEmpty()) {
+          this.getLog().warn("Skip build source folder list descriptor because there is not any source or resource folders to be used for build");
+        } else {
+          final String rooPath = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(folderToPack.getAbsolutePath()));
+          final StringBuilder buffer = new StringBuilder();
+          for (final File f : buildFolders) {
+            String relativePath = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(f.getAbsolutePath())).substring(rooPath.length()+1);
+            if (buffer.length() > 0) {
+              buffer.append('\n');
+            }
+            this.getLog().debug("Add build folder into descriptor: " + relativePath);
+            buffer.append(relativePath);
+          }
+          final String fileContent = buffer.toString();
+          this.getLog().debug("Formed list of mvn-golang project source and resource build folders\n---------" + fileContent + "---------");
+          FileUtils.writeStringToFile(mvnGolangBuildFolderListFile, fileContent, StandardCharsets.UTF_8);
+        }
+      }
+
       if (mvnGolangDependencyListFile.isFile()) {
-        this.getLog().warn("Skip dependency descriptor making because detected existing one: " + MVNGOLANG_DEPENDENCIES_FILE);
+        this.getLog().warn("Skip dependency descriptor create because detected existing one: " + MVNGOLANG_DEPENDENCIES_FILE);
       } else {
         final List<Artifact> golangDependencies = new ArrayList<>();
         MavenProject currentProject = this.getProject();
@@ -201,6 +240,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
         this.getLog().debug("Formed list of mvn-golang dependencies\n---------" + flagFileContent + "---------");
         FileUtils.writeStringToFile(mvnGolangDependencyListFile, flagFileContent, StandardCharsets.UTF_8);
       }
+
       ZipUtil.pack(folderToPack, resultZip, Math.min(9, Math.max(1, this.compression)));
     } finally {
       FileUtils.deleteQuietly(folderToPack);

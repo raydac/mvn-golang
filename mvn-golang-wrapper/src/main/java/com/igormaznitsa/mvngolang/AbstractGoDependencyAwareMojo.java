@@ -24,11 +24,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+import org.zeroturnaround.zip.NameMapper;
 import org.zeroturnaround.zip.ZipUtil;
 
 public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
@@ -147,16 +149,56 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         getLog().debug("Dependency already unpacked: " + outDir);
         resultFolders.add(outDir);
       } else {
-        try {
-          getLog().debug("Unpack dependency archive: " + zipFile);
-          ZipUtil.unpack(zipFile, outDir, StandardCharsets.UTF_8);
-          resultFolders.add(outDir);
-        } catch (Exception ex) {
-          throw new MojoExecutionException("Can't unpack dependency archive '" + zipFile.getName() + "' into folder '" + targetFolder + '\'', ex);
+        if (ZipUtil.containsEntry(zipFile, GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE)) {
+          final File srcTargetFolder = new File(outDir, "src");
+          try {
+            unzipSrcFoldersContent(zipFile, srcTargetFolder);
+            resultFolders.add(outDir);
+          } catch (Exception ex) {
+            throw new MojoExecutionException("Can't unpack source folders from dependency archive '" + zipFile.getName() + "' into folder '" + srcTargetFolder + '\'', ex);
+          }
+        } else {
+          try {
+            getLog().debug("Unpack dependency archive: " + zipFile);
+            ZipUtil.unpack(zipFile, outDir, StandardCharsets.UTF_8);
+            resultFolders.add(outDir);
+          } catch (Exception ex) {
+            throw new MojoExecutionException("Can't unpack dependency archive '" + zipFile.getName() + "' into folder '" + targetFolder + '\'', ex);
+          }
         }
       }
     }
     return resultFolders;
+  }
+
+  private boolean unzipSrcFoldersContent(@Nonnull final File artifactZip, @Nonnull final File targetFolder) {
+    final byte[] buildFolderListFile = ZipUtil.unpackEntry(artifactZip, GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE);
+    if (buildFolderListFile == null) {
+      return false;
+    } else {
+      final List<String> folderList = new ArrayList<>();
+      for (final String folder : new String(buildFolderListFile, StandardCharsets.UTF_8).split("\\n")) {
+        final String trimmed = folder.trim();
+        if (trimmed.isEmpty()) {
+          continue;
+        }
+        folderList.add(folder + '/');
+      }
+
+      for (final String folder : folderList) {
+        ZipUtil.unpack(artifactZip, targetFolder, new NameMapper() {
+          @Override
+          @Nullable
+          public String map(@Nonnull final String name) {
+            if (name.startsWith(folder)) {
+              return name.substring(folder.length());
+            }
+            return null;
+          }
+        });
+      }
+      return true;
+    }
   }
 
   @Nonnull
