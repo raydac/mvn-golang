@@ -61,6 +61,7 @@ public final class MavenUtils {
 
   /**
    * Check that execution in a test mode.
+   *
    * @param execution maven execution object, must not be null
    * @return true if a test mode is active, false otherwise
    */
@@ -71,8 +72,10 @@ public final class MavenUtils {
 
   /**
    * Make resolve artifact project building request.
+   *
    * @param session maven session, must not be null
-   * @param remoteRepositories list of remote repositories, must not be null and can't contain null
+   * @param remoteRepositories list of remote repositories, must not be null and
+   * can't contain null
    * @return created request, must not be null
    */
   @Nonnull
@@ -88,11 +91,14 @@ public final class MavenUtils {
 
   /**
    * Parse string containing artifact record
+   *
    * @param record string containing record, must not be null
    * @param handler artifact handler for created artifact, must not be null
    * @return new created artifact from the record, must not be null
-   * @throws InvalidVersionSpecificationException  it will be thrown if version format is wrong
-   * @throws IllegalArgumentException it will be thrown if record can't be recognized as artifact record
+   * @throws InvalidVersionSpecificationException it will be thrown if version
+   * format is wrong
+   * @throws IllegalArgumentException it will be thrown if record can't be
+   * recognized as artifact record
    */
   @Nonnull
   public static Artifact parseArtifactRecord(
@@ -115,9 +121,11 @@ public final class MavenUtils {
 
   /**
    * Make artifact record from a maven artifact
+   *
    * @param artifact artifact to be converted into string, must not be null
    * @return string representation of artifact, must not be null
-   * @see #parseArtifactRecord(java.lang.String, org.apache.maven.artifact.handler.ArtifactHandler) 
+   * @see #parseArtifactRecord(java.lang.String,
+   * org.apache.maven.artifact.handler.ArtifactHandler)
    */
   @Nonnull
   public static String makeArtifactRecord(@Nonnull final Artifact artifact) {
@@ -138,7 +146,8 @@ public final class MavenUtils {
    * project.
    *
    * @param mavenProject maven project, must not be null
-   * @param includeTestDependencies flag to process dependencies marked for test phases
+   * @param includeTestDependencies flag to process dependencies marked for test
+   * phases
    * @param mojo calling mojo, must not be null
    * @param session maven session, must not be null
    * @param execution maven execution, must not be null
@@ -150,7 +159,7 @@ public final class MavenUtils {
    */
   @Nonnull
   @MustNotContainNull
-  public static List<File> scanForMvnGoArtifacts(
+  public static List<Pair<Artifact, File>> scanForMvnGoArtifacts(
           @Nonnull final MavenProject mavenProject,
           final boolean includeTestDependencies,
           @Nonnull final AbstractMojo mojo,
@@ -159,7 +168,7 @@ public final class MavenUtils {
           @Nonnull final ArtifactResolver resolver,
           @Nonnull @MustNotContainNull final List<ArtifactRepository> remoteRepositories
   ) throws ArtifactResolverException {
-    final List<File> result = new ArrayList<>();
+    final List<Pair<Artifact, File>> result = new ArrayList<>();
     final String phase = execution.getLifecyclePhase();
 
     final Set<String> alreadyFoundArtifactRecords = new HashSet<>();
@@ -205,7 +214,7 @@ public final class MavenUtils {
           if (result.contains(artifactFile)) {
             mojo.getLog().debug("Artifact file ignored as duplication: " + artifactFile);
           } else {
-            result.add(artifactFile);
+            result.add(new Pair<Artifact,File>(artifact, artifactFile));
           }
         }
       }

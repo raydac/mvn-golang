@@ -73,8 +73,6 @@ public final class IOUtils {
 
     return nextValue;
   }
-
-
   
   /**
    * Make file path appropriate for current OS.

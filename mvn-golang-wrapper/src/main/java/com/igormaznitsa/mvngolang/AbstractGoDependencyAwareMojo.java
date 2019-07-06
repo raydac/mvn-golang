@@ -19,6 +19,7 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
+import com.igormaznitsa.mvngolang.utils.Pair;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -101,7 +103,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     super.doInit();
     if (this.isScanDependencies()) {
       getLog().info("Scanning maven dependencies");
-      final List<File> foundArtifacts;
+      final List<Pair<Artifact, File>> foundArtifacts;
 
       try {
         foundArtifacts = MavenUtils.scanForMvnGoArtifacts(
@@ -123,9 +125,14 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
         final File dependencyTempTargetFolder = new File(this.getDependencyTempFolder());
         getLog().debug("Depedencies will be unpacked into folder: " + dependencyTempTargetFolder);
-        final List<File> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
+        final List<Pair<Artifact,File>> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
 
-        final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolders.toArray(new File[0]));
+        final List<File> unpackedFolderList = new ArrayList<>();
+        for(final Pair<Artifact,File> f : unpackedFolders) {
+          unpackedFolderList.add(f.right());
+        }
+        
+        final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolderList.toArray(new File[0]));
         getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
         this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
       }
@@ -136,36 +143,35 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Nonnull
   @MustNotContainNull
-  private List<File> unpackArtifactsIntoFolder(@Nonnull @MustNotContainNull final List<File> zippedArtifacts, @Nonnull final File targetFolder) throws MojoExecutionException {
-    final List<File> resultFolders = new ArrayList<>();
+  private List<Pair<Artifact, File>> unpackArtifactsIntoFolder(@Nonnull @MustNotContainNull final List<Pair<Artifact, File>> zippedArtifacts, @Nonnull final File targetFolder) throws MojoExecutionException {
+    final List<Pair<Artifact,File>> resultFolders = new ArrayList<>();
 
     if (!targetFolder.isDirectory() && !targetFolder.mkdirs()) {
       throw new MojoExecutionException("Can't create folder to unpack dependencies: " + targetFolder);
     }
 
-    for (final File zipFile : zippedArtifacts) {
-      final File outDir = new File(targetFolder, FilenameUtils.getBaseName(zipFile.getName()));
+    for (final Pair<Artifact, File> zipFile : zippedArtifacts) {
+      final File outDir = new File(targetFolder, FilenameUtils.getBaseName(zipFile.right().getName()));
       if (outDir.isDirectory()) {
         getLog().debug("Dependency already unpacked: " + outDir);
-        resultFolders.add(outDir);
       } else {
-        if (ZipUtil.containsEntry(zipFile, GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE)) {
+        if (ZipUtil.containsEntry(zipFile.right(), GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE)) {
           final File srcTargetFolder = new File(outDir, "src");
           try {
-            unzipSrcFoldersContent(zipFile, srcTargetFolder);
+            unzipSrcFoldersContent(zipFile.right(), srcTargetFolder);
           } catch (Exception ex) {
-            throw new MojoExecutionException("Can't unpack source folders from dependency archive '" + zipFile.getName() + "' into folder '" + srcTargetFolder + '\'', ex);
+            throw new MojoExecutionException("Can't unpack source folders from dependency archive '" + zipFile.right().getName() + "' into folder '" + srcTargetFolder + '\'', ex);
           }
         } else {
           try {
             getLog().debug("Unpack dependency archive: " + zipFile);
-            ZipUtil.unpack(zipFile, outDir, StandardCharsets.UTF_8);
+            ZipUtil.unpack(zipFile.right(), outDir, StandardCharsets.UTF_8);
           } catch (Exception ex) {
-            throw new MojoExecutionException("Can't unpack dependency archive '" + zipFile.getName() + "' into folder '" + targetFolder + '\'', ex);
+            throw new MojoExecutionException("Can't unpack dependency archive '" + zipFile.right().getName() + "' into folder '" + targetFolder + '\'', ex);
           }
         }
-        resultFolders.add(outDir);
       }
+      resultFolders.add(new Pair<Artifact,File>(zipFile.left(), outDir));
     }
     return resultFolders;
   }
