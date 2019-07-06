@@ -25,16 +25,20 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class GoModModel {
+public final class GoMod {
+
   private static final Pattern TOKENIZER = Pattern.compile("(\\/\\/|\\\"[^\\\"]+\\\"|[\\w.\\-/]+|[<>=-]+|\\(|\\)|[\\s\\n]+)");
+
   @Nonnull
   private static String quoteIfHasSpace(@Nonnull final String str) {
     return str.contains(" ") ? '\"' + str + '\"' : str;
   }
+
   @Nonnull
   private static String ensureNoQuoting(@Nonnull final String text) {
     return text.startsWith("\"") ? text.substring(1, text.length() - 1) : text;
   }
+
   @Nonnull
   @MustNotContainNull
   private static List<ModuleInfo> extractModuleInfo(@Nonnull @MustNotContainNull final List<String> tokens, @Nonnull @MustNotContainNull final String... separators) {
@@ -88,8 +92,9 @@ public final class GoModModel {
 
     return result;
   }
+
   @Nonnull
-  public static GoModModel from(@Nonnull final String str) {
+  public static GoMod from(@Nonnull final String str) {
     final List<GoModItem> foundItems = new ArrayList<>();
 
     final Matcher matcher = TOKENIZER.matcher(str);
@@ -314,36 +319,41 @@ public final class GoModModel {
       }
     }
 
-    return new GoModModel(foundItems);
+    return new GoMod(foundItems);
   }
   private final List<GoModItem> items;
-  private GoModModel(@Nonnull @MustNotContainNull final List<GoModItem> items) {
+
+  private GoMod(@Nonnull @MustNotContainNull final List<GoModItem> items) {
     final List<GoModItem> newList = new ArrayList<>(items);
     Collections.sort(newList);
     this.items = newList;
   }
+
   @Nonnull
-  public GoModModel addItem(@Nonnull final GoModItem item) {
+  public GoMod addItem(@Nonnull final GoModItem item) {
     this.items.add(item);
     Collections.sort(this.items);
     return this;
   }
+
   @Nonnull
   @MustNotContainNull
   public <T extends GoModItem> List<T> find(@Nonnull final Class<T> klass) {
     final List<T> result = new ArrayList<>();
-    
+
     for (final GoModItem i : this.items) {
       if (klass == i.getClass()) {
         result.add(klass.cast(i));
       }
     }
-    
+
     return result;
   }
+
   public int size() {
     return this.items.size();
   }
+
   @Nonnull
   @Override
   public String toString() {
@@ -401,21 +411,21 @@ public final class GoModModel {
 
   public static final class GoModule extends GoModItem {
 
-    private final ModuleInfo module;
+    private final ModuleInfo moduleInfo;
 
     public GoModule(@Nonnull final ModuleInfo module) {
-      this.module = Assertions.assertNotNull(module);
+      this.moduleInfo = Assertions.assertNotNull(module);
     }
 
     @Nonnull
-    public ModuleInfo getModule() {
-      return this.module;
+    public ModuleInfo getModuleInfo() {
+      return this.moduleInfo;
     }
 
     @Override
     @Nonnull
     public String toString() {
-      return "module " + this.module;
+      return "module " + this.moduleInfo;
     }
 
     @Override
@@ -505,7 +515,7 @@ public final class GoModModel {
     @Nonnull
     @Override
     public String toString() {
-      return this.module + " => " + this.replacement;
+      return "replace " + this.module + " => " + this.replacement;
     }
 
     @Override
@@ -514,7 +524,6 @@ public final class GoModModel {
     }
 
   }
-
 
   public static final class GoExclude extends GoModItem {
 
@@ -540,7 +549,6 @@ public final class GoModModel {
       return 3;
     }
   }
-
 
   private enum ParserState {
     FIND,

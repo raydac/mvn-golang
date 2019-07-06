@@ -19,19 +19,19 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class GoModModelTest {
+public class GoModTest {
 
-  private void assertModules(final GoModModel model, final String... texts) {
-    final List<GoModModel.GoModule> modules = model.find(GoModModel.GoModule.class);
+  private void assertModules(final GoMod model, final String... texts) {
+    final List<GoMod.GoModule> modules = model.find(GoMod.GoModule.class);
     assertEquals(texts.length, modules.size());
     for (int i = 0; i < texts.length; i++) {
-      assertEquals(texts[i], modules.get(i).getModule().getModule());
+      assertEquals(texts[i], modules.get(i).getModuleInfo().getModule());
     }
   }
 
   @Test
   public void testComplex1() {
-    final GoModModel model = GoModModel.from("module github.com/maruel/panicparse\n"
+    final GoMod model = GoMod.from("module github.com/maruel/panicparse\n"
             + "\n"
             + "go 1.11\n"
             + "\n"
@@ -46,7 +46,7 @@ public class GoModModelTest {
 
   @Test
   public void testComplex2() {
-    final GoModModel model = GoModModel.from("module google.golang.org/api\n"
+    final GoMod model = GoMod.from("module google.golang.org/api\n"
             + "\n"
             + "require (\n"
             + "	cloud.google.com/go v0.38.0 // indirect\n"
@@ -72,11 +72,11 @@ public class GoModModelTest {
 
   @Test
   public void testComplex3() {
-    GoModModel model = GoModModel.from("module \"rsc.io/sampler\"\n"
+    GoMod model = GoMod.from("module \"rsc.io/sampler\"\n"
             + "\n"
             + "require \"golang.org/x/text\" v0.0.0-20170915032832-14c0d48ead0c");
     assertEquals(2, model.size());
-    model = GoModModel.from("module m\n"
+    model = GoMod.from("module m\n"
             + "\n"
             + "go 1.11\n"
             + "\n"
@@ -91,7 +91,7 @@ public class GoModModelTest {
 
   @Test
   public void testComplex4() {
-    final GoModModel model = GoModModel.from("module example.com/me/hello\n"
+    final GoMod model = GoMod.from("module example.com/me/hello\n"
             + "\n"
             + "    require (\n"
             + "     example.com/me/goodbye v0.0.0\n"
@@ -104,24 +104,45 @@ public class GoModModelTest {
     assertEquals("module example.com/me/hello\n"
             + "require example.com/me/goodbye v0.0.0\n"
             + "require rsc.io/quote v1.5.2\n"
-            + "example.com/me/goodbye => ../goodbye", model.toString());
+            + "replace example.com/me/goodbye => ../goodbye", model.toString());
+  }
+
+  @Test
+  public void testComplex5() {
+    final GoMod model = GoMod.from("module github.com/example/project\n"
+            + "\n"
+            + "require (\n"
+            + "    github.com/SermoDigital/jose v0.0.0-20180104203859-803625baeddc\n"
+            + "    github.com/google/uuid v1.1.0\n"
+            + ")\n"
+            + "\n"
+            + "exclude github.com/SermoDigital/jose v0.9.1\n"
+            + "\n"
+            + "replace github.com/google/uuid v1.1.0 => git.coolaj86.com/coolaj86/uuid.go v1.1.1");
+    assertEquals(5, model.size());
+
+    assertEquals("module github.com/example/project\n"
+            + "require github.com/SermoDigital/jose v0.0.0-20180104203859-803625baeddc\n"
+            + "require github.com/google/uuid v1.1.0\n"
+            + "replace github.com/google/uuid v1.1.0 => git.coolaj86.com/coolaj86/uuid.go v1.1.1\n"
+            + "exclude github.com/SermoDigital/jose v0.9.1", model.toString());
   }
 
   @Test
   public void testModule() {
-    assertModules(GoModModel.from("module (example.com/hello) // huzzaa"), "example.com/hello");
-    assertModules(GoModModel.from("module (\n"
+    assertModules(GoMod.from("module (example.com/hello) // huzzaa"), "example.com/hello");
+    assertModules(GoMod.from("module (\n"
             + "example.com/hello // some\n"
             + "  \"sss.gid/fsdsd\"   \n"
             + ") // huzzaa"), "example.com/hello", "sss.gid/fsdsd");
-    assertModules(GoModModel.from("module (example.com/hello) // huzzaa"), "example.com/hello");
-    assertModules(GoModModel.from("module example.com/hello"), "example.com/hello");
-    assertModules(GoModModel.from("module example.com/hello\n"), "example.com/hello");
-    assertModules(GoModModel.from("module example.com/hello // huzzaa"), "example.com/hello");
-    assertModules(GoModModel.from("\n   \n    module \"example.com/hello\" // huzzaa"), "example.com/hello");
-    assertModules(GoModModel.from("module \"example.com/hello\""), "example.com/hello");
-    assertModules(GoModModel.from("module \"example.com/hello\"\n"), "example.com/hello");
-    assertModules(GoModModel.from("module \"example.com/hello\" // huzzaa"), "example.com/hello");
+    assertModules(GoMod.from("module (example.com/hello) // huzzaa"), "example.com/hello");
+    assertModules(GoMod.from("module example.com/hello"), "example.com/hello");
+    assertModules(GoMod.from("module example.com/hello\n"), "example.com/hello");
+    assertModules(GoMod.from("module example.com/hello // huzzaa"), "example.com/hello");
+    assertModules(GoMod.from("\n   \n    module \"example.com/hello\" // huzzaa"), "example.com/hello");
+    assertModules(GoMod.from("module \"example.com/hello\""), "example.com/hello");
+    assertModules(GoMod.from("module \"example.com/hello\"\n"), "example.com/hello");
+    assertModules(GoMod.from("module \"example.com/hello\" // huzzaa"), "example.com/hello");
   }
 
 }
