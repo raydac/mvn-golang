@@ -42,6 +42,12 @@ public class GoModTest {
             + ")");
 
     assertEquals(5, model.size());
+
+    assertEquals("module github.com/maruel/panicparse\n"
+            + "require github.com/mattn/go-colorable v0.1.1\n"
+            + "require github.com/mattn/go-isatty v0.0.7\n"
+            + "require github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b\n"
+            + "go 1.11", model.toString());
   }
 
   @Test
@@ -68,6 +74,24 @@ public class GoModTest {
             + ")");
 
     assertEquals(17, model.size());
+
+    assertEquals("module google.golang.org/api\n"
+            + "require cloud.google.com/go v0.38.0\n"
+            + "require github.com/golang/protobuf v1.3.1\n"
+            + "require github.com/google/go-cmp v0.3.0\n"
+            + "require github.com/hashicorp/golang-lru v0.5.1\n"
+            + "require go.opencensus.io v0.21.0\n"
+            + "require golang.org/x/lint v0.0.0-20190409202823-959b441ac422\n"
+            + "require golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c\n"
+            + "require golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45\n"
+            + "require golang.org/x/sync v0.0.0-20190423024810-112230192c58\n"
+            + "require golang.org/x/sys v0.0.0-20190507160741-ecd444e8653b\n"
+            + "require golang.org/x/text v0.3.2\n"
+            + "require golang.org/x/tools v0.0.0-20190506145303-2d16b83fe98c\n"
+            + "require google.golang.org/appengine v1.5.0\n"
+            + "require google.golang.org/genproto v0.0.0-20190502173448-54afdca5d873\n"
+            + "require google.golang.org/grpc v1.20.1\n"
+            + "require honnef.co/go/tools v0.0.0-20190418001031-e561f6794a2a", model.toString());
   }
 
   @Test
@@ -87,6 +111,12 @@ public class GoModTest {
             + "\n"
             + "replace example.com/a => example.com/c v1.0.0");
     assertEquals(5, model.size());
+
+    assertEquals("module m\n"
+            + "require example.com/a v1.0.0\n"
+            + "require example.com/d v1.0.0\n"
+            + "replace example.com/a => example.com/c v1.0.0\n"
+            + "go 1.11", model.toString());
   }
 
   @Test
