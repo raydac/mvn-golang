@@ -153,7 +153,6 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           final File srcTargetFolder = new File(outDir, "src");
           try {
             unzipSrcFoldersContent(zipFile, srcTargetFolder);
-            resultFolders.add(outDir);
           } catch (Exception ex) {
             throw new MojoExecutionException("Can't unpack source folders from dependency archive '" + zipFile.getName() + "' into folder '" + srcTargetFolder + '\'', ex);
           }
@@ -161,11 +160,11 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           try {
             getLog().debug("Unpack dependency archive: " + zipFile);
             ZipUtil.unpack(zipFile, outDir, StandardCharsets.UTF_8);
-            resultFolders.add(outDir);
           } catch (Exception ex) {
             throw new MojoExecutionException("Can't unpack dependency archive '" + zipFile.getName() + "' into folder '" + targetFolder + '\'', ex);
           }
         }
+        resultFolders.add(outDir);
       }
     }
     return resultFolders;
