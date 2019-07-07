@@ -379,22 +379,22 @@ public final class GoMod {
 
   public final static class ModuleInfo {
 
-    private final String module;
+    private final String name;
     private final String version;
 
-    public ModuleInfo(@Nonnull final String module) {
-      this.module = Assertions.assertNotNull(module);
+    public ModuleInfo(@Nonnull final String name) {
+      this.name = Assertions.assertNotNull(name);
       this.version = null;
     }
 
-    public ModuleInfo(@Nonnull final String module, @Nullable final String version) {
-      this.module = Assertions.assertNotNull(module);
+    public ModuleInfo(@Nonnull final String name, @Nullable final String version) {
+      this.name = Assertions.assertNotNull(name);
       this.version = version;
     }
 
     @Nonnull
-    public String getModule() {
-      return this.module;
+    public String getName() {
+      return this.name;
     }
 
     @Nullable
@@ -405,7 +405,7 @@ public final class GoMod {
     @Nonnull
     @Override
     public String toString() {
-      return quoteIfHasSpace(this.module) + (this.version == null ? "" : " " + quoteIfHasSpace(this.version));
+      return quoteIfHasSpace(this.name) + (this.version == null ? "" : " " + quoteIfHasSpace(this.version));
     }
   }
 

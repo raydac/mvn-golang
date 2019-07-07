@@ -28,8 +28,8 @@ import java.io.File;
 /**
  * The Mojo wraps the 'fix' command.
  */
-@Mojo(name = "fix", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangFixMojo extends AbstractGoPackageAwareMojo {
+@Mojo(name = "fix", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = false, requiresDependencyResolution = ResolutionScope.COMPILE)
+public class GolangFixMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     @Override
     public boolean isSourceFolderRequired() {

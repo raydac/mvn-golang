@@ -159,6 +159,38 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private MojoExecution execution;
 
   /**
+   * Flag to preprocess go.mod files in dependencies and in project to replace path to modules found in dependencies.
+   * 
+   * @since 2.3.3
+   */
+  @Parameter(defaultValue = "false", property = "mvn.golang.preprocess.modules")
+  private boolean preprocessModules;
+  
+  /**
+   * Flag to restore preprocessed go.mod file after end of work.
+   *
+   * @since 2.3.3
+   */
+  @Parameter(defaultValue = "true", property = "mvn.golang.restore.modules")
+  private boolean restoreModules;
+  
+  public boolean isRestoreModules() {
+    return this.restoreModules;
+  }
+  
+  public void setRestoreModules(final boolean value) {
+    this.restoreModules = value;
+  }
+  
+  public boolean isPreprocessModules(){
+    return this.preprocessModules;
+  }
+  
+  public void setPreprocessModules(final boolean value){
+    this.preprocessModules = value;
+  }
+  
+  /**
    * Flag shows that environment PATH variable should be filtered for footsteps
    * of other go/bin folders to prevent conflicts.
    *
@@ -1505,7 +1537,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     boolean error = false;
 
-    while (true) {
+    while (!Thread.currentThread().isInterrupted()) {
       final ProcessExecutor executor = prepareExecutor(proxySettings);
       if (executor == null) {
         logOptionally("The Mojo should not be executed");

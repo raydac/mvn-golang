@@ -25,7 +25,7 @@ public class GoModTest {
     final List<GoMod.GoModule> modules = model.find(GoMod.GoModule.class);
     assertEquals(texts.length, modules.size());
     for (int i = 0; i < texts.length; i++) {
-      assertEquals(texts[i], modules.get(i).getModuleInfo().getModule());
+      assertEquals(texts[i], modules.get(i).getModuleInfo().getName());
     }
   }
 

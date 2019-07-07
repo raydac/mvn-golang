@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
  * The Mojo allows to process commands which are not covered by MOJOs of the
  * plug-in.
  */
-@Mojo(name = "custom", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
+@Mojo(name = "custom", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = false, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangCustomMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**

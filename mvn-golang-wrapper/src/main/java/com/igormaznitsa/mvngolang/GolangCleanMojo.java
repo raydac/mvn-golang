@@ -33,8 +33,8 @@ import java.io.IOException;
 /**
  * The Mojo wraps the 'clean' command.
  */
-@Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangCleanMojo extends AbstractGoPackageAwareMojo {
+@Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = false, requiresDependencyResolution = ResolutionScope.COMPILE)
+public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**
    * Clean all folders provided by Go Path. <b>Be careful with the flag!</b>
