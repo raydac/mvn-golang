@@ -108,6 +108,9 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Nonnull
   private String makeRelativePathToModule(@Nonnull final File goModFile, @Nonnull final File otherGoModFile) {
     final String relativePath = goModFile.toPath().relativize(otherGoModFile.getParentFile().toPath()).toString();
+    if (relativePath.contains("/bin/.__deps__/")) {
+      getLog().warn("DETECTED STRANGE PATH: "+goModFile + " -> "+otherGoModFile);
+    }
     return relativePath;
   }
 
@@ -205,7 +208,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   public final void doInit() throws MojoFailureException, MojoExecutionException {
     super.doInit();
 
-    if (this.isPreprocessModules()) {
+    if (this.isPreprocessGoMod()) {
       try {
         restoreGoModFromBakIfExists(this.getSources(false));
       } catch (IOException ex) {
@@ -239,7 +242,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         getLog().debug("Depedencies will be unpacked into folder: " + dependencyTempTargetFolder);
         final List<Pair<Artifact, File>> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
 
-        if (this.isPreprocessModules()) {
+        if (this.isPreprocessGoMod()) {
           this.getLog().info("Activated preprocessing of go.mod files");
           this.preprocessModsInUnpackedDependencies(unpackedFolders);
         }
@@ -284,7 +287,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Override
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
     try {
-      if (this.isPreprocessModules() && this.isRestoreModules()) {
+      if (this.isPreprocessGoMod() && this.isRestoreGoMod()) {
         this.restoreGoModFromBakIfExists(this.getSources(false));
       }
     } catch (IOException ex) {

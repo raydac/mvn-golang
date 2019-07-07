@@ -20,11 +20,13 @@ import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -241,12 +243,37 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
         FileUtils.writeStringToFile(mvnGolangDependencyListFile, flagFileContent, StandardCharsets.UTF_8);
       }
 
+      this.getLog().debug("Restoring all backup go.mod in prepared folder to pack");
+      restoreAllBackupGoMod(folderToPack);
+
       ZipUtil.pack(folderToPack, resultZip, Math.min(9, Math.max(1, this.compression)));
     } finally {
       FileUtils.deleteQuietly(folderToPack);
     }
 
     return resultZip;
+  }
+
+  private void restoreAllBackupGoMod(@Nonnull final File folder) throws IOException {
+    final File backup = new File(folder, GO_MOD_FILE_NAME_BAK);
+    if (backup.isFile()) {
+      final File gomod = new File(folder, GO_MOD_FILE_NAME);
+      if (gomod.isFile() && !gomod.delete()) {
+        throw new IOException("Can't delete " + gomod);
+      }
+      if (!backup.renameTo(gomod)) {
+        throw new IOException("Can't rename " + backup);
+      }
+    }
+
+    for (final File f : folder.listFiles(new FileFilter() {
+      @Override
+      public boolean accept(@Nonnull final File pathname) {
+        return pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath());
+      }
+    })) {
+      restoreAllBackupGoMod(f);
+    }
   }
 
 }

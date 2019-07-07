@@ -163,31 +163,31 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * 
    * @since 2.3.3
    */
-  @Parameter(defaultValue = "false", property = "mvn.golang.preprocess.modules")
-  private boolean preprocessModules;
+  @Parameter(defaultValue = "false", property = "mvn.golang.preprocess.gomod")
+  private boolean preprocessGoMod;
   
   /**
    * Flag to restore preprocessed go.mod file after end of work.
    *
    * @since 2.3.3
    */
-  @Parameter(defaultValue = "true", property = "mvn.golang.restore.modules")
-  private boolean restoreModules;
+  @Parameter(defaultValue = "true", property = "mvn.golang.restore.gomod")
+  private boolean restoreGoMod;
   
-  public boolean isRestoreModules() {
-    return this.restoreModules;
+  public boolean isRestoreGoMod() {
+    return this.restoreGoMod;
   }
   
-  public void setRestoreModules(final boolean value) {
-    this.restoreModules = value;
+  public void setRestoreGoMod(final boolean value) {
+    this.restoreGoMod = value;
   }
   
-  public boolean isPreprocessModules(){
-    return this.preprocessModules;
+  public boolean isPreprocessGoMod(){
+    return this.preprocessGoMod;
   }
   
-  public void setPreprocessModules(final boolean value){
-    this.preprocessModules = value;
+  public void setPreprocessGoMod(final boolean value){
+    this.preprocessGoMod = value;
   }
   
   /**
