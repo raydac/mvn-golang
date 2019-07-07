@@ -107,11 +107,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Nonnull
   private String makeRelativePathToModule(@Nonnull final File goModFile, @Nonnull final File otherGoModFile) {
-    final String relativePath = goModFile.toPath().relativize(otherGoModFile.getParentFile().toPath()).toString();
-    if (relativePath.contains("/bin/.__deps__/")) {
-      getLog().warn("DETECTED STRANGE PATH: "+goModFile + " -> "+otherGoModFile);
-    }
-    return relativePath;
+    return goModFile.toPath().relativize(otherGoModFile.getParentFile().toPath()).toString();
   }
 
   private void preprocessModsInUnpackedDependencies(@Nonnull @MustNotContainNull final List<Pair<Artifact, File>> unpackedDependencyFolders) throws MojoExecutionException {
