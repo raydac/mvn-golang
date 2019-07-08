@@ -20,17 +20,22 @@ import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.mvngolang.utils.GoMod;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
-import com.igormaznitsa.mvngolang.utils.Pair;
+import com.igormaznitsa.mvngolang.utils.Tuple;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -110,34 +115,28 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     return goModFile.toPath().relativize(otherGoModFile.getParentFile().toPath()).toString();
   }
 
-  private void preprocessModsInUnpackedDependencies(@Nonnull @MustNotContainNull final List<Pair<Artifact, File>> unpackedDependencyFolders) throws MojoExecutionException {
+  private void preprocessModsInUnpackedDependencies(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedDependencyFolders) throws MojoExecutionException {
     try {
-      final List<Pair<Artifact, Pair<GoMod, File>>> lst = preprocessModuleFilesInDependencies(unpackedDependencyFolders);
+      final List<Tuple<Artifact, Tuple<GoMod, File>>> lst = preprocessModuleFilesInDependencies(unpackedDependencyFolders);
+      final List<Tuple<GoMod, File>> dependencyGoMods = listRightPart(lst);
 
-      final File goModBakSrc = new File(this.getSources(false), GO_MOD_FILE_NAME_BAK);
-      final File goModSrc = new File(this.getSources(false), GO_MOD_FILE_NAME);
-      
-      if (!goModBakSrc.isFile() && goModSrc.isFile()) {
-        FileUtils.copyFile(goModSrc, goModBakSrc);
-      }
-      
-      if (goModSrc.isFile()) {
-        final GoMod parse = GoMod.from(FileUtils.readFileToString(goModBakSrc, StandardCharsets.UTF_8));
+      final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = fildGoModsAndParse(Collections.singletonList(Tuple.of(this.getProject().getArtifact(), this.getSources(false))), true);
 
-        for (final Pair<Artifact, Pair<GoMod, File>> p : lst) {
-          parse.addItem(
-                  new GoMod.GoReplace(
-                          new GoMod.ModuleInfo(p.right().left().find(GoMod.GoModule.class).get(0).getModuleInfo().getName()),
-                          new GoMod.ModuleInfo(
-                                  makeRelativePathToModule(goModSrc.getParentFile(), p.right().right())
-                          )
-                  )
-          );
+      for (final Tuple<Artifact, Tuple<GoMod, File>> f : projectGoMods) {
+        final File goModBakSrc = new File(f.right().right().getParentFile(), GO_MOD_FILE_NAME_BAK);
+        final File goModSrc = f.right().right();
+
+        if (!goModBakSrc.isFile() && goModSrc.isFile()) {
+          FileUtils.copyFile(goModSrc, goModBakSrc);
         }
 
-        FileUtils.write(goModSrc, parse.toString(), StandardCharsets.UTF_8);
+        if (goModSrc.isFile()) {
+          final GoMod parsed = f.right().left();
+          if (replaceLinksToModules(f.right(), dependencyGoMods)) {
+            FileUtils.write(goModSrc, f.right().left().toString(), StandardCharsets.UTF_8);
+          }
+        }
       }
-
     } catch (IOException ex) {
       throw new MojoExecutionException("Can't process a go.mod file", ex);
     }
@@ -145,57 +144,68 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Nonnull
   @MustNotContainNull
-  private List<Pair<Artifact, Pair<GoMod, File>>> preprocessModuleFilesInDependencies(@Nonnull @MustNotContainNull final List<Pair<Artifact, File>> unpackedFolders) throws IOException {
-    final List<Pair<Artifact, Pair<GoMod, File>>> foundAndParsedGoMods = new ArrayList<>();
+  private List<Tuple<Artifact, Tuple<GoMod, File>>> fildGoModsAndParse(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders, final boolean parseGoMod) throws IOException {
+    final List<Tuple<Artifact, Tuple<GoMod, File>>> result = new ArrayList<>();
 
-    getLog().debug("Loading and parse g.mod files from unpacked dependencies");
-
-    for (final Pair<Artifact, File> f : unpackedFolders) {
-      final File artifactGomodFile = new File(f.right(), "src" + File.separator + GO_MOD_FILE_NAME);
-
-      if (artifactGomodFile.isFile()) {
-        final GoMod parser = GoMod.from(FileUtils.readFileToString(artifactGomodFile, StandardCharsets.UTF_8));
-        foundAndParsedGoMods.add(new Pair<Artifact, Pair<GoMod, File>>(f.left(), new Pair<>(parser, artifactGomodFile)));
+    for (final Tuple<Artifact, File> tuple : unpackedFolders) {
+      for (final File f : FileUtils.listFiles(tuple.right(), FileFilterUtils.nameFileFilter("go.mod"), TrueFileFilter.INSTANCE)) {
+        final GoMod model = parseGoMod ? GoMod.from(FileUtils.readFileToString(f, StandardCharsets.UTF_8)) : null;
+        result.add(Tuple.of(tuple.left(), Tuple.of(model, f)));
       }
     }
 
-    getLog().debug("Adding replaces to dependency modules into go.mod");
+    return result;
+  }
 
-    for (final Pair<Artifact, Pair<GoMod, File>> i : foundAndParsedGoMods) {
-      for (final Pair<Artifact, Pair<GoMod, File>> j : foundAndParsedGoMods) {
-        if (i == j) {
-          continue;
-        }
+  private boolean replaceLinksToModules(@Nonnull final Tuple<GoMod, File> source, @Nonnull @MustNotContainNull final List<Tuple<GoMod, File>> targets) throws IOException {
+    boolean changed = false;
+    for (final Tuple<GoMod, File> j : targets) {
+      if (!source.equals(j)) {
+        final GoMod thatParsedGoMod = j.left();
+        final File thatGoModFile = j.right();
 
-        final String moduleName = j.right().left().find(GoMod.GoModule.class).get(0).getModuleInfo().getName();
-
-        final List<GoMod.GoReplace> existingReplaces = i.right().left().find(GoMod.GoReplace.class);
-
-        boolean presentedAmongReplaces = false;
-        for (final GoMod.GoReplace r : existingReplaces) {
-          if (moduleName.equals(r.getModule().getName())) {
-            presentedAmongReplaces = true;
-            break;
-          }
-        }
-
-        if (!presentedAmongReplaces) {
-          i.right().left().addItem(new GoMod.GoReplace(
-                  new GoMod.ModuleInfo(moduleName),
-                  new GoMod.ModuleInfo(makeRelativePathToModule(i.right().right(), j.right().right()))));
+        if (source.left().hasRequireFor(thatParsedGoMod.getModule(), null) && !source.left().hasReplaceFor(thatParsedGoMod.getModule(), null)) {
+          final String relativePath = makeRelativePathToModule(source.right().getParentFile(), thatGoModFile.getParentFile());
+          source.left().addItem(new GoMod.GoReplace(new GoMod.ModuleInfo(thatParsedGoMod.getModule()), new GoMod.ModuleInfo(relativePath)));
+          changed = true;
         }
       }
     }
+    return changed;
+  }
 
-    getLog().debug("Replacing go.mod files by changed versions");
-
-    for (final Pair<Artifact, Pair<GoMod, File>> i : foundAndParsedGoMods) {
-      FileUtils.write(i.right().right(), i.right().left().toString(), StandardCharsets.UTF_8);
-      
-      this.getLog().debug("---saved: "+i.right().right());
-      this.getLog().debug(i.right().left().toString());
-      this.getLog().debug("----------");
+  @Nonnull
+  @MustNotContainNull
+  private List<Tuple<GoMod, File>> listRightPart(@Nonnull @MustNotContainNull final List<Tuple<Artifact, Tuple<GoMod, File>>> list) {
+    final List<Tuple<GoMod, File>> parsed = new ArrayList<>();
+    for (final Tuple<Artifact, Tuple<GoMod, File>> i : list) {
+      parsed.add(i.right());
     }
+    return parsed;
+  }
+
+  private int generateCrossLinksBetweenArtifactGoMods(@Nonnull @MustNotContainNull final List<Tuple<Artifact, Tuple<GoMod, File>>> unpackedFolders) throws IOException {
+    int changedCounter = 0;
+
+    final List<Tuple<GoMod, File>> parsed = listRightPart(unpackedFolders);
+
+    for (final Tuple<GoMod, File> i : parsed) {
+      if (replaceLinksToModules(i, parsed)) {
+        changedCounter = 0;
+        FileUtils.write(i.right(), i.left().toString(), StandardCharsets.UTF_8);
+      }
+    }
+    return changedCounter;
+  }
+
+  @Nonnull
+  @MustNotContainNull
+  private List<Tuple<Artifact, Tuple<GoMod, File>>> preprocessModuleFilesInDependencies(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders) throws IOException {
+    getLog().debug("Findig go.mod descriptors in unpacked artifacts");
+    final List<Tuple<Artifact, Tuple<GoMod, File>>> foundAndParsedGoMods = fildGoModsAndParse(unpackedFolders, true);
+    getLog().debug(String.format("Found %d go.mod descriptors", foundAndParsedGoMods.size()));
+    final int changedGoModCounter = generateCrossLinksBetweenArtifactGoMods(foundAndParsedGoMods);
+    getLog().debug(String.format("Changed %d go.mod descriptors in unpacked artifacts", changedGoModCounter));
 
     return foundAndParsedGoMods;
   }
@@ -214,7 +224,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
     if (this.isScanDependencies()) {
       getLog().info("Scanning maven dependencies");
-      final List<Pair<Artifact, File>> foundArtifacts;
+      final List<Tuple<Artifact, File>> foundArtifacts;
 
       try {
         foundArtifacts = MavenUtils.scanForMvnGoArtifacts(
@@ -236,7 +246,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
         final File dependencyTempTargetFolder = new File(this.getDependencyTempFolder());
         getLog().debug("Depedencies will be unpacked into folder: " + dependencyTempTargetFolder);
-        final List<Pair<Artifact, File>> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
+        final List<Tuple<Artifact, File>> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
 
         if (this.isPreprocessGoMod()) {
           this.getLog().info("Activated preprocessing of go.mod files");
@@ -244,10 +254,10 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         }
 
         final List<File> unpackedFolderList = new ArrayList<>();
-        for (final Pair<Artifact, File> f : unpackedFolders) {
+        for (final Tuple<Artifact, File> f : unpackedFolders) {
           unpackedFolderList.add(f.right());
         }
-        
+
         final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolderList.toArray(new File[0]));
         getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
         this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
@@ -295,14 +305,14 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Nonnull
   @MustNotContainNull
-  private List<Pair<Artifact, File>> unpackArtifactsIntoFolder(@Nonnull @MustNotContainNull final List<Pair<Artifact, File>> zippedArtifacts, @Nonnull final File targetFolder) throws MojoExecutionException {
-    final List<Pair<Artifact, File>> resultFolders = new ArrayList<>();
+  private List<Tuple<Artifact, File>> unpackArtifactsIntoFolder(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> zippedArtifacts, @Nonnull final File targetFolder) throws MojoExecutionException {
+    final List<Tuple<Artifact, File>> resultFolders = new ArrayList<>();
 
     if (!targetFolder.isDirectory() && !targetFolder.mkdirs()) {
       throw new MojoExecutionException("Can't create folder to unpack dependencies: " + targetFolder);
     }
 
-    for (final Pair<Artifact, File> zipFile : zippedArtifacts) {
+    for (final Tuple<Artifact, File> zipFile : zippedArtifacts) {
       final File outDir = new File(targetFolder, FilenameUtils.getBaseName(zipFile.right().getName()));
       if (outDir.isDirectory()) {
         getLog().debug("Dependency already unpacked: " + outDir);
@@ -323,7 +333,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           }
         }
       }
-      resultFolders.add(new Pair<Artifact, File>(zipFile.left(), outDir));
+      resultFolders.add(Tuple.of(zipFile.left(), outDir));
     }
     return resultFolders;
   }

@@ -19,32 +19,41 @@ import com.igormaznitsa.meta.common.utils.Assertions;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class Pair<A, B> {
+public class Tuple<A, B> {
 
   private final A left;
   private final B right;
 
-  public Pair(@Nonnull final A left, @Nonnull final B right) {
+  private Tuple(@Nonnull final A left, @Nonnull final B right) {
     this.left = Assertions.assertNotNull(left);
     this.right = Assertions.assertNotNull(right);
   }
 
+  @Nonnull
+  public static <A, B> Tuple<A, B> of(@Nonnull A left, @Nonnull B right) {
+    return new Tuple<>(left, right);
+  }
+
   @Override
-  public boolean equals(@Nullable final Object obj){
-    if (obj == this) return true;
-    if (obj == null) return false;
-    if (obj instanceof Pair) {
-      final Pair<?,?> that = (Pair<?,?>)obj;
+  public boolean equals(@Nullable final Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (obj instanceof Tuple) {
+      final Tuple<?, ?> that = (Tuple<?, ?>) obj;
       return this.left.equals(that.left) && this.right.equals(that.right);
     }
     return false;
   }
-  
+
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return this.left.hashCode() ^ this.right.hashCode();
   }
-  
+
   @Nonnull
   public A left() {
     return this.left;

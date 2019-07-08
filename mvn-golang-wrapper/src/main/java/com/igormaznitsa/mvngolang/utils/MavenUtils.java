@@ -159,7 +159,7 @@ public final class MavenUtils {
    */
   @Nonnull
   @MustNotContainNull
-  public static List<Pair<Artifact, File>> scanForMvnGoArtifacts(
+  public static List<Tuple<Artifact, File>> scanForMvnGoArtifacts(
           @Nonnull final MavenProject mavenProject,
           final boolean includeTestDependencies,
           @Nonnull final AbstractMojo mojo,
@@ -168,7 +168,7 @@ public final class MavenUtils {
           @Nonnull final ArtifactResolver resolver,
           @Nonnull @MustNotContainNull final List<ArtifactRepository> remoteRepositories
   ) throws ArtifactResolverException {
-    final List<Pair<Artifact, File>> result = new ArrayList<>();
+    final List<Tuple<Artifact, File>> result = new ArrayList<>();
     final String phase = execution.getLifecyclePhase();
 
     final Set<String> alreadyFoundArtifactRecords = new HashSet<>();
@@ -214,7 +214,7 @@ public final class MavenUtils {
           if (result.contains(artifactFile)) {
             mojo.getLog().debug("Artifact file ignored as duplication: " + artifactFile);
           } else {
-            result.add(new Pair<Artifact,File>(artifact, artifactFile));
+            result.add(Tuple.of(artifact, artifactFile));
           }
         }
       }
