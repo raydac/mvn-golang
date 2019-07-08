@@ -111,8 +111,8 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   }
 
   @Nonnull
-  private String makeRelativePathToModule(@Nonnull final File goModFile, @Nonnull final File otherGoModFile) {
-    return goModFile.toPath().relativize(otherGoModFile.getParentFile().toPath()).toString();
+  private String makeRelativePathToFolder(@Nonnull final File goModFile, @Nonnull final File folder) {
+    return goModFile.toPath().relativize(folder.toPath()).toString();
   }
 
   private void preprocessModsInUnpackedDependencies(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedDependencyFolders) throws MojoExecutionException {
@@ -165,7 +165,8 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         final File thatGoModFile = j.right();
 
         if (source.left().hasRequireFor(thatParsedGoMod.getModule(), null) && !source.left().hasReplaceFor(thatParsedGoMod.getModule(), null)) {
-          final String relativePath = makeRelativePathToModule(source.right().getParentFile(), thatGoModFile.getParentFile());
+          
+          final String relativePath = makeRelativePathToFolder(source.right().getParentFile(), thatGoModFile.getParentFile());
           source.left().addItem(new GoMod.GoReplace(new GoMod.ModuleInfo(thatParsedGoMod.getModule()), new GoMod.ModuleInfo(relativePath)));
           changed = true;
         }
