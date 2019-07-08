@@ -456,7 +456,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Be verbose in logging.
    */
-  @Parameter(name = "verbose", defaultValue = "false")
+  @Parameter(name = "verbose", defaultValue = "false", property = "mvn.golang.verbose")
   private boolean verbose;
 
   /**
