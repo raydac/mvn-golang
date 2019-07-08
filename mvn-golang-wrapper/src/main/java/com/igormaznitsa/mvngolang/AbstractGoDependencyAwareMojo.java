@@ -27,7 +27,9 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,7 +48,7 @@ import org.zeroturnaround.zip.ZipUtil;
 
 public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
-  protected final String GO_MOD_FILE_NAME_BAK = "go.mod.mvn.orig";
+  protected final String GO_MOD_FILE_NAME_BAK = ".#go.mod.mvn.orig";
   protected final String GO_MOD_FILE_NAME = "go.mod";
 
   /**
@@ -115,12 +117,12 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     return goModFile.toPath().relativize(folder.toPath()).toString();
   }
 
-  private void preprocessModsInUnpackedDependencies(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedDependencyFolders) throws MojoExecutionException {
+  private void preprocessModules(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedDependencyFolders) throws MojoExecutionException {
     try {
       final List<Tuple<Artifact, Tuple<GoMod, File>>> lst = preprocessModuleFilesInDependencies(unpackedDependencyFolders);
       final List<Tuple<GoMod, File>> dependencyGoMods = listRightPart(lst);
 
-      final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = fildGoModsAndParse(Collections.singletonList(Tuple.of(this.getProject().getArtifact(), this.getSources(false))), true);
+      final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = fildGoModsAndParse(Collections.singletonList(Tuple.of(this.getProject().getArtifact(), this.getSources(false))));
 
       for (final Tuple<Artifact, Tuple<GoMod, File>> f : projectGoMods) {
         final File goModFileBak = new File(f.right().right().getParentFile(), GO_MOD_FILE_NAME_BAK);
@@ -151,12 +153,18 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Nonnull
   @MustNotContainNull
-  private List<Tuple<Artifact, Tuple<GoMod, File>>> fildGoModsAndParse(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders, final boolean parseGoMod) throws IOException {
+  private List<File> fildGoModsInFolder(@Nonnull @MustNotContainNull final File folder) throws IOException {
+    return new ArrayList<>(FileUtils.listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME), TrueFileFilter.INSTANCE));
+  }
+
+  @Nonnull
+  @MustNotContainNull
+  private List<Tuple<Artifact, Tuple<GoMod, File>>> fildGoModsAndParse(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders) throws IOException {
     final List<Tuple<Artifact, Tuple<GoMod, File>>> result = new ArrayList<>();
 
     for (final Tuple<Artifact, File> tuple : unpackedFolders) {
       for (final File f : FileUtils.listFiles(tuple.right(), FileFilterUtils.nameFileFilter("go.mod"), TrueFileFilter.INSTANCE)) {
-        final GoMod model = parseGoMod ? GoMod.from(FileUtils.readFileToString(f, StandardCharsets.UTF_8)) : null;
+        final GoMod model = GoMod.from(FileUtils.readFileToString(f, StandardCharsets.UTF_8));
         result.add(Tuple.of(tuple.left(), Tuple.of(model, f)));
       }
     }
@@ -210,7 +218,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @MustNotContainNull
   private List<Tuple<Artifact, Tuple<GoMod, File>>> preprocessModuleFilesInDependencies(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders) throws IOException {
     getLog().debug("Findig go.mod descriptors in unpacked artifacts");
-    final List<Tuple<Artifact, Tuple<GoMod, File>>> foundAndParsedGoMods = fildGoModsAndParse(unpackedFolders, true);
+    final List<Tuple<Artifact, Tuple<GoMod, File>>> foundAndParsedGoMods = fildGoModsAndParse(unpackedFolders);
     getLog().debug(String.format("Found %d go.mod descriptors", foundAndParsedGoMods.size()));
     final int changedGoModCounter = generateCrossLinksBetweenArtifactGoMods(foundAndParsedGoMods);
     getLog().debug(String.format("Changed %d go.mod descriptors in unpacked artifacts", changedGoModCounter));
@@ -222,11 +230,14 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   public final void doInit() throws MojoFailureException, MojoExecutionException {
     super.doInit();
 
-    if (this.isPreprocessGoMod()) {
+    if (this.isModuleMode()) {
       try {
-        restoreGoModFromBakIfExists(this.getSources(false));
+        final File src = this.getSources(false);
+        if (src != null) {
+          this.restoreGoModFromBackupAndRemoveBackup(src);
+        }
       } catch (IOException ex) {
-        throw new MojoExecutionException("IOException", ex);
+        throw new MojoExecutionException("Error during restoring of detected go.mod backup in source folder", ex);
       }
     }
 
@@ -256,56 +267,88 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         getLog().debug("Depedencies will be unpacked into folder: " + dependencyTempTargetFolder);
         final List<Tuple<Artifact, File>> unpackedFolders = unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
 
-        if (this.isPreprocessGoMod()) {
-          this.getLog().info("Activated preprocessing of go.mod files");
-          this.preprocessModsInUnpackedDependencies(unpackedFolders);
+        if (this.isModuleMode()) {
+          this.getLog().info("Module mode is activacted");
+          this.preprocessModules(unpackedFolders);
         }
 
-        final List<File> unpackedFolderList = new ArrayList<>();
-        for (final Tuple<Artifact, File> f : unpackedFolders) {
-          unpackedFolderList.add(f.right());
-        }
+        if (this.isModuleMode()) {
+          this.getLog().info("Dependemcies are not added into GOPATH because module mode is on");
+        } else {
+          final List<File> unpackedFolderList = new ArrayList<>();
+          for (final Tuple<Artifact, File> f : unpackedFolders) {
+            unpackedFolderList.add(f.right());
+          }
 
-        final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolderList.toArray(new File[0]));
-        getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
-        this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
+          final String preparedExtraPartForGoPath = IOUtils.makeOsFilePathWithoutDuplications(unpackedFolderList.toArray(new File[0]));
+          getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
+          this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
+        }
       }
     } else {
       getLog().info("Maven dependency scanning is off");
     }
   }
 
-  private void restoreGoModFromBakIfExists(@Nonnull final File folder) throws MojoExecutionException {
-    try {
-      final File gomodFile = new File(folder, GO_MOD_FILE_NAME);
-      final File gomodFileBak = new File(folder, GO_MOD_FILE_NAME_BAK);
+  @Override
+  @Nonnull
+  protected File getDirectoryToUseAsWorkingOne() throws IOException {
+    if (this.isModuleMode()) {
+      final File srcFolder = this.getSources(false);
+      if (srcFolder.isDirectory()) {
+        final List<File> foundGoMods = this.fildGoModsInFolder(srcFolder);
+        this.getLog().debug(String.format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
 
-      if (gomodFileBak.isFile()) {
-        this.getLog().debug("Restoring go.mod from backup");
+        Collections.sort(foundGoMods, new Comparator<File>() {
+          @Override
+          public int compare(@Nonnull final File o1, @Nonnull final File o2) {
+            return o1.toString().compareTo(o2.toString());
+          }
+        });
 
-        if (gomodFile.isFile() && !gomodFile.delete()) {
-          throw new IOException("Can't delete existing go.mod file: " + gomodFile);
+        if (foundGoMods.isEmpty()) {
+          this.getLog().error("Module mode is activated but there is no any go,od file in the source folder: " + srcFolder);
+          throw new IOException("Can't find any go.mod folder in the source folder: " + srcFolder);
+        } else {
+          final File gomodFolder = foundGoMods.get(0).getParentFile();
+          this.getLog().info(String.format("Detected module folder '%s' to be used as working folder", gomodFolder));
+          return gomodFolder;
         }
-
-        if (!gomodFileBak.renameTo(gomodFile)) {
-          throw new IOException("Can't rename  file '" + gomodFileBak + "' to '" + gomodFile + '\'');
-        }
-      } else {
-        this.getLog().debug("There is no any backup go.mod");
       }
-    } catch (IOException ex) {
-      throw new MojoExecutionException("Can't restore go.mod backup", ex);
+    }
+
+    return super.getDirectoryToUseAsWorkingOne();
+  }
+
+  private void restoreGoModFromBackupAndRemoveBackup(@Nonnull final File folder) throws IOException {
+    final Collection<File> backupFiles = FileUtils.listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME_BAK), TrueFileFilter.INSTANCE);
+
+    this.getLog().debug(String.format("Restoring go.mod from backup in %s, detected %d files", folder, backupFiles.size()));
+
+    for (final File backup : backupFiles) {
+      final File restored = new File(folder, GO_MOD_FILE_NAME);
+      if (restored.isFile() && !restored.delete()) {
+        throw new IOException("Can't delete file during backup restore: " + restored);
+      }
+      if (!backup.renameTo(restored)) {
+        throw new IOException("Can't rename backup: " + backup + " -> " + restored);
+      }
     }
   }
 
   @Override
-  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
+  public void afterExecution(@Nullable
+          final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
     try {
-      if (this.isPreprocessGoMod() && this.isRestoreGoMod()) {
-        this.restoreGoModFromBakIfExists(this.getSources(false));
+      if (this.isModuleMode()) {
+        final File srcFolder = this.getSources(false);
+        if (srcFolder.isDirectory()) {
+          this.getLog().debug("Restoring go.mod from backup in source folder: " + srcFolder);
+          this.restoreGoModFromBackupAndRemoveBackup(srcFolder);
+        }
       }
     } catch (IOException ex) {
-      throw new MojoExecutionException("IOException", ex);
+      throw new MojoExecutionException("Error during restore go.mod from backup", ex);
     } finally {
       super.afterExecution(proxySettings, error);
     }
@@ -313,7 +356,10 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Nonnull
   @MustNotContainNull
-  private List<Tuple<Artifact, File>> unpackArtifactsIntoFolder(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> zippedArtifacts, @Nonnull final File targetFolder) throws MojoExecutionException {
+  private List<Tuple<Artifact, File>> unpackArtifactsIntoFolder(@Nonnull
+          @MustNotContainNull
+          final List<Tuple<Artifact, File>> zippedArtifacts, @Nonnull
+          final File targetFolder) throws MojoExecutionException {
     final List<Tuple<Artifact, File>> resultFolders = new ArrayList<>();
 
     if (!targetFolder.isDirectory() && !targetFolder.mkdirs()) {
@@ -346,7 +392,9 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     return resultFolders;
   }
 
-  private boolean unzipSrcFoldersContent(@Nonnull final File artifactZip, @Nonnull final File targetFolder) {
+  private boolean unzipSrcFoldersContent(@Nonnull
+          final File artifactZip, @Nonnull
+          final File targetFolder) {
     final byte[] buildFolderListFile = ZipUtil.unpackEntry(artifactZip, GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE);
     if (buildFolderListFile == null) {
       return false;
@@ -364,7 +412,8 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         ZipUtil.unpack(artifactZip, targetFolder, new NameMapper() {
           @Override
           @Nullable
-          public String map(@Nonnull final String name) {
+          public String map(@Nonnull
+                  final String name) {
             if (name.startsWith(folder)) {
               return name.substring(folder.length());
             }

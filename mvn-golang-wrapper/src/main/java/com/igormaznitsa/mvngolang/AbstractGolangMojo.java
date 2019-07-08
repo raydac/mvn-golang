@@ -159,37 +159,40 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private MojoExecution execution;
 
   /**
-   * Flag to preprocess go.mod files in dependencies and in project to replace path to modules found in dependencies.
-   * 
-   * @since 2.3.3
-   */
-  @Parameter(defaultValue = "false", property = "mvn.golang.preprocess.gomod")
-  private boolean preprocessGoMod;
-  
-  /**
-   * Flag to restore preprocessed go.mod file after end of work.
+   * Flag to turn on module mode. It affects GOPATH build and source folder
+   * location recognition.
    *
    * @since 2.3.3
    */
-  @Parameter(defaultValue = "true", property = "mvn.golang.restore.gomod")
-  private boolean restoreGoMod;
-  
-  public boolean isRestoreGoMod() {
-    return this.restoreGoMod;
+  @Parameter(name = "moduleMode", defaultValue = "false", property = "mvn.golang.module.mode")
+  private boolean moduleMode;
+
+  /**
+   * Path to be used as working directory for executing process, by default it
+   * is unset and working directory depends on mode and command.
+   *
+   * @since 2.3.3
+   */
+  @Parameter(name = "workingDir")
+  private String workingDir;
+
+  @Nullable
+  public final String getWorkingDir() {
+    return this.workingDir;
   }
-  
-  public void setRestoreGoMod(final boolean value) {
-    this.restoreGoMod = value;
+
+  public final void setWorkingDir(@Nullable final String path) {
+    this.workingDir = path;
   }
-  
-  public boolean isPreprocessGoMod(){
-    return this.preprocessGoMod;
+
+  public final boolean isModuleMode() {
+    return this.moduleMode;
   }
-  
-  public void setPreprocessGoMod(final boolean value){
-    this.preprocessGoMod = value;
+
+  public final void setModuleMode(final boolean value) {
+    this.moduleMode = value;
   }
-  
+
   /**
    * Flag shows that environment PATH variable should be filtered for footsteps
    * of other go/bin folders to prevent conflicts.
@@ -1839,15 +1842,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
-    final File sourcesFile = getSources(isSourceFolderRequired());
-    logOptionally("GoLang project sources folder : " + sourcesFile);
-    if (sourcesFile.isDirectory()) {
-      result.directory(sourcesFile);
-    }
+    final File workingDirectory = this.findWorkingDir();
+    logOptionally("Working directory: " + workingDirectory);
+    result.directory(workingDirectory);
 
     logOptionally("");
 
-    registerEnvVars(result, detectedRoot, gobin, gocache, sourcesFile, gopathParts);
+    registerEnvVars(result, detectedRoot, gobin, gocache, this.getSources(this.isSourceFolderRequired()), gopathParts);
 
     logOptionally("........................");
 
@@ -1892,7 +1893,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     } else {
       addEnvVar(result, "GOCACHE", theGoCache);
     }
-    
+
     final String trgtOs = this.getTargetOS();
     final String trgtArch = this.getTargetArch();
     final String trgtArm = this.getTargetArm();
@@ -1923,9 +1924,41 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     thePath = IOUtils.makeOsFilePathWithoutDuplications((theGoRoot + File.separator + getExecSubpath()), thePath, theGoBin);
     addEnvVar(result, "PATH", thePath);
 
+    boolean go111moduleDetected = false;
+
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
+      if ("GO111MODULE".equals(record.getKey().toString())) {
+        go111moduleDetected = true;
+      }
       addEnvVar(result, record.getKey().toString(), record.getValue().toString());
     }
+
+    if (this.isModuleMode()) {
+      if (go111moduleDetected) {
+        this.getLog().warn("Module mode is true but GO111MODULE detected among custom environment variables");
+      } else {
+        this.getLog().info("Forcing GO111MODULE as ON because module mode is true");
+        addEnvVar(result, "GO111MODULE", "on");
+      }
+    }
+  }
+
+  @Nonnull
+  protected File getDirectoryToUseAsWorkingOne() throws IOException {
+    return this.getSources(isSourceFolderRequired());
+  }
+
+  @Nonnull
+  private File findWorkingDir() throws IOException {
+    String dir = this.getWorkingDir();
+    if (dir != null) {
+      final File result = new File(dir);
+      if (!result.isDirectory()) {
+        throw new IOException("Can't find working directory: " + result);
+      }
+      return result;
+    }
+    return this.getDirectoryToUseAsWorkingOne();
   }
 
   /**
