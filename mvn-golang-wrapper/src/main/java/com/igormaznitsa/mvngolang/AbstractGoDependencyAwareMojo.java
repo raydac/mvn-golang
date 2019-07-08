@@ -123,24 +123,24 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
       final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = fildGoModsAndParse(Collections.singletonList(Tuple.of(this.getProject().getArtifact(), this.getSources(false))), true);
 
       for (final Tuple<Artifact, Tuple<GoMod, File>> f : projectGoMods) {
-        final File goModBakSrc = new File(f.right().right().getParentFile(), GO_MOD_FILE_NAME_BAK);
-        final File goModSrc = f.right().right();
+        final File goModFileBak = new File(f.right().right().getParentFile(), GO_MOD_FILE_NAME_BAK);
+        final File goModFile = f.right().right();
 
-        if (goModBakSrc.isFile()) {
-          if (goModSrc.isFile() && !goModSrc.delete()) {
-            throw new IOException("Can't detete go.mod file: " + goModSrc);
+        if (goModFileBak.isFile()) {
+          if (goModFile.isFile() && !goModFile.delete()) {
+            throw new IOException("Can't detete go.mod file: " + goModFile);
           }
-          FileUtils.copyFile(goModBakSrc, goModSrc);
+          FileUtils.copyFile(goModFileBak, goModFile);
         } else {
-          if (goModSrc.isFile()) {
-            FileUtils.copyFile(goModSrc, goModBakSrc);
+          if (goModFile.isFile()) {
+            FileUtils.copyFile(goModFile, goModFileBak);
           }
         }
 
-        if (goModSrc.isFile()) {
-          final GoMod parsed = GoMod.from(FileUtils.readFileToString(goModSrc, StandardCharsets.UTF_8));
-          if (replaceLinksToModules(Tuple.of(parsed, goModSrc), dependencyGoMods)) {
-            FileUtils.write(goModSrc, f.right().left().toString(), StandardCharsets.UTF_8);
+        if (goModFile.isFile()) {
+          final GoMod parsed = GoMod.from(FileUtils.readFileToString(goModFile, StandardCharsets.UTF_8));
+          if (replaceLinksToModules(Tuple.of(parsed, goModFile), dependencyGoMods)) {
+            FileUtils.write(goModFile, parsed.toString(), StandardCharsets.UTF_8);
           }
         }
       }
