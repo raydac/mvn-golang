@@ -126,13 +126,20 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         final File goModBakSrc = new File(f.right().right().getParentFile(), GO_MOD_FILE_NAME_BAK);
         final File goModSrc = f.right().right();
 
-        if (!goModBakSrc.isFile() && goModSrc.isFile()) {
-          FileUtils.copyFile(goModSrc, goModBakSrc);
+        if (goModBakSrc.isFile()) {
+          if (goModSrc.isFile() && !goModSrc.delete()) {
+            throw new IOException("Can't detete go.mod file: " + goModSrc);
+          }
+          FileUtils.copyFile(goModBakSrc, goModSrc);
+        } else {
+          if (goModSrc.isFile()) {
+            FileUtils.copyFile(goModSrc, goModBakSrc);
+          }
         }
 
         if (goModSrc.isFile()) {
-          final GoMod parsed = f.right().left();
-          if (replaceLinksToModules(f.right(), dependencyGoMods)) {
+          final GoMod parsed = GoMod.from(FileUtils.readFileToString(goModSrc, StandardCharsets.UTF_8));
+          if (replaceLinksToModules(Tuple.of(parsed, goModSrc), dependencyGoMods)) {
             FileUtils.write(goModSrc, f.right().left().toString(), StandardCharsets.UTF_8);
           }
         }
@@ -165,7 +172,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         final File thatGoModFile = j.right();
 
         if (source.left().hasRequireFor(thatParsedGoMod.getModule(), null) && !source.left().hasReplaceFor(thatParsedGoMod.getModule(), null)) {
-          
+
           final String relativePath = makeRelativePathToFolder(source.right().getParentFile(), thatGoModFile.getParentFile());
           source.left().addItem(new GoMod.GoReplace(new GoMod.ModuleInfo(thatParsedGoMod.getModule()), new GoMod.ModuleInfo(relativePath)));
           changed = true;
