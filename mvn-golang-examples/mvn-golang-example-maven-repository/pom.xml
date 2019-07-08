@@ -14,6 +14,11 @@
   <name>Example of dependency from Maven repository</name>
   <description>Example how to use mvn-golang artifact saved in maven repository</description>
 
+  <properties>
+    <mvn.golang.preprocess.gomod>true</mvn.golang.preprocess.gomod>
+    <mvn.golang.restore.gomod>false</mvn.golang.restore.gomod>
+  </properties>
+
   <modules>
     <module>mvn-go-test-metalib</module>
     <module>mvn-go-test-lib</module>
