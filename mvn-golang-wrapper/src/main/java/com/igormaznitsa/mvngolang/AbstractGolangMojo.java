@@ -1843,8 +1843,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
     final File workingDirectory = this.findWorkingDir();
-    logOptionally("Working directory: " + workingDirectory);
-    result.directory(workingDirectory);
+    if (workingDirectory.isDirectory()) {
+      logOptionally("Working directory: " + workingDirectory);
+      result.directory(workingDirectory);
+    } else {
+      logOptionally("Working directory is not set because provided folder doesn't exist: " + workingDirectory);
+    }
 
     logOptionally("");
 
