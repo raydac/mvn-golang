@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>mvn-golang-example-maven-module-mix</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Example of dependency from Maven repository</name>
+  <description>Example of use maven dependency together with golang modules</description>
+
+  <properties>
+    <mvn.golang.module.mode>true</mvn.golang.module.mode>
+  </properties>
+
+  <modules>
+    <module>mvn-go-test-mix-terminal</module>
+    <module>mvn-go-test-mix-proxy</module>
+    <module>mvn-go-test-mix-app</module>
+  </modules>
+
+
+</project>

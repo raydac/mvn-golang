@@ -121,6 +121,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public static final String GOARTIFACT_PACKAGING = "mvn-golang";
   public static final String GO_MOD_FILE_NAME = "go.mod";
+  public static final String ENV_GO111MODULE = "GO111MODULE";
 
   /**
    * VERSION, OS, PLATFORM,-OSXVERSION
@@ -1935,7 +1936,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     boolean go111moduleDetected = false;
 
     for (final Map.Entry<?, ?> record : getEnv().entrySet()) {
-      if ("GO111MODULE".equals(record.getKey().toString())) {
+      if (ENV_GO111MODULE.equals(record.getKey().toString())) {
         go111moduleDetected = true;
       }
       addEnvVar(result, record.getKey().toString(), record.getValue().toString());
@@ -1943,17 +1944,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (this.isModuleMode()) {
       if (go111moduleDetected) {
-        this.getLog().warn("Module mode is true but GO111MODULE detected among custom environment variables");
+        this.getLog().warn(String.format("Module mode is true but %s detected among custom environment parameters",ENV_GO111MODULE));
       } else {
-        this.getLog().info("Forcing GO111MODULE as ON because module mode is true");
-        addEnvVar(result, "GO111MODULE", "on");
+        this.getLog().warn(String.format("Forcing '%s = on' because module mode is activated",ENV_GO111MODULE));
+        addEnvVar(result, ENV_GO111MODULE, "on");
       }
     }
   }
 
   @Nonnull
   @MustNotContainNull
-  protected List<File> fildGoModsInFolder(@Nonnull @MustNotContainNull final File folder) throws IOException {
+  protected List<File> findAllGoModsInFolder(@Nonnull @MustNotContainNull final File folder) throws IOException {
     return new ArrayList<>(FileUtils.listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME), TrueFileFilter.INSTANCE));
   }
 
@@ -1962,7 +1963,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if (this.isModuleMode()) {
       final File srcFolder = this.getSources(false);
       if (srcFolder.isDirectory()) {
-        final List<File> foundGoMods = this.fildGoModsInFolder(srcFolder);
+        final List<File> foundGoMods = this.findAllGoModsInFolder(srcFolder);
         this.getLog().debug(String.format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
 
         Collections.sort(foundGoMods, new Comparator<File>() {
@@ -1980,6 +1981,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           this.getLog().info(String.format("Detected module folder '%s' to be used as working folder", gomodFolder));
           return gomodFolder;
         }
+      } else {
+          this.getLog().debug("Source folder is not found: "+srcFolder);
       }
     }
 

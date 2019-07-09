@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 
 public final class GoMod {
 
-    private static final Pattern TOKENIZER = Pattern.compile("(\\/\\/|\\\"[^\\\"]+\\\"|[\\w.+\\-/]+|[<>=-]+|\\(|\\)|[\\s\\n]+)");
+    private static final Pattern TOKENIZER = Pattern.compile("(\\/\\/|\\\"[^\\\"]+\\\"|[<>=\\w.+\\-/]+|[<>=-]+|\\(|\\)|[\\s\\n]+)");
 
     @Nonnull
     private static String quoteIfHasSpace(@Nonnull final String str) {
