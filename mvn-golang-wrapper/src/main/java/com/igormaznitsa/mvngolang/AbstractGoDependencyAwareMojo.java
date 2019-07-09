@@ -20,23 +20,20 @@ import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.mvngolang.utils.GoMod;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
-import com.igormaznitsa.mvngolang.utils.Tuple;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
+import com.igormaznitsa.mvngolang.utils.Tuple;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -48,8 +45,7 @@ import org.zeroturnaround.zip.ZipUtil;
 
 public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
-  protected final String GO_MOD_FILE_NAME_BAK = ".#go.mod.mvn.orig";
-  protected final String GO_MOD_FILE_NAME = "go.mod";
+  public static final String GO_MOD_FILE_NAME_BAK = ".#go.mod.mvn.orig";
 
   /**
    * Internal variable to keep GOPATH part containing folders of unpacked
@@ -149,12 +145,6 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     } catch (IOException ex) {
       throw new MojoExecutionException("Can't process a go.mod file", ex);
     }
-  }
-
-  @Nonnull
-  @MustNotContainNull
-  private List<File> fildGoModsInFolder(@Nonnull @MustNotContainNull final File folder) throws IOException {
-    return new ArrayList<>(FileUtils.listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME), TrueFileFilter.INSTANCE));
   }
 
   @Nonnull
@@ -288,36 +278,6 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     } else {
       getLog().info("Maven dependency scanning is off");
     }
-  }
-
-  @Override
-  @Nonnull
-  protected File getDirectoryToUseAsWorkingOne() throws IOException {
-    if (this.isModuleMode()) {
-      final File srcFolder = this.getSources(false);
-      if (srcFolder.isDirectory()) {
-        final List<File> foundGoMods = this.fildGoModsInFolder(srcFolder);
-        this.getLog().debug(String.format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
-
-        Collections.sort(foundGoMods, new Comparator<File>() {
-          @Override
-          public int compare(@Nonnull final File o1, @Nonnull final File o2) {
-            return o1.toString().compareTo(o2.toString());
-          }
-        });
-
-        if (foundGoMods.isEmpty()) {
-          this.getLog().error("Module mode is activated but there is no any go,od file in the source folder: " + srcFolder);
-          throw new IOException("Can't find any go.mod folder in the source folder: " + srcFolder);
-        } else {
-          final File gomodFolder = foundGoMods.get(0).getParentFile();
-          this.getLog().info(String.format("Detected module folder '%s' to be used as working folder", gomodFolder));
-          return gomodFolder;
-        }
-      }
-    }
-
-    return super.getDirectoryToUseAsWorkingOne();
   }
 
   private void restoreGoModFromBackupAndRemoveBackup(@Nonnull final File folder) throws IOException {

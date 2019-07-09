@@ -45,6 +45,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +63,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.Header;
@@ -117,6 +120,7 @@ import org.zeroturnaround.exec.ProcessResult;
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public static final String GOARTIFACT_PACKAGING = "mvn-golang";
+  public static final String GO_MOD_FILE_NAME = "go.mod";
 
   /**
    * VERSION, OS, PLATFORM,-OSXVERSION
@@ -1948,7 +1952,37 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
+  @MustNotContainNull
+  protected List<File> fildGoModsInFolder(@Nonnull @MustNotContainNull final File folder) throws IOException {
+    return new ArrayList<>(FileUtils.listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME), TrueFileFilter.INSTANCE));
+  }
+
+  @Nonnull
   protected File getDirectoryToUseAsWorkingOne() throws IOException {
+    if (this.isModuleMode()) {
+      final File srcFolder = this.getSources(false);
+      if (srcFolder.isDirectory()) {
+        final List<File> foundGoMods = this.fildGoModsInFolder(srcFolder);
+        this.getLog().debug(String.format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
+
+        Collections.sort(foundGoMods, new Comparator<File>() {
+          @Override
+          public int compare(@Nonnull final File o1, @Nonnull final File o2) {
+            return o1.toString().compareTo(o2.toString());
+          }
+        });
+
+        if (foundGoMods.isEmpty()) {
+          this.getLog().error("Module mode is activated but there is no any go.mod file in the source folder: " + srcFolder);
+          throw new IOException("Can't find any go.mod folder in the source folder: " + srcFolder);
+        } else {
+          final File gomodFolder = foundGoMods.get(0).getParentFile();
+          this.getLog().info(String.format("Detected module folder '%s' to be used as working folder", gomodFolder));
+          return gomodFolder;
+        }
+      }
+    }
+
     return this.getSources(isSourceFolderRequired());
   }
 
