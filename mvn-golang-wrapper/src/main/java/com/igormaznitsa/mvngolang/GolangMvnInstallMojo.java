@@ -109,13 +109,9 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
 
   @Override
   protected boolean doMainBusiness(@Nonnull final ProxySettings proxySettings, final int maxAttempts) throws InterruptedException, MojoFailureException, MojoExecutionException, IOException {
-    try {
-      final File archive = compressProjectFiles();
-      this.getProject().getArtifact().setFile(archive);
-    } catch (IOException ex) {
-      throw new MojoExecutionException("Detected unexpected IOException, check the log!", ex);
-    }
-    return true;
+    final File archive = compressProjectFiles();
+    this.getProject().getArtifact().setFile(archive);
+    return false;
   }
 
   private void safeCopyDirectory(@Nullable final String src, @Nonnull final File dst, @Nullable @MustNotContainNull final List<File> dstList) throws IOException {

@@ -1598,16 +1598,20 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       final ProxySettings proxySettings = extractProxySettings();
       beforeExecution(proxySettings);
 
-      boolean error = false;
+      Exception exception = null;
+      boolean errorDuringMainBusiness = false;
       try {
-        error = doMainBusiness(proxySettings, 10);
-      } catch (IOException ex) {
-        error = true;
-        throw new MojoExecutionException(ex.getMessage(), ex);
-      } catch (InterruptedException ex) {
-        error = true;
+        errorDuringMainBusiness = doMainBusiness(proxySettings, 10);
+      } catch (final Exception ex) {
+        exception = ex;
       } finally {
-        afterExecution(null, error);
+        afterExecution(null, errorDuringMainBusiness || exception != null);
+      }
+
+      if (exception != null) {
+        throw new MojoExecutionException(exception.getMessage(), exception);
+      } else if (errorDuringMainBusiness) {
+        throw new MojoFailureException("Mojo execution failed, see log");
       }
     }
   }
@@ -1944,9 +1948,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (this.isModuleMode()) {
       if (go111moduleDetected) {
-        this.getLog().warn(String.format("Module mode is true but %s detected among custom environment parameters",ENV_GO111MODULE));
+        this.getLog().warn(String.format("Module mode is true but %s detected among custom environment parameters", ENV_GO111MODULE));
       } else {
-        this.getLog().warn(String.format("Forcing '%s = on' because module mode is activated",ENV_GO111MODULE));
+        this.getLog().warn(String.format("Forcing '%s = on' because module mode is activated", ENV_GO111MODULE));
         addEnvVar(result, ENV_GO111MODULE, "on");
       }
     }
@@ -1982,7 +1986,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           return gomodFolder;
         }
       } else {
-          this.getLog().debug("Source folder is not found: "+srcFolder);
+        this.getLog().debug("Source folder is not found: " + srcFolder);
       }
     }
 
