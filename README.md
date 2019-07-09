@@ -8,6 +8,11 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+__2.3.3 (SNAPSHOT)__
+ - refactoring
+ - added parameter `workingDirectory` to replace automatically choosen working directory during tool execution.
+ - added support of [Golang modules]() with maven dependencies, added [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix) [#60](https://github.com/raydac/mvn-golang/issues/60)
+
 __2.3.2 (24-jun-2019)__
  - updated maven archetypes
  - fixed `mvn-golang:vet does not have maven dependency resolution` [#59](https://github.com/raydac/mvn-golang/issues/59)
