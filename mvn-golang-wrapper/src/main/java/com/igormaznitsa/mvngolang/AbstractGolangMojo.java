@@ -1888,6 +1888,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     logOptionally("....Environment vars....");
 
     addEnvVar(result, "GOROOT", theGoRoot.getAbsolutePath());
+    this.project.getProperties().setProperty("mvn.golang.goroot.last", theGoRoot.getAbsolutePath());
 
     String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(goPathParts);
     if (isEnforceGoPathToEnd()) {
