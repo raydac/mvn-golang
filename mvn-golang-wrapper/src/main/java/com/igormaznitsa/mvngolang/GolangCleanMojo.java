@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
@@ -45,7 +44,8 @@ public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
   private boolean cleanGoPath;
 
   /**
-   * Delete plugin Golang store folder It is folder where the plugin keeps cached SDKs and packages.
+   * Delete plugin Golang store folder It is folder where the plugin keeps
+   * cached SDKs and packages.
    *
    * @since 2.1.1
    */
@@ -61,6 +61,14 @@ public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Nonnull
   public String getGoCommand() {
     return "clean";
+  }
+
+  @Override
+  public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
+    super.beforeExecution(proxySettings);
+    if (this.isModuleMode() && this.getBuildFlags().length == 0) {
+      this.addTmpBuildFlagIfNotPresented("-modcache");
+    }
   }
 
   private void deleteStoreFolder() throws MojoFailureException {
