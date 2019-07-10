@@ -164,8 +164,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private MojoExecution execution;
 
   /**
-   * Flag to turn on module mode. It affects GOPATH build and source folder
-   * location recognition.
+   * Flag to turn on support for module mode. Dependencies will not be added
+   * into GOPATH, go.mod files will be preprocessed to have replace links to
+   * each other locally. After processing all go.mod files are restored from
+   * backup.
    *
    * @since 2.3.3
    */
