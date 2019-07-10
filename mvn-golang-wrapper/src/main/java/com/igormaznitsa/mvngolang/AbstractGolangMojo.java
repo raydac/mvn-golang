@@ -1853,7 +1853,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final ProcessExecutor result = new ProcessExecutor(commandLine);
 
-    final File workingDirectory = this.findWorkingDir();
+    final File workingDirectory = this.getWorkingDirectoryForExecutor();
     if (workingDirectory.isDirectory()) {
       logOptionally("Working directory: " + workingDirectory);
       result.directory(workingDirectory);
@@ -1888,7 +1888,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     logOptionally("....Environment vars....");
 
     addEnvVar(result, "GOROOT", theGoRoot.getAbsolutePath());
-    this.project.getProperties().setProperty("mvn.golang.goroot.last", theGoRoot.getAbsolutePath());
 
     String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(goPathParts);
     if (isEnforceGoPathToEnd()) {
@@ -1966,7 +1965,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  protected File getDirectoryToUseAsWorkingOne() throws IOException {
+  protected File getWorkingDirectoryForExecutor() throws IOException {
+    final String forcedWorkingDirdir = this.getWorkingDir();
+    if (forcedWorkingDirdir != null) {
+      final File result = new File(forcedWorkingDirdir);
+      if (!result.isDirectory()) {
+        throw new IOException("Working directory doesn't exist: " + result);
+      }
+      return result;
+    }
+    
     if (this.isModuleMode()) {
       final File srcFolder = this.getSources(false);
       if (srcFolder.isDirectory()) {
@@ -1994,19 +2002,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     return this.getSources(isSourceFolderRequired());
-  }
-
-  @Nonnull
-  private File findWorkingDir() throws IOException {
-    String dir = this.getWorkingDir();
-    if (dir != null) {
-      final File result = new File(dir);
-      if (!result.isDirectory()) {
-        throw new IOException("Can't find working directory: " + result);
-      }
-      return result;
-    }
-    return this.getDirectoryToUseAsWorkingOne();
   }
 
   /**

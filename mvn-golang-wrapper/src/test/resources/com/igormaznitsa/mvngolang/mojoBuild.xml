@@ -20,6 +20,7 @@
                 </goals>
                 <configuration>
                     <skip>true</skip>
+                    <workingDir>some/working/dir</workingDir>
                     <useMavenProxy>true</useMavenProxy>
                     <targetOs>someos</targetOs>
                     <targetArch>somearch</targetArch>
