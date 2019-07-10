@@ -8,7 +8,7 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mvn-go-test-app</artifactId>
+  <artifactId>mvn-go-test-mix-app</artifactId>
   <packaging>mvn-golang</packaging>
 
   <dependencies>
