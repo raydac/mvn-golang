@@ -23,10 +23,6 @@
         <extensions>true</extensions>
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
-          <buildMode>archive</buildMode>
-          <packages>
-            <package>./...</package>
-          </packages>
         </configuration>
       </plugin>
     </plugins>
