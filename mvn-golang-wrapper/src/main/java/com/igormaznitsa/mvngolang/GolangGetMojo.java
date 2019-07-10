@@ -717,7 +717,6 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
       getLog().info("(!) Get initial version of package repository before CVS operations");
       this.buildFlagsToIgnore.add("-u");
       this.addTmpBuildFlagIfNotPresented("-d");
-      this.addTmpBuildFlagIfNotPresented("-v");
 
       try {
         final boolean error = this.doMainBusiness(proxySettings, 10);
