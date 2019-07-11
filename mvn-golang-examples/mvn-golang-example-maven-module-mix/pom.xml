@@ -11,7 +11,6 @@
   <artifactId>mvn-golang-example-maven-module-mix</artifactId>
   <packaging>pom</packaging>
 
-  <name>Example of dependency from Maven repository</name>
   <description>Example of use maven dependency together with golang modules</description>
 
   <properties>
