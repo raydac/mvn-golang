@@ -303,8 +303,12 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
       if (this.isModuleMode()) {
         final File srcFolder = this.getSources(false);
         if (srcFolder.isDirectory()) {
-          this.getLog().debug("Restoring go.mod from backup in source folder: " + srcFolder);
-          this.restoreGoModFromBackupAndRemoveBackup(srcFolder);
+          if (this.isRestoreGoMod()) {
+            this.getLog().debug("Restoring go.mod from backup in source folder: " + srcFolder);
+            this.restoreGoModFromBackupAndRemoveBackup(srcFolder);
+          } else {
+            this.getLog().info("Restoring go.mod from backup is disabled");
+          }
         }
       }
     } catch (IOException ex) {
@@ -312,6 +316,10 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     } finally {
       super.afterExecution(proxySettings, error);
     }
+  }
+
+  protected boolean isRestoreGoMod() {
+    return Boolean.parseBoolean(this.getProject().getProperties().getProperty("mvn.golang.restore.go.mod", "true"));
   }
 
   @Nonnull
