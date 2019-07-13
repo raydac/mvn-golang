@@ -1888,6 +1888,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     logOptionally("....Environment vars....");
 
     addEnvVar(result, "GOROOT", theGoRoot.getAbsolutePath());
+    this.project.getProperties().setProperty("mvn.golang.last.goroot", theGoRoot.getAbsolutePath());
 
     String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(goPathParts);
     if (isEnforceGoPathToEnd()) {
@@ -1896,17 +1897,20 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(preparedGoPath, makePathFromExtraGoPathElements(), removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getSpecialPartOfGoPath());
     }
     addEnvVar(result, "GOPATH", preparedGoPath);
+    this.project.getProperties().setProperty("mvn.golang.last.gopath", preparedGoPath);
 
     if (theGoBin == null) {
       getLog().warn("GOBIN is disabled by direct order");
     } else {
       addEnvVar(result, "GOBIN", theGoBin);
+      this.project.getProperties().setProperty("mvn.golang.last.gobin", theGoBin);
     }
 
     if (theGoBin == null) {
       getLog().warn("GOCACHE is not provided by direct order");
     } else {
       addEnvVar(result, "GOCACHE", theGoCache);
+      this.project.getProperties().setProperty("mvn.golang.last.gocache", theGoCache);
     }
 
     final String trgtOs = this.getTargetOS();
@@ -1916,28 +1920,34 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (trgt386 != null) {
       addEnvVar(result, "GO386", trgt386);
+      this.project.getProperties().setProperty("mvn.golang.last.go386", trgt386);
     }
 
     if (trgtOs != null) {
       addEnvVar(result, "GOOS", trgtOs);
+      this.project.getProperties().setProperty("mvn.golang.last.goos", trgtOs);
     }
 
     if (trgtArm != null) {
       addEnvVar(result, "GOARM", trgtArm);
+      this.project.getProperties().setProperty("mvn.golang.last.goarm", trgtArm);
     }
 
     if (trgtArch != null) {
       addEnvVar(result, "GOARCH", trgtArch);
+      this.project.getProperties().setProperty("mvn.golang.last.goarch", trgtArch);
     }
 
     final File gorootbootstrap = findGoRootBootstrap(true);
     if (gorootbootstrap != null) {
       addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
+      this.project.getProperties().setProperty("mvn.golang.last.goroot_bootstrap", gorootbootstrap.getAbsolutePath());
     }
 
     String thePath = GetUtils.ensureNonNull(getEnvPath(), "");
     thePath = IOUtils.makeOsFilePathWithoutDuplications((theGoRoot + File.separator + getExecSubpath()), thePath, theGoBin);
     addEnvVar(result, "PATH", thePath);
+    this.project.getProperties().setProperty("mvn.golang.last.path", thePath);
 
     boolean go111moduleDetected = false;
 
@@ -1974,7 +1984,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       }
       return result;
     }
-    
+
     if (this.isModuleMode()) {
       final File srcFolder = this.getSources(false);
       if (srcFolder.isDirectory()) {
