@@ -307,7 +307,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
             this.getLog().debug("Restoring go.mod from backup in source folder: " + srcFolder);
             this.restoreGoModFromBackupAndRemoveBackup(srcFolder);
           } else {
-            this.getLog().info("Restoring go.mod from backup is disabled");
+            this.getLog().warn("Restoring of go.mod from backup is disabled");
           }
         }
       }
