@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -222,6 +223,16 @@ public final class MavenUtils {
     }
 
     return result;
+  }
+
+  @Nullable
+  public static String findProperty(
+          @Nonnull final MavenProject project,
+          @Nonnull final String key,
+          @Nullable final String dflt
+  ) {
+    return project.getProperties()
+            .getProperty(key, System.getProperty(key, dflt));
   }
 
 }

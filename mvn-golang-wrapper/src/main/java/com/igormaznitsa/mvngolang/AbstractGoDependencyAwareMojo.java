@@ -319,7 +319,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   }
 
   protected boolean isRestoreGoMod() {
-    return Boolean.parseBoolean(this.getProject().getProperties().getProperty("mvn.golang.restore.go.mod", "true"));
+    return Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.restore.go.mod", "true"));
   }
 
   @Nonnull
