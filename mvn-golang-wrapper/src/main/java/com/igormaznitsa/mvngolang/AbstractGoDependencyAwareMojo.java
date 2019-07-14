@@ -341,9 +341,27 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
     for (final Tuple<Artifact, File> zipFile : zippedArtifacts) {
       final File outDir = new File(targetFolder, FilenameUtils.getBaseName(zipFile.right().getName()));
+
+      boolean doUnpackArch = false;
       if (outDir.isDirectory()) {
-        getLog().debug("Dependency already unpacked: " + outDir);
+        this.getLog().debug("Unpacked dependemcy folder already exists: " + outDir);
+        if (Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.force.clean.dependency", "false"))) {
+          this.getLog().debug("Forcing dependency folder delete: " + outDir);
+          try {
+            FileUtils.deleteDirectory(outDir);
+          } catch (IOException ex) {
+            throw new MojoExecutionException("Can't delete dependency folder: " + outDir, ex);
+          }
+          doUnpackArch = true;
+        } else {
+          getLog().debug("Ignoring dependency unpack because folder exists: " + outDir);
+          doUnpackArch = false;
+        }
       } else {
+        doUnpackArch = true;
+      }
+
+      if (doUnpackArch) {
         if (ZipUtil.containsEntry(zipFile.right(), GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE)) {
           final File srcTargetFolder = new File(outDir, "src");
           try {
@@ -360,6 +378,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           }
         }
       }
+
       resultFolders.add(Tuple.of(zipFile.left(), outDir));
     }
     return resultFolders;
