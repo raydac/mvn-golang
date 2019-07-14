@@ -32,7 +32,7 @@ import java.io.IOException;
 /**
  * The Mojo wraps the 'clean' command.
  */
-@Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = false, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**

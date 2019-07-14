@@ -34,7 +34,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 /**
  * The Mojo wraps the 'build' command.
  */
-@Mojo(name = "build", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = false, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "build", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**

@@ -28,7 +28,7 @@ import java.io.File;
 /**
  * The Mojo wraps the 'fix' command.
  */
-@Mojo(name = "fix", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = false, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "fix", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangFixMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     @Override

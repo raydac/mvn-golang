@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * The Mojo wraps the 'test' command.
  */
-@Mojo(name = "test", defaultPhase = LifecyclePhase.TEST, threadSafe = false, requiresDependencyResolution = ResolutionScope.TEST)
+@Mojo(name = "test", defaultPhase = LifecyclePhase.TEST, threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**

@@ -58,7 +58,7 @@ import org.zeroturnaround.zip.ZipUtil;
  *
  * @since 2.1.0
  */
-@Mojo(name = "mvninstall", defaultPhase = LifecyclePhase.INSTALL, threadSafe = false, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "mvninstall", defaultPhase = LifecyclePhase.INSTALL, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
 
   /**

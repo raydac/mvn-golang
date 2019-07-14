@@ -583,6 +583,78 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return value == null || value.isEmpty();
   }
 
+  protected boolean doesNeedSessionLock() {
+    return false;
+  }
+
+  /**
+   * Generate unique file name in bounds current maven session.
+   *
+   * @return file name, must not be null
+   * @since 2.3.3
+   */
+  @Nonnull
+  private String makeLockFileName() {
+    final String id = Long.toHexString((long) System.identityHashCode(this.getSession()) & 0xFFFFFFFFL).toUpperCase(Locale.ENGLISH);
+    return ".#mvn.go.session.lock." + id;
+  }
+
+  /**
+   * Internal method to generate session locking file for mvn-golang mojo. If
+   * file exists then it will be waiting for its removing to create new one.
+   *
+   * @throws MojoExecutionException it will be thrown if any error in process
+   * @since 2.3.3
+   */
+  private void lockMvnGolangSession() throws MojoExecutionException {
+    final File lockFile = new File(this.getProject().getBasedir(), makeLockFileName());
+
+    this.getLog().debug("Locking project for mvn-golang sync processing, locker file: " + lockFile);
+    while (!Thread.currentThread().isInterrupted()) {
+      final boolean locked;
+
+      try {
+        locked = lockFile.createNewFile();
+      } catch (IOException ex) {
+        throw new MojoExecutionException("Detected error during attempt to make locker file: " + lockFile, ex);
+      }
+
+      if (locked) {
+        lockFile.deleteOnExit();
+        this.getLog().debug("Locking file created: " + lockFile);
+        return;
+      } else {
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * Internal method to unlock current mvn-golang session through removing of
+   * the locking file. If file can't be found then it warns and continue work as
+   * if it would be removed.
+   *
+   * @throws MojoExecutionException it is thrown if any error
+   * @since 2.3.3
+   */
+  private void unlockMvnGolangSession() throws MojoExecutionException {
+    final File locker = new File(this.getProject().getBasedir(), makeLockFileName());
+
+    this.getLog().debug("Unlocking project for mvn-golang sync processing, locker file: " + locker);
+    if (locker.isFile()) {
+      if (!locker.delete()) {
+        throw new MojoExecutionException("Can't delete locker file: " + locker);
+      }
+    } else {
+      this.getLog().warn("Can't detect locker file, may be it was removed externally: " + locker);
+    }
+  }
+
   @Nonnull
   private static String extractExtensionOfArchive(@Nonnull final String archiveName) {
     final String lcName = archiveName.toLowerCase(Locale.ENGLISH);
@@ -1590,30 +1662,42 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if (this.isSkip()) {
       getLog().info("Skipping mvn-golang execution");
     } else {
-      if (!isHideBanner()) {
-        printBanner();
+      if (this.doesNeedSessionLock()) {
+        lockMvnGolangSession();
+        if (Thread.currentThread().isInterrupted()) {
+          throw new MojoFailureException("Current thread is interrupted");
+        }
       }
-      doInit();
-
-      printEcho();
-
-      final ProxySettings proxySettings = extractProxySettings();
-      beforeExecution(proxySettings);
-
-      Exception exception = null;
-      boolean errorDuringMainBusiness = false;
       try {
-        errorDuringMainBusiness = doMainBusiness(proxySettings, 10);
-      } catch (final Exception ex) {
-        exception = ex;
-      } finally {
-        afterExecution(null, errorDuringMainBusiness || exception != null);
-      }
+        if (!isHideBanner()) {
+          printBanner();
+        }
+        doInit();
 
-      if (exception != null) {
-        throw new MojoExecutionException(exception.getMessage(), exception);
-      } else if (errorDuringMainBusiness) {
-        throw new MojoFailureException("Mojo execution failed, see log");
+        printEcho();
+
+        final ProxySettings proxySettings = extractProxySettings();
+        beforeExecution(proxySettings);
+
+        Exception exception = null;
+        boolean errorDuringMainBusiness = false;
+        try {
+          errorDuringMainBusiness = doMainBusiness(proxySettings, 10);
+        } catch (final Exception ex) {
+          exception = ex;
+        } finally {
+          afterExecution(null, errorDuringMainBusiness || exception != null);
+        }
+
+        if (exception != null) {
+          throw new MojoExecutionException(exception.getMessage(), exception);
+        } else if (errorDuringMainBusiness) {
+          throw new MojoFailureException("Mojo execution failed, see log");
+        }
+      } finally {
+        if (this.doesNeedSessionLock()) {
+          unlockMvnGolangSession();
+        }
       }
     }
   }

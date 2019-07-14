@@ -318,6 +318,11 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     }
   }
 
+  @Override
+  protected boolean doesNeedSessionLock() {
+    return true;
+  }
+
   protected boolean isRestoreGoMod() {
     return Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.restore.go.mod", "true"));
   }
