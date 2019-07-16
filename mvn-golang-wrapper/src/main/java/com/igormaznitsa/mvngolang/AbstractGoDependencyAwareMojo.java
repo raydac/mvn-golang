@@ -83,6 +83,24 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Parameter(name = "dependencyTempFolder", defaultValue = "${project.build.directory}${file.separator}.__deps__")
   private String dependencyTempFolder;
 
+  /**
+   * Flag to turn on session synchronization to prevent parallel processing of
+   * modules in module mode if session is parallel one,
+   *
+   * @since 2.3.3
+   * @see #isModuleMode()
+   */
+  @Parameter(name = "syncSessionIfModules", defaultValue = "true", property = "mvn.golang.sync.session.if.modules")
+  private boolean syncSessionIfModules;
+
+  public boolean isSyncSessionIfModules() {
+    return this.syncSessionIfModules;
+  }
+
+  public void setSyncSessionIfModules(final boolean value) {
+    this.syncSessionIfModules = value;
+  }
+
   @Nonnull
   public String getDependencyTempFolder() {
     return this.dependencyTempFolder;
@@ -320,7 +338,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Override
   protected boolean doesNeedSessionLock() {
-    return true;
+    return this.getSession().isParallel() && this.isModuleMode() && this.isSyncSessionIfModules();
   }
 
   protected boolean isRestoreGoMod() {

@@ -594,11 +594,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * @since 2.3.3
    */
   @Nonnull
-  private String makeLockFileName() {
-    final String id = Long.toHexString((long) System.identityHashCode(this.getSession()) & 0xFFFFFFFFL).toUpperCase(Locale.ENGLISH);
+  private String makeSessionLockFileName() {
+    final String id = Long.toHexString(this.getSession().getStartTime().getTime()).toUpperCase(Locale.ENGLISH);
     return ".#mvn.go.session.lock." + id;
   }
 
+  @Nonnull
+  protected File getTempFileFolder() {
+    return new File(System.getProperty("java.io.tmpdir"));
+  }
+  
   /**
    * Internal method to generate session locking file for mvn-golang mojo. If
    * file exists then it will be waiting for its removing to create new one.
@@ -607,7 +612,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * @since 2.3.3
    */
   private void lockMvnGolangSession() throws MojoExecutionException {
-    final File lockFile = new File(this.getProject().getBasedir(), makeLockFileName());
+    final File lockFile = new File(this.getTempFileFolder(), makeSessionLockFileName());
 
     this.getLog().debug("Locking project for mvn-golang sync processing, locker file: " + lockFile);
     while (!Thread.currentThread().isInterrupted()) {
@@ -643,7 +648,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * @since 2.3.3
    */
   private void unlockMvnGolangSession() throws MojoExecutionException {
-    final File locker = new File(this.getProject().getBasedir(), makeLockFileName());
+    final File locker = new File(this.getTempFileFolder(), makeSessionLockFileName());
 
     this.getLog().debug("Unlocking project for mvn-golang sync processing, locker file: " + locker);
     if (locker.isFile()) {
