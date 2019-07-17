@@ -231,8 +231,15 @@ public final class MavenUtils {
           @Nonnull final String key,
           @Nullable final String dflt
   ) {
-    return project.getProperties()
-            .getProperty(key, System.getProperty(key, dflt));
+    String projectProperty = null;
+
+    MavenProject curProject = project;
+    do {
+      projectProperty = curProject.getProperties().getProperty(key);
+      curProject = curProject.getParent();
+    } while (projectProperty == null && curProject != null);
+
+    return projectProperty == null ? System.getProperty(key, dflt) : projectProperty;
   }
 
 }
