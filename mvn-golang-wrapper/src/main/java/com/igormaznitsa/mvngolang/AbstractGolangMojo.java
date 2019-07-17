@@ -24,6 +24,7 @@ import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.meta.common.utils.StrUtils;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 import com.igormaznitsa.mvngolang.utils.WildCardMatcher;
@@ -917,7 +918,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isSkip() {
-    return this.skip || Boolean.getBoolean("mvn.golang.skip");
+    return this.skip 
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.skip", "false"));
   }
 
   public boolean isEnforceGoPathToEnd() {
@@ -1188,7 +1190,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isDisableSslCheck() {
-    return this.disableSSLcheck || Boolean.getBoolean("mvn.golang.disable.ssl.check");
+    return this.disableSSLcheck || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.disable.ssl.check", "false"));
   }
 
   public void setDisableSslCheck(final boolean flag) {

@@ -18,6 +18,7 @@ package com.igormaznitsa.mvngolang;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -48,7 +49,9 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   @Override
   public boolean isSkip() {
-    return super.isSkip() || Boolean.getBoolean("skipTests") || Boolean.getBoolean("maven.test.skip");
+    return super.isSkip() 
+            || Boolean.getBoolean("skipTests") 
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.test.skip", "false"));
   }
 
   @Override
