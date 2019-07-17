@@ -9,7 +9,7 @@
 
 # Changelog
 __2.3.3 (SNAPSHOT)__
- - refactoring
+ - minor fixes and refactoring
  - added parameter `workingDirectory` to replace automatically choosen working directory during tool execution.
  - added support of [Golang modules]() with maven dependencies, added [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix) [#60](https://github.com/raydac/mvn-golang/issues/60)
 
