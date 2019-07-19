@@ -109,7 +109,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   @Nonnull
   private File getResultFile() {
-    return new File(getResultFolder(), this.resultName);
+    return new File(getResultFolder(), this.getResultName());
   }
 
   @Nonnull
@@ -192,7 +192,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   public String[] getCommandFlags() {
     final List<String> flags = new ArrayList<>();
 
-    flags.add("-buildmode=" + this.buildMode);
+    flags.add("-buildmode=" + this.getBuildMode());
 
     final List<String> linkerflags = this.getLdflagsAsList();
 
@@ -218,10 +218,15 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     }
 
     final String[] selectedPackages = this.getPackages();
+    final String selectedResultName = this.getResultName();
 
     if (selectedPackages == null || selectedPackages.length < 2) {
-      flags.add("-o");
-      flags.add(getResultFile().getAbsolutePath());
+      if ("none".equalsIgnoreCase(selectedResultName.trim())) {
+        this.getLog().info("Result name is not defined so that '-o' option is not added.");
+      } else {
+        flags.add("-o");
+        flags.add(this.getResultFile().getAbsolutePath());
+      }
     }
 
     return flags.toArray(new String[flags.size()]);
