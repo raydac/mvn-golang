@@ -221,7 +221,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     final String selectedResultName = this.getResultName();
 
     if (selectedPackages == null || selectedPackages.length < 2) {
-      if ("none".equalsIgnoreCase(selectedResultName.trim())) {
+      if ("none".equals(selectedResultName.trim())) {
         this.getLog().info("Result name is not defined so that '-o' option is not added.");
       } else {
         flags.add("-o");
