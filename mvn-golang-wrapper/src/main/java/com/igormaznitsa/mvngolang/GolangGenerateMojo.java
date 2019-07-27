@@ -16,7 +16,6 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -38,11 +37,10 @@ public class GolangGenerateMojo extends AbstractGoPackageAndDependencyAwareMojo 
   }
 
   @Override
-  public boolean isSkip() {
-    return super.isSkip()
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.generate.skip", "false"));
+  protected String getSkipMojoPropertySuffix() {
+    return "generate";
   }
-
+  
   @Override
   @Nullable
   @MustNotContainNull

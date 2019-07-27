@@ -16,20 +16,18 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
@@ -99,11 +97,10 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
   }
 
   @Override
-  public boolean isSkip() {
-    return super.isSkip()
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.jfrog.skip", "false"));
+  protected String getSkipMojoPropertySuffix() {
+    return "jfrog";
   }
-
+  
   @Nonnull
   @Override
   protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException, MojoExecutionException {

@@ -350,9 +350,13 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
+  protected String getSkipMojoPropertySuffix() {
+    return "get";
+  }  
+  
+  @Override
   public boolean isSkip() {
     return super.isSkip() 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.get.skip", "false"))
             || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mdep.skip", "false"));
   }
   

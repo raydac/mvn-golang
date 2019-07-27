@@ -16,12 +16,11 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.common.utils.GetUtils;
+import javax.annotation.Nonnull;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-
-import javax.annotation.Nonnull;
 
 /**
  * The Mojo allows to process commands which are not covered by MOJOs of the
@@ -36,6 +35,11 @@ public class GolangCustomMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Parameter(name = "customCommand", required = true)
   private String customCommand;
 
+  @Override
+  protected String getSkipMojoPropertySuffix() {
+    return "clean";
+  }
+  
   @Override
   @Nonnull
   public String getGoCommand() {

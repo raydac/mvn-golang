@@ -48,11 +48,15 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
+  protected String getSkipMojoPropertySuffix() {
+    return "test";
+  }  
+  
+  @Override
   public boolean isSkip() {
     return super.isSkip() 
             || Boolean.getBoolean("skipTests") 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.test.skip", "false"))
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.test.skip", "false"));
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.test.skip", "false"));
   }
 
   @Override

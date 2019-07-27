@@ -18,7 +18,6 @@ package com.igormaznitsa.mvngolang;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
-import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -35,65 +34,65 @@ import java.util.List;
 @Mojo(name = "tool", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangToolMojo extends AbstractGoDependencyAwareMojo {
 
-    /**
-     * The Command to be executed.
-     */
-    @Parameter(name = "command", required = true)
-    private String command;
+  /**
+   * The Command to be executed.
+   */
+  @Parameter(name = "command", required = true)
+  private String command;
 
-    /**
-     * Command arguments.
-     */
-    @Parameter(name = "args")
-    private String[] args;
+  /**
+   * Command arguments.
+   */
+  @Parameter(name = "args")
+  private String[] args;
 
-    @Nullable
-    @MustNotContainNull
-    public String[] getArgs() {
-        return this.args == null ? null : this.args.clone();
-    }
+  @Nullable
+  @MustNotContainNull
+  public String[] getArgs() {
+    return this.args == null ? null : this.args.clone();
+  }
 
-    public void setArgs(@Nullable @MustNotContainNull final String [] value) {
-        this.args = value == null ? null : value.clone();
-    }
+  public void setArgs(@Nullable @MustNotContainNull final String[] value) {
+    this.args = value == null ? null : value.clone();
+  }
 
   @Override
-  public boolean isSkip() {
-    return super.isSkip() || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.tool.skip", "false"));
+  protected String getSkipMojoPropertySuffix() {
+    return "tool";
   }
-    
-    @Override
-    @Nonnull
-    @MustNotContainNull
-    public String[] getTailArguments() {
-        final List<String> result = new ArrayList<>();
-        result.add(this.command);
-        for (final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
-            result.add(s);
-        }
-        return result.toArray(new String[result.size()]);
-    }
 
-    public void setCommand(@Nullable final String value) {
-        this.command = value;
+  @Override
+  @Nonnull
+  @MustNotContainNull
+  public String[] getTailArguments() {
+    final List<String> result = new ArrayList<>();
+    result.add(this.command);
+    for (final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
+      result.add(s);
     }
+    return result.toArray(new String[result.size()]);
+  }
 
-    @Nonnull
-    public String getCommand() {
-        return this.command;
-    }
+  public void setCommand(@Nullable final String value) {
+    this.command = value;
+  }
 
-    @Override
-    @Nonnull
-    public String getGoCommand() {
-        return "tool";
-    }
+  @Nonnull
+  public String getCommand() {
+    return this.command;
+  }
 
-    @Override
-    @Nonnull
-    @MustNotContainNull
-    public String[] getCommandFlags() {
-        return ArrayUtils.EMPTY_STRING_ARRAY;
-    }
+  @Override
+  @Nonnull
+  public String getGoCommand() {
+    return "tool";
+  }
+
+  @Override
+  @Nonnull
+  @MustNotContainNull
+  public String[] getCommandFlags() {
+    return ArrayUtils.EMPTY_STRING_ARRAY;
+  }
 
 }

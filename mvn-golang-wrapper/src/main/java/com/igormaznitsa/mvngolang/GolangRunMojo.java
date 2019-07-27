@@ -18,7 +18,6 @@ package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
-import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -92,8 +91,8 @@ public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
-  public boolean isSkip() {
-    return super.isSkip() || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.run.skip", "false"));
+  protected String getSkipMojoPropertySuffix() {
+    return "run";
   }
   
   @Override

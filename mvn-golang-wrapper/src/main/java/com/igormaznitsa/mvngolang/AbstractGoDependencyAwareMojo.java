@@ -360,7 +360,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     for (final Tuple<Artifact, File> zipFile : zippedArtifacts) {
       final File outDir = new File(targetFolder, FilenameUtils.getBaseName(zipFile.right().getName()));
 
-      boolean doUnpackArch = false;
+      final boolean doUnpackArch;
       if (outDir.isDirectory()) {
         this.getLog().debug("Unpacked dependemcy folder already exists: " + outDir);
         if (Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.force.clean.dependency", "false"))) {

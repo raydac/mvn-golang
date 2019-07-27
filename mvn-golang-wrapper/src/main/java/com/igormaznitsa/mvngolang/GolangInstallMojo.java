@@ -21,7 +21,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import javax.annotation.Nonnull;
-import org.apache.maven.plugins.annotations.Parameter;
 
 
 /**
@@ -31,9 +30,13 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class GolangInstallMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   @Override
+  protected String getSkipMojoPropertySuffix() {
+    return "install";
+  }  
+  
+  @Override
   public boolean isSkip() {
     return super.isSkip() 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.install.skip", "false"))
             || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.deploy.skip", "false"));
   }
     

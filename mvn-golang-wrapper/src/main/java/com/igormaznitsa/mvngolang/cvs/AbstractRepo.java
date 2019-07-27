@@ -27,91 +27,96 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
 public abstract class AbstractRepo {
 
-    private final String command;
+  private final String command;
 
-    public AbstractRepo(@Nonnull final String command) {
-        this.command = SystemUtils.IS_OS_WINDOWS ? command + ".exe" : command;
+  public AbstractRepo(@Nonnull final String command) {
+    this.command = SystemUtils.IS_OS_WINDOWS ? command + ".exe" : command;
+  }
+
+  @Nonnull
+  public String getCommand() {
+    return this.command;
+  }
+
+  public int execute(@Nullable String customCommand, @Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull @MustNotContainNull final String... args) {
+    final List<String> cli = new ArrayList<>();
+    cli.add(GetUtils.findFirstNonNull(customCommand, this.command));
+    for (final String s : args) {
+      cli.add(s);
     }
 
-    @Nonnull
-    public String getCommand() {
-        return this.command;
+    if (logger.isDebugEnabled()) {
+      logger.debug("Executing repo command : " + cli);
     }
 
-    public int execute(@Nullable String customCommand, @Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull @MustNotContainNull final String... args) {
-        final List<String> cli = new ArrayList<>();
-        cli.add(GetUtils.findFirstNonNull(customCommand, this.command));
-        for (final String s : args) {
-            cli.add(s);
-        }
+    final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+    final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Executing repo command : " + cli);
-        }
+    final ProcessExecutor executor = new ProcessExecutor(cli);
 
-        final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    int result = -1;
 
-        final ProcessExecutor executor = new ProcessExecutor(cli);
+    try {
+      final ProcessResult processResult = executor.directory(cvsFolder).redirectError(errorStream).redirectOutput(outStream).executeNoTimeout();
+      result = processResult.getExitValue();
 
-        int result = -1;
+      if (logger.isDebugEnabled()) {
+        logger.debug("Exec.out.........................................");
+        logger.debug(new String(errorStream.toByteArray(), Charset.defaultCharset()));
+        logger.debug(".................................................");
+      }
 
-        try {
-            final ProcessResult processResult = executor.directory(cvsFolder).redirectError(errorStream).redirectOutput(outStream).executeNoTimeout();
-            result = processResult.getExitValue();
+      if (result != 0) {
+        logger.error(new String(errorStream.toByteArray(), Charset.defaultCharset()));
+      }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Exec.out.........................................");
-                logger.debug(new String(errorStream.toByteArray(), Charset.defaultCharset()));
-                logger.debug(".................................................");
-            }
-
-            if (result != 0) {
-                logger.error(new String(errorStream.toByteArray(), Charset.defaultCharset()));
-            }
-
-        } catch (Exception ex) {
-            logger.error("Unexpected error", ex);
-        }
-
-        return result;
+    } catch (IOException | InterruptedException | InvalidExitValueException ex) {
+      if (ex instanceof InterruptedException) {
+        Thread.currentThread().interrupt();
+      }
+      logger.error("Unexpected error", ex);
     }
 
-    protected boolean checkResult(@Nonnull final Log logger, final int code) {
-        return code == 0;
-    }
+    return result;
+  }
 
-    public abstract boolean doesContainCVS(@Nonnull File folder);
+  protected boolean checkResult(@Nonnull final Log logger, final int code) {
+    return code == 0;
+  }
 
-    public boolean prepareFolder(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customExe, @Nonnull final File cvsFolder) {
-        return true;
-    }
+  public abstract boolean doesContainCVS(@Nonnull File folder);
 
-    public boolean processCVSForCustomOptions(
-            @Nonnull final Log logger,
-            @Nullable final ProxySettings proxy,
-            @Nonnull final File cvsFolder,
-            @Nullable final String customCommand,
-            @Nonnull @MustNotContainNull final String... options
-    ) {
-        logger.debug("customCvsCall: " + Arrays.toString(options));
-        return checkResult(logger, execute(customCommand, logger, cvsFolder, options));
-    }
+  public boolean prepareFolder(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customExe, @Nonnull final File cvsFolder) {
+    return true;
+  }
 
-    public abstract boolean processCVSRequisites(
-            @Nonnull final Log logger,
-            @Nullable final ProxySettings proxy,
-            @Nullable final String customCommand,
-            @Nonnull final File cvsFolder,
-            @Nullable final String branchId,
-            @Nullable final String tagId,
-            @Nullable final String revisionId
-    );
+  public boolean processCVSForCustomOptions(
+          @Nonnull final Log logger,
+          @Nullable final ProxySettings proxy,
+          @Nonnull final File cvsFolder,
+          @Nullable final String customCommand,
+          @Nonnull @MustNotContainNull final String... options
+  ) {
+    logger.debug("customCvsCall: " + Arrays.toString(options));
+    return checkResult(logger, execute(customCommand, logger, cvsFolder, options));
+  }
+
+  public abstract boolean processCVSRequisites(
+          @Nonnull final Log logger,
+          @Nullable final ProxySettings proxy,
+          @Nullable final String customCommand,
+          @Nonnull final File cvsFolder,
+          @Nullable final String branchId,
+          @Nullable final String tagId,
+          @Nullable final String revisionId
+  );
 }

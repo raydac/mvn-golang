@@ -41,6 +41,8 @@ import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -918,8 +920,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isSkip() {
-    return this.skip 
+    final boolean result = this.skip 
             || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.skip", "false"));
+    
+    final String skipMojoSuffix = this.getSkipMojoPropertySuffix();
+    return skipMojoSuffix == null ? result : result 
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
   }
 
   public boolean isEnforceGoPathToEnd() {
@@ -1350,7 +1356,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           builder.setConnectionManager(new BasicHttpClientConnectionManager(r));
           builder.setSSLSocketFactory(sslfactory);
           builder.setSSLContext(sslcontext);
-        } catch (final Exception ex) {
+        } catch (final KeyManagementException | NoSuchAlgorithmException ex) {
           throw new MojoExecutionException("Can't disable SSL certificate check", ex);
         }
       } else {
@@ -1690,7 +1696,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         boolean errorDuringMainBusiness = false;
         try {
           errorDuringMainBusiness = doMainBusiness(proxySettings, 10);
-        } catch (final Exception ex) {
+        } catch (final IOException | InterruptedException | MojoExecutionException | MojoFailureException ex) {
+          if (ex instanceof InterruptedException) {
+            Thread.currentThread().interrupt();
+          }
           exception = ex;
         } finally {
           afterExecution(null, errorDuringMainBusiness || exception != null);
@@ -2130,6 +2139,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return false;
   }
 
+  protected String getSkipMojoPropertySuffix() {
+    return null;
+  }
+  
   protected void processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
     final File reportsFolderFile = new File(this.getReportsFolder());
 
