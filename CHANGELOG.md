@@ -1,4 +1,5 @@
 # __2.3.3 (SNAPSHOT)__
+ - added unified boolean properties `mvn.golang.<MOJO_NAME>.skip` to skip work of selected mojo [#65](https://github.com/raydac/mvn-golang/issues/65)
  - text `none` in `resultName` field of `build` mojo disables auto-adding of `-o` command line option  
  - minor fixes and refactoring
  - added parameter `workingDirectory` to replace automatically choosen working directory during tool execution.
