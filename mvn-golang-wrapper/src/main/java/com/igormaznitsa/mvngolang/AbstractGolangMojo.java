@@ -2139,6 +2139,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return false;
   }
 
+  @Nullable
   protected String getSkipMojoPropertySuffix() {
     return null;
   }

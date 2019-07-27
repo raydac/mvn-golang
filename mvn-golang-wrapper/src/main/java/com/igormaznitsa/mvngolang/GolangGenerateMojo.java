@@ -36,6 +36,7 @@ public class GolangGenerateMojo extends AbstractGoPackageAndDependencyAwareMojo 
     return "generate";
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "generate";

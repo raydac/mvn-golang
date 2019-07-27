@@ -90,6 +90,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return this.ldFlags == null ? new ArrayList<String>() : new ArrayList<>(Arrays.asList(this.ldFlags));
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "build";

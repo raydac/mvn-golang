@@ -56,6 +56,7 @@ public class GolangToolMojo extends AbstractGoDependencyAwareMojo {
     this.args = value == null ? null : value.clone();
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "tool";

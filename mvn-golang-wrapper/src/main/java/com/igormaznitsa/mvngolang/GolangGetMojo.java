@@ -349,6 +349,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return this.deleteCommonPkg;
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "get";

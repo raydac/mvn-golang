@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * The Mojo allows to run a program, it wraps <b>run</b> command.
@@ -90,6 +91,7 @@ public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return result;
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "run";

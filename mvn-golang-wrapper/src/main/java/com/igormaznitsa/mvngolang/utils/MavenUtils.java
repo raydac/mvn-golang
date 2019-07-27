@@ -225,7 +225,7 @@ public final class MavenUtils {
     return result;
   }
 
-  private static boolean doesContainFile(final List<Tuple<Artifact, File>> list, final File file) {
+  private static boolean doesContainFile(@Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> list, @Nonnull final File file) {
     boolean result = false;
     for (final Tuple<Artifact, File> t : list) {
       if (t.right().equals(file)) {

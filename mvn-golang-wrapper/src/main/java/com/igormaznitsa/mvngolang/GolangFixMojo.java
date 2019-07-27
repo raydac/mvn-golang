@@ -34,6 +34,7 @@ public class GolangFixMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return true;
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "fix";

@@ -96,6 +96,7 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
     return this.command;
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "jfrog";

@@ -102,6 +102,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
     return this.compression;
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "install";

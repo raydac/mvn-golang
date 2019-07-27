@@ -36,6 +36,7 @@ public class GolangVetMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return new String[]{'.' + File.separator + "..."};
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "vet";

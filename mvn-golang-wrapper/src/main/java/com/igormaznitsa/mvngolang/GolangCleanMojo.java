@@ -62,6 +62,7 @@ public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return "clean";
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "clean";

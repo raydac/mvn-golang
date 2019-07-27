@@ -21,6 +21,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -29,6 +30,7 @@ import javax.annotation.Nonnull;
 @Mojo(name = "install", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangInstallMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "install";

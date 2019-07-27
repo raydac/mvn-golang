@@ -47,6 +47,7 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return name.endsWith(".go") ? name : name + ".go";
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "test";

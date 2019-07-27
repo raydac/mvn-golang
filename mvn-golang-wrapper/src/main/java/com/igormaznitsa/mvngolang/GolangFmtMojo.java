@@ -35,6 +35,7 @@ public class GolangFmtMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return "fmt";
   }
 
+  @Nullable
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "fmt";
