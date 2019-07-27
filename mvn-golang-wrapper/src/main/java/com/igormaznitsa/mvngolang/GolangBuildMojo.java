@@ -18,6 +18,7 @@ package com.igormaznitsa.mvngolang;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
 import java.util.ArrayList;
@@ -90,6 +91,12 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return this.ldFlags == null ? new ArrayList<String>() : new ArrayList<>(Arrays.asList(this.ldFlags));
   }
 
+  @Override
+  public boolean isSkip() {
+    return super.isSkip()
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.build.skip", "false"));
+  }
+  
   public boolean isStrip() {
     return this.strip;
   }

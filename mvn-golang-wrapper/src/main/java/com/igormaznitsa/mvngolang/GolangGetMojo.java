@@ -19,6 +19,7 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.cvs.CVSType;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.PackageList;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
@@ -348,6 +349,13 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return this.deleteCommonPkg;
   }
 
+  @Override
+  public boolean isSkip() {
+    return super.isSkip() 
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.get.skip", "false"))
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mdep.skip", "false"));
+  }
+  
   @Nullable
   @MustNotContainNull
   public String[] getCustomCvsOptions() {

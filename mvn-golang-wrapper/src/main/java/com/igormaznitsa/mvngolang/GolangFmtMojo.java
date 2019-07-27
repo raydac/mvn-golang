@@ -16,6 +16,7 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -24,34 +25,38 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 
-
 /**
  * The Mojo wraps the 'fmt' command.
  */
 @Mojo(name = "fmt", defaultPhase = LifecyclePhase.PROCESS_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangFmtMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
-    @Override
-    @Nonnull
-    public String getGoCommand() {
-        return "fmt";
-    }
+  @Override
+  @Nonnull
+  public String getGoCommand() {
+    return "fmt";
+  }
 
-    @Override
-    @Nullable
-    @MustNotContainNull
-    protected String[] getDefaultPackages() {
-        return new String[]{'.' + File.separator + "..."};
-    }
+  @Override
+  public boolean isSkip() {
+    return super.isSkip() || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.fmt.skip", "false"));
+  }
 
-    @Override
-    public boolean isSourceFolderRequired() {
-        return true;
-    }
+  @Override
+  @Nullable
+  @MustNotContainNull
+  protected String[] getDefaultPackages() {
+    return new String[]{'.' + File.separator + "..."};
+  }
 
-    @Override
-    public boolean isEnforcePrintOutput() {
-        return true;
-    }
+  @Override
+  public boolean isSourceFolderRequired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnforcePrintOutput() {
+    return true;
+  }
 
 }

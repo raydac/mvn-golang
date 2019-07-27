@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -63,6 +64,11 @@ public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return "clean";
   }
 
+  @Override
+  public boolean isSkip() {
+    return super.isSkip() || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.clean.skip", "false"));
+  }
+  
   @Override
   public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
     super.beforeExecution(proxySettings);

@@ -16,6 +16,7 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
 import java.io.IOException;
@@ -95,6 +96,12 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
   @Nonnull
   public String getCommand() {
     return this.command;
+  }
+
+  @Override
+  public boolean isSkip() {
+    return super.isSkip()
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.jfrog.skip", "false"));
   }
 
   @Nonnull

@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.mvngolang;
 
+import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -29,18 +30,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 @Mojo(name = "install", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangInstallMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
-    /**
-    * Set this to 'true' to bypass artifact deploy
-    *
-    * @since 2.1.8
-    */
-    @Parameter(property = "maven.deploy.skip", defaultValue = "false")
-    private boolean skip;
-
-    @Override
-    public boolean isSkip() {
-      return this.skip;
-    }
+  @Override
+  public boolean isSkip() {
+    return super.isSkip() 
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.install.skip", "false"))
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.deploy.skip", "false"));
+  }
     
     @Override
     @Nonnull
