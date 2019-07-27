@@ -204,7 +204,7 @@ public final class MavenUtils {
               alreadyFoundArtifactRecords.add(str);
               try {
                 artifacts.add(parseArtifactRecord(str, new MvnGolangArtifactHandler()));
-              } catch (Exception ex) {
+              } catch (InvalidVersionSpecificationException ex) {
                 throw new ArtifactResolverException("Can't make artifact: " + str, ex);
               }
             }
@@ -212,7 +212,7 @@ public final class MavenUtils {
 
           final File artifactFile = artifactResult.getArtifact().getFile();
           mojo.getLog().debug("Artifact file: " + artifactFile);
-          if (result.contains(artifactFile)) {
+          if (doesContainFile(result, artifactFile)) {
             mojo.getLog().debug("Artifact file ignored as duplication: " + artifactFile);
           } else {
             result.add(Tuple.of(artifact, artifactFile));
@@ -222,6 +222,17 @@ public final class MavenUtils {
       currentProject = currentProject.hasParent() ? currentProject.getParent() : null;
     }
 
+    return result;
+  }
+
+  private static boolean doesContainFile(final List<Tuple<Artifact, File>> list, final File file) {
+    boolean result = false;
+    for (final Tuple<Artifact, File> t : list) {
+      if (t.right().equals(file)) {
+        result = true;
+        break;
+      }
+    }
     return result;
   }
 
