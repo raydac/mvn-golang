@@ -47,7 +47,7 @@ public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
   private String xprog;
 
   /**
-   * Command arguments. They follow package names in command line..
+   * Command arguments. They follow package names in command line.
    *
    * @since 2.1.7
    */

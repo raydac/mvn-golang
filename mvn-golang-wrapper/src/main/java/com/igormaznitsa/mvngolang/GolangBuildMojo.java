@@ -44,8 +44,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   private String resultFolder;
 
   /**
-   * Name of the result file. NB! Keep in mind that in the case of gomobile you
-   * must define right extension!
+   * Name of the result file.
    * <b>By default it uses ${project.build.finalName}</b>
    */
   @Parameter(name = "resultName", defaultValue = "${project.build.finalName}")

@@ -229,7 +229,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private boolean useMavenProxy;
 
   /**
-   * Disable check of SSL certificate during HTTP request. Also can be changed
+   * Disable check of SSL certificate during HTTPS request. Also can be changed
    * by system property 'mvn.golang.disable.ssl.check'
    *
    * @since 2.1.7
@@ -374,7 +374,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String goRoot;
 
   /**
-   * The Go bootstrap home.
+   * The Go bootstrap home folder.
    */
   @Parameter(name = "goRootBootstrap")
   private String goRootBootstrap;
@@ -517,7 +517,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String sdkArchiveName;
 
   /**
-   * Directly defined URL to download SDK. In the case SDK list will not be
+   * Directly defined URL to download GoSDK. In the case SDK list will not be
    * downloaded and plug-in will try download archive through the link.
    */
   @Parameter(name = "sdkDownloadUrl")
@@ -728,7 +728,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private File loadSDKAndUnpackIntoCache(@Nullable final ProxySettings proxySettings, @Nonnull final File cacheFolder, @Nonnull final String baseSdkName, final boolean dontLoadIfNotInCache) throws IOException, MojoExecutionException {
+  private File loadSDKAndUnpackIntoCache(
+          @Nullable final ProxySettings proxySettings, 
+          @Nonnull final File cacheFolder, 
+          @Nonnull final String baseSdkName, 
+          final boolean dontLoadIfNotInCache
+  ) throws IOException, MojoExecutionException {
     synchronized (AbstractGolangMojo.class) {
       final File sdkFolder = new File(cacheFolder, baseSdkName);
 
