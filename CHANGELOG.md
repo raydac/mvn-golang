@@ -1,8 +1,9 @@
 # __2.3.3 (SNAPSHOT)__
+ - __minimal supported JDK version increased to 1.8__
  - added unified boolean properties `mvn.golang.<MOJO_NAME>.skip` to skip work of selected mojo [#65](https://github.com/raydac/mvn-golang/issues/65)
  - text `none` in `resultName` field of `build` mojo disables auto-adding of `-o` command line option  
  - minor fixes and refactoring
- - added parameter `workingDirectory` to replace automatically choosen working directory during tool execution.
+ - added parameter `workingDir` to replace automatically choosen working directory during tool execution.
  - added support of [Golang modules]() with maven dependencies, added [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix) [#60](https://github.com/raydac/mvn-golang/issues/60)
 
 # __2.3.2 (24-jun-2019)__
