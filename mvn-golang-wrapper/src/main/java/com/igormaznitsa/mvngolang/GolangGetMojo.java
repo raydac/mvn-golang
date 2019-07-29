@@ -174,8 +174,24 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Parameter(name = "disableCvsAutosearch", defaultValue = "false")
   private boolean disableCvsAutosearch;
 
+  /**
+   * Allow lock maven session during command processing. It increases stability of work in parallel mode.
+   * 
+   * @since 2.3.3
+   */
+  @Parameter(name = "allowLockSession", defaultValue = "true")
+  private boolean allowLockSession;
+  
   private List<PackageList.Package> integralPackageList;
 
+  public boolean isAllowLockSession() {
+    return this.allowLockSession;
+  }
+  
+  public void setAllowLockSession(final boolean flag) {
+    this.allowLockSession = flag;
+  }
+  
   @Nullable
   public String getExternalPackageFile() {
     return this.externalPackageFile;
@@ -606,7 +622,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   @Override
   protected boolean doesNeedSessionLock() {
-    return  this.getSession().isParallel();
+    return  this.getSession().isParallel() && this.isAllowLockSession();
   }
   
   @Override
