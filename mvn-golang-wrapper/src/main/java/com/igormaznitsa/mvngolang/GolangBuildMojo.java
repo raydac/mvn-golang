@@ -87,7 +87,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @MustNotContainNull
   @Nonnull
   public List<String> getLdflagsAsList() {
-    return this.ldFlags == null ? new ArrayList<String>() : new ArrayList<>(Arrays.asList(this.ldFlags));
+    return this.ldFlags == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(this.ldFlags));
   }
 
   @Nullable

@@ -77,27 +77,12 @@ public final class UnpackUtils {
                 if (normalizedName.endsWith(".tar.gz")) {
                     logger.debug("Detected TAR.GZ archive");
                     archInputStream = new TarArchiveInputStream(new GZIPInputStream(in));
-
-                    entryGetter = new ArchEntryGetter() {
-                        @Override
-                        @Nullable
-                        public ArchiveEntry getNextEntry() throws IOException {
-                            return ((TarArchiveInputStream) archInputStream).getNextTarEntry();
-                        }
-                    };
-
+                    entryGetter = () -> ((TarArchiveInputStream) archInputStream).getNextTarEntry();
                 } else {
                     logger.debug("Detected OTHER archive");
                     archInputStream = ARCHIVE_STREAM_FACTORY.createArchiveInputStream(in);
                     logger.debug("Created archive stream : " + archInputStream.getClass().getName());
-
-                    entryGetter = new ArchEntryGetter() {
-                        @Override
-                        @Nullable
-                        public ArchiveEntry getNextEntry() throws IOException {
-                            return archInputStream.getNextEntry();
-                        }
-                    };
+                    entryGetter = () -> archInputStream.getNextEntry();
                 }
 
             } catch (ArchiveException ex) {

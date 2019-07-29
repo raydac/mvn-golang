@@ -48,7 +48,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -818,51 +817,41 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             }
 
             final long size = entity.getContentLength();
-            final InputStream inStream = entity.getContent();
-
-            showProgressBar = size > 0L && !this.session.isParallel();
-
-            this.getLog().info("Downloading SDK archive into file : " + archiveFile);
-
-            long loadedCounter = 0L;
-            final byte[] buffer = new byte[1024 * 1024];
-
-            int lastRenderedValue = -1;
-
-            final int PROGRESSBAR_WIDTH = 10;
-            final String LOADING_TITLE = "Loading " + Long.toString(size / (1024L * 1024L)) + " Mb ";
-
-            if (showProgressBar) {
-              lastRenderedValue = IOUtils.printTextProgressBar(LOADING_TITLE, 0, size, PROGRESSBAR_WIDTH, lastRenderedValue);
-            }
-
-            final OutputStream fileOutStream = new BufferedOutputStream(new FileOutputStream(archiveFile), 128 * 16384);
-            try {
-              while (!Thread.currentThread().isInterrupted()) {
-                final int readCounter = inStream.read(buffer);
-                if (readCounter < 0) {
-                  break;
-                }
-                fileOutStream.write(buffer, 0, readCounter);
-                loadedCounter += readCounter;
-                if (showProgressBar) {
-                  lastRenderedValue = IOUtils.printTextProgressBar(LOADING_TITLE, loadedCounter, size, PROGRESSBAR_WIDTH, lastRenderedValue);
-                }
-              }
-            } finally {
+            try (final InputStream inStream = entity.getContent()) {
+              showProgressBar = size > 0L && !this.session.isParallel();
+              this.getLog().info("Downloading SDK archive into file : " + archiveFile);
+              long loadedCounter = 0L;
+              final byte[] buffer = new byte[1024 * 1024];
+              int lastRenderedValue = -1;
+              final int PROGRESSBAR_WIDTH = 10;
+              final String LOADING_TITLE = "Loading " + Long.toString(size / (1024L * 1024L)) + " Mb ";
               if (showProgressBar) {
-                System.out.println();
+                lastRenderedValue = IOUtils.printTextProgressBar(LOADING_TITLE, 0, size, PROGRESSBAR_WIDTH, lastRenderedValue);
               }
-              IOUtils.closeSilently(fileOutStream);
+              final OutputStream fileOutStream = new BufferedOutputStream(new FileOutputStream(archiveFile), 128 * 16384);
+              try {
+                while (!Thread.currentThread().isInterrupted()) {
+                  final int readCounter = inStream.read(buffer);
+                  if (readCounter < 0) {
+                    break;
+                  }
+                  fileOutStream.write(buffer, 0, readCounter);
+                  loadedCounter += readCounter;
+                  if (showProgressBar) {
+                    lastRenderedValue = IOUtils.printTextProgressBar(LOADING_TITLE, loadedCounter, size, PROGRESSBAR_WIDTH, lastRenderedValue);
+                  }
+                }
+              } finally {
+                if (showProgressBar) {
+                  System.out.println();
+                }
+                IOUtils.closeSilently(fileOutStream);
+              }
+              if (Thread.currentThread().isInterrupted()) {
+                throw new MojoExecutionException("Interrupted");
+              }
+              this.getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
             }
-
-            if (Thread.currentThread().isInterrupted()) {
-              throw new MojoExecutionException("Interrupted");
-            }
-
-            this.getLog().info("Archived SDK has been succesfully downloaded, its size is " + (archiveFile.length() / 1024L) + " Kb");
-
-            inStream.close();
 
             if (this.isCheckSdkHash()) {
               if (xGoogHash.isValid() && xGoogHash.hasData()) {
@@ -2091,12 +2080,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         final List<File> foundGoMods = this.findAllGoModsInFolder(srcFolder);
         this.getLog().debug(String.format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
 
-        Collections.sort(foundGoMods, new Comparator<File>() {
-          @Override
-          public int compare(@Nonnull final File o1, @Nonnull final File o2) {
-            return o1.toString().compareTo(o2.toString());
-          }
-        });
+        Collections.sort(foundGoMods, (@Nonnull final File o1, @Nonnull final File o2) -> o1.toString().compareTo(o2.toString()));
 
         if (foundGoMods.isEmpty()) {
           this.getLog().error("Module mode is activated but there is no any go.mod file in the source folder: " + srcFolder);

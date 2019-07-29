@@ -21,7 +21,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.10.1</version>
+      <version>2.10.3</version>
     </dependency>
     <dependency>
       <groupId>com.igormaznitsa</groupId>
@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.zeroturnaround</groupId>
       <artifactId>zt-exec</artifactId>
-      <version>1.10</version>
+      <version>1.11</version>
       <exclusions>
         <exclusion>
           <groupId>commons-io</groupId>
@@ -129,12 +129,12 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.8.1</version>
+      <version>3.9</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.7</version>
+      <version>4.5.9</version>
       <exclusions>
         <exclusion>
           <groupId>commons-codec</groupId>
@@ -290,13 +290,13 @@
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java17</artifactId>
+            <artifactId>java18</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>
         <executions>
           <execution>
-            <id>ensure-java-1.7-class-library</id>
+            <id>ensure-java-1.8-class-library</id>
             <phase>test</phase>
             <goals>
               <goal>check</goal>
@@ -309,7 +309,7 @@
         <artifactId>meta-checker</artifactId>
         <version>${meta.version}</version>
         <configuration>
-          <restrictClassFormat>7</restrictClassFormat>
+          <restrictClassFormat>8</restrictClassFormat>
           <checkNullable>true</checkNullable>
           <checkMayContainNull>true</checkMayContainNull>
           <failForAnnotations>

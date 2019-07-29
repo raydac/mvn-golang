@@ -40,7 +40,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
-import org.zeroturnaround.zip.NameMapper;
 import org.zeroturnaround.zip.ZipUtil;
 
 public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
@@ -419,16 +418,12 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
       }
 
       for (final String folder : folderList) {
-        ZipUtil.unpack(artifactZip, targetFolder, new NameMapper() {
-          @Override
-          @Nullable
-          public String map(@Nonnull
-                  final String name) {
-            if (name.startsWith(folder)) {
-              return name.substring(folder.length());
-            }
-            return null;
+        ZipUtil.unpack(artifactZip, targetFolder, (@Nonnull
+        final String name) -> {
+          if (name.startsWith(folder)) {
+            return name.substring(folder.length());
           }
+          return null;
         });
       }
       return true;
