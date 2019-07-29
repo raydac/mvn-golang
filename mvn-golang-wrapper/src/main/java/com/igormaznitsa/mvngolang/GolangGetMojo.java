@@ -303,9 +303,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     command.add(script.path);
     if (script.options != null) {
-      for (final String s : script.options) {
-        command.add(s);
-      }
+      command.addAll(Arrays.asList(script.options));
     }
 
     if (getLog().isDebugEnabled()) {
@@ -316,7 +314,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     getLog().warn(String.format("Starting script in VCS folder [%s] : %s", packageName, StringUtils.join(command.toArray(), ' ')));
 
-    final ProcessExecutor processExecutor = new ProcessExecutor(command.toArray(new String[command.size()]));
+    final ProcessExecutor processExecutor = new ProcessExecutor(command.toArray(new String[0]));
     processExecutor
             .exitValueAny()
             .directory(rootCvsFolder)
@@ -333,7 +331,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
       final ProcessResult process = processExecutor.executeNoTimeout();
       final int exitValue = process.getExitValue();
 
-      result = script.ignoreFail ? true : exitValue == 0;
+      result = script.ignoreFail || exitValue == 0;
     } catch (IOException | InterruptedException | InvalidExitValueException ex) {
       getLog().error("Error in proces custom script", ex);
     }
@@ -606,6 +604,11 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
     }
   }
 
+  @Override
+  protected boolean doesNeedSessionLock() {
+    return  this.getSession().isParallel();
+  }
+  
   @Override
   public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
 
