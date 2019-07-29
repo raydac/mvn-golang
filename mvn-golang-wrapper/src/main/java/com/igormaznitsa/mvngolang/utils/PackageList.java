@@ -171,9 +171,7 @@ public final class PackageList {
         }
         break;
         case '/': {
-          if (checkQuotes && quot) {
-            pos = -1;
-          } else {
+          if (!checkQuotes || !quot) {
             if (pos < 0) {
               pos = i;
             } else {

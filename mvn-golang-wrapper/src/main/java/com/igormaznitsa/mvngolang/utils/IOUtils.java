@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.System.out;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,7 +58,6 @@ public final class IOUtils {
     builder.append("[");
 
     final int progress = max(0, min(progressBarWidth, (int) Math.round(progressBarWidth * ((double) value / (double) maxValue))));
-    int nextValue = progress;
 
     for (int i = 0; i < progress; i++) {
       builder.append('▒');
@@ -66,12 +67,12 @@ public final class IOUtils {
     }
     builder.append("]\u001B[?25h");
 
-    if (nextValue != lastValue) {
-      System.out.print(builder.toString());
-      System.out.flush();
+    if (progress != lastValue) {
+      out.print(builder.toString());
+      out.flush();
     }
 
-    return nextValue;
+    return progress;
   }
   
   /**
@@ -135,7 +136,7 @@ public final class IOUtils {
       if (closeable != null) {
         closeable.close();
       }
-    } catch (final IOException ex) {
+    } catch (final IOException ignoring) {
     }
   }
 }

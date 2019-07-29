@@ -236,10 +236,10 @@ public final class GoMod {
                                 nextState = ParserState.FIND;
                             } else if ("//".equals(token)) {
                                 findEol = true;
-                                processTokenList = bracket ? !tokenList.isEmpty() : true;
+                                processTokenList = !bracket || !tokenList.isEmpty();
                                 nextState = bracket ? state : ParserState.FIND;
                             } else if (token.contains("\n")) {
-                                processTokenList = bracket ? !tokenList.isEmpty() : true;
+                                processTokenList = !bracket || !tokenList.isEmpty();
                                 nextState = bracket ? state : ParserState.FIND;
                             } else {
                                 if (!token.trim().isEmpty()) {
@@ -343,6 +343,7 @@ public final class GoMod {
                     foundItems.add(new GoCustom(customTokenName, tokenList.toArray(new String[0])));
                 }
                 break;
+                default:break;
             }
         }
 

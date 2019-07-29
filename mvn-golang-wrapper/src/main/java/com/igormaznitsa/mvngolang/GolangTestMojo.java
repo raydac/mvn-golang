@@ -79,7 +79,7 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
         result.add("-run");
         result.add(name[1]);
       }
-      return result.toArray(new String[result.size()]);
+      return result.toArray(new String[0]);
     } else {
       return new String[]{'.' + File.separator + "..."};
     }

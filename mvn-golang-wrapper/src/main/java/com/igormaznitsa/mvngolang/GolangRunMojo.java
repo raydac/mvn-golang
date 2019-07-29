@@ -72,7 +72,7 @@ public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
   public String[] getTailArguments() {
     final List<String> result = new ArrayList<>(Arrays.asList(super.getTailArguments()));
     result.addAll(Arrays.asList(this.getArgs()));
-    return result.toArray(new String[result.size()]);
+    return result.toArray(new String[0]);
   }
 
   @Override

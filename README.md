@@ -9,6 +9,7 @@
 
 # Changelog
 __2.3.3 (SNAPSHOT)__
+ - improved work in parallel mode
  - __minimal supported JDK version increased to 1.8__
  - added unified boolean properties `mvn.golang.<MOJO_NAME>.skip` to skip work of selected mojo [#65](https://github.com/raydac/mvn-golang/issues/65)
  - text `none` in `resultName` field of `build` mojo disables auto-adding of `-o` command line option  

@@ -50,9 +50,7 @@ public abstract class AbstractRepo {
   public int execute(@Nullable String customCommand, @Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull @MustNotContainNull final String... args) {
     final List<String> cli = new ArrayList<>();
     cli.add(GetUtils.findFirstNonNull(customCommand, this.command));
-    for (final String s : args) {
-      cli.add(s);
-    }
+    cli.addAll(Arrays.asList(args));
 
     if (logger.isDebugEnabled()) {
       logger.debug("Executing repo command : " + cli);

@@ -130,16 +130,12 @@ public final class MavenUtils {
    */
   @Nonnull
   public static String makeArtifactRecord(@Nonnull final Artifact artifact) {
-    final StringBuilder buffer = new StringBuilder();
-    buffer.append(
-            artifact.getGroupId())
-            .append("::").append(artifact.getArtifactId())
-            .append("::").append(artifact.getVersionRange().toString())
-            .append("::").append(GetUtils.ensureNonNull(artifact.getScope(), "compile"))
-            .append("::").append(GetUtils.ensureNonNull(artifact.getType(), "zip"))
-            .append("::").append(GetUtils.ensureNonNull(artifact.getClassifier(), ""));
-
-    return buffer.toString();
+    return artifact.getGroupId() +
+        "::" + artifact.getArtifactId() +
+        "::" + artifact.getVersionRange().toString() +
+        "::" + GetUtils.ensureNonNull(artifact.getScope(), "compile") +
+        "::" + GetUtils.ensureNonNull(artifact.getType(), "zip") +
+        "::" + GetUtils.ensureNonNull(artifact.getClassifier(), "");
   }
 
   /**
@@ -170,14 +166,14 @@ public final class MavenUtils {
           @Nonnull @MustNotContainNull final List<ArtifactRepository> remoteRepositories
   ) throws ArtifactResolverException {
     final List<Tuple<Artifact, File>> result = new ArrayList<>();
-    final String phase = execution.getLifecyclePhase();
+//    final String phase = execution.getLifecyclePhase();
 
     final Set<String> alreadyFoundArtifactRecords = new HashSet<>();
 
     MavenProject currentProject = mavenProject;
     while (currentProject != null && !Thread.currentThread().isInterrupted()) {
       final Set<Artifact> projectDependencies = currentProject.getDependencyArtifacts();
-      final List<Artifact> artifacts = new ArrayList<>(projectDependencies == null ? Collections.<Artifact>emptySet() : projectDependencies);
+      final List<Artifact> artifacts = new ArrayList<>(projectDependencies == null ? Collections.emptySet() : projectDependencies);
       mojo.getLog().debug("Detected dependency artifacts: " + artifacts);
 
       while (!artifacts.isEmpty() && !Thread.currentThread().isInterrupted()) {
@@ -242,7 +238,7 @@ public final class MavenUtils {
           @Nonnull final String key,
           @Nullable final String dflt
   ) {
-    String projectProperty = null;
+    String projectProperty;
 
     MavenProject curProject = project;
     do {

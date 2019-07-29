@@ -37,7 +37,7 @@ public final class WildCardMatcher {
                     break;
                 default: {
                     final String code = Integer.toHexString(c).toUpperCase(Locale.ENGLISH);
-                    builder.append("\\u").append("0000".substring(0, 4 - code.length())).append(code);
+                    builder.append("\\u").append("0000", 0, 4 - code.length()).append(code);
                 }
                 break;
             }

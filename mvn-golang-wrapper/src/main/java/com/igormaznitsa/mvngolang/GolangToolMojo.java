@@ -26,6 +26,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -68,10 +69,8 @@ public class GolangToolMojo extends AbstractGoDependencyAwareMojo {
   public String[] getTailArguments() {
     final List<String> result = new ArrayList<>();
     result.add(this.command);
-    for (final String s : GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)) {
-      result.add(s);
-    }
-    return result.toArray(new String[result.size()]);
+    result.addAll(Arrays.asList(GetUtils.ensureNonNull(this.args, ArrayUtils.EMPTY_STRING_ARRAY)));
+    return result.toArray(new String[0]);
   }
 
   public void setCommand(@Nullable final String value) {

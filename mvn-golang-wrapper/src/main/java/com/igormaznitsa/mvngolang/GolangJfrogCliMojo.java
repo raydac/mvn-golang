@@ -122,9 +122,7 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
     this.getLog().info("   Target: " + this.getTarget());
     this.getLog().info("  Command: " + this.getCommand());
 
-    for (final String option : this.getArguments()) {
-      cliList.add(option);
-    }
+    cliList.addAll(this.getArguments());
 
     this.getLog().debug("Prepared CLI: " + cliList);
 

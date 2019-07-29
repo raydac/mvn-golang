@@ -48,6 +48,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -824,7 +825,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
               final byte[] buffer = new byte[1024 * 1024];
               int lastRenderedValue = -1;
               final int PROGRESSBAR_WIDTH = 10;
-              final String LOADING_TITLE = "Loading " + Long.toString(size / (1024L * 1024L)) + " Mb ";
+              final String LOADING_TITLE = "Loading " + size / (1024L * 1024L) + " Mb ";
               if (showProgressBar) {
                 lastRenderedValue = IOUtils.printTextProgressBar(LOADING_TITLE, 0, size, PROGRESSBAR_WIDTH, lastRenderedValue);
               }
@@ -1033,11 +1034,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       }
     }
 
-    for (final String b : this.tempBuildFlags) {
-      result.add(b);
-    }
+    result.addAll(this.tempBuildFlags);
 
-    return result.toArray(new String[result.size()]);
+    return result.toArray(new String[0]);
   }
 
   @Nonnull
@@ -1066,7 +1065,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         }
       }
 
-      return result.toArray(new File[result.size()]);
+      return result.toArray(new File[0]);
     } finally {
       LOCKER.unlock();
     }
@@ -1839,7 +1838,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (path != null) {
       final StringBuilder buffer = new StringBuilder();
-      for (final String s : path.split("\\" + File.pathSeparator)) {
+      for (final String s : path.split(Pattern.quote(File.pathSeparator))) {
         if (filter && GOBINFOLDER_PATTERN.matcher(s).find()) {
           getLog().debug("Removing item '" + s + "' from PATH because it looks like go/bin");
           continue;
@@ -1912,17 +1911,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       commandLine.add("-v");
     }
 
-    for (final String s : getBuildFlags()) {
-      commandLine.add(s);
-    }
-
-    for (final String s : getTailArguments()) {
-      commandLine.add(s);
-    }
-
-    for (final String s : getOptionalExtraTailArguments()) {
-      commandLine.add(s);
-    }
+    commandLine.addAll(Arrays.asList(getBuildFlags()));
+    commandLine.addAll(Arrays.asList(getTailArguments()));
+    commandLine.addAll(Arrays.asList(getOptionalExtraTailArguments()));
 
     final StringBuilder cli = new StringBuilder();
     int index = 0;
@@ -2080,7 +2071,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         final List<File> foundGoMods = this.findAllGoModsInFolder(srcFolder);
         this.getLog().debug(String.format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
 
-        Collections.sort(foundGoMods, (@Nonnull final File o1, @Nonnull final File o2) -> o1.toString().compareTo(o2.toString()));
+        foundGoMods.sort(Comparator.comparing(File::toString));
 
         if (foundGoMods.isEmpty()) {
           this.getLog().error("Module mode is activated but there is no any go.mod file in the source folder: " + srcFolder);

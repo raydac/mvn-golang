@@ -20,7 +20,6 @@ import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -140,7 +139,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
     final Model model = this.getProject().getModel();
     Writer writer = null;
     try {
-      writer = new OutputStreamWriter(new FileOutputStream(new File(folder, "pom.xml"), false), "UTF-8");
+      writer = new OutputStreamWriter(new FileOutputStream(new File(folder, "pom.xml"), false), StandardCharsets.UTF_8);
       new MavenXpp3Writer().write(writer, model);
       if (getLog().isDebugEnabled()) {
         getLog().debug("Effective pom has been written");
@@ -269,12 +268,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
       }
     }
 
-    for (final File f : folder.listFiles(new FileFilter() {
-      @Override
-      public boolean accept(@Nonnull final File pathname) {
-        return pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath());
-      }
-    })) {
+    for (final File f : folder.listFiles(pathname -> pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath()))) {
       restoreAllBackupGoMod(f);
     }
   }

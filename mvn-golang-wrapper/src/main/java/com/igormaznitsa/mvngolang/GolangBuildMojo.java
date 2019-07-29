@@ -235,7 +235,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
       }
     }
 
-    return flags.toArray(new String[flags.size()]);
+    return flags.toArray(new String[0]);
   }
 
 }
