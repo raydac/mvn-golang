@@ -255,6 +255,7 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
 
 # Some Examples
  - __[Maven repository dependencies example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-repository)__
+ - __[Maven repository dependencies together with modules example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix)__
  - __[Versioning of dependencies](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/test-git-cvs)__
  - __["Hello world!" console application.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-helloworld)__
  - __[Console application with embedded text resource prepared with the `go-bindata` utility.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-genbindata)__
