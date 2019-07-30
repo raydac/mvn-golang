@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -139,6 +140,26 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
     this.registerOutputBuffers(result);
 
     return result;
+  }
+ 
+  @Nonnull
+  @MustNotContainNull
+  @Override
+  public String[] getTailArguments() {
+    throw new NotImplementedException("Must not be called");
+  }
+
+  @Nonnull
+  @Override
+  public String getGoCommand() {
+    throw new NotImplementedException("Must not be called");
+  }
+
+  @Nonnull
+  @MustNotContainNull
+  @Override
+  public String[] getCommandFlags() {
+    throw new NotImplementedException("Must not be called");
   }
 
 }

@@ -68,7 +68,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -195,11 +194,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     this.workingDir = path;
   }
 
-  public final boolean isModuleMode() {
+  public boolean isModuleMode() {
     return this.moduleMode;
   }
 
-  public final void setModuleMode(final boolean value) {
+  public void setModuleMode(final boolean value) {
     this.moduleMode = value;
   }
 
@@ -1804,9 +1803,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   @MustNotContainNull
-  public String[] getTailArguments() {
-    throw new NotImplementedException("Must be overriden");
-  }
+  public abstract String[] getTailArguments();
 
   @Nonnull
   @MustNotContainNull
@@ -1820,15 +1817,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  public String getGoCommand() {
-    throw new NotImplementedException("Must be overriden");
-  }
+  public abstract String getGoCommand();
 
   @Nonnull
   @MustNotContainNull
-  public String[] getCommandFlags() {
-    throw new NotImplementedException("Must be overriden");
-  }
+  public abstract String[] getCommandFlags();
 
   @Nullable
   private String getEnvPath() {

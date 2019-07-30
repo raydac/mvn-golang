@@ -34,6 +34,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
@@ -271,6 +272,26 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
     for (final File f : folder.listFiles(pathname -> pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath()))) {
       restoreAllBackupGoMod(f);
     }
+  }
+
+  @Nonnull
+  @MustNotContainNull
+  @Override
+  public String[] getTailArguments() {
+    throw new NotImplementedException("Must not be called");
+  }
+
+  @Nonnull
+  @Override
+  public String getGoCommand() {
+    throw new NotImplementedException("Must not be called");
+  }
+
+  @Nonnull
+  @MustNotContainNull
+  @Override
+  public String[] getCommandFlags() {
+    throw new NotImplementedException("Must not be called");
   }
 
 }

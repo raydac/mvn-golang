@@ -17,6 +17,7 @@
       <!-- the module must be disabled for install and deploy because it doesn't generate artifact -->
       <maven.install.skip>true</maven.install.skip>
       <maven.deploy.skip>true</maven.deploy.skip>
+      <mvn.golang.build.skip>true</mvn.golang.build.skip>
   </properties>
 
   <build>
@@ -38,12 +39,6 @@
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
         </configuration>
-        <executions>
-          <execution>
-            <id>default-build</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

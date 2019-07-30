@@ -40,6 +40,16 @@
         </configuration>
         <executions>
           <execution>
+            <id>print-module-graph</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>mod</goal>
+            </goals>
+            <configuration>
+             <command>graph</command>
+            </configuration>
+          </execution>
+          <execution>
             <id>do-vet</id>
             <goals>
               <goal>vet</goal>
