@@ -304,7 +304,15 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
     assertArrayEquals(new String[]{"flag1", "flag2"}, toolMojo.getBuildFlags());
     assertArrayEquals(new String[]{"arg1", "arg2"}, toolMojo.getArgs());
   }
-
+  
+  @Test
+  public void testGolangModMojoConfiguration() throws Exception {
+    final GolangModMojo modMojo = findMojo(GolangModMojo.class, "mojoMod.xml", "mod");
+    assertTrue(modMojo.isModuleMode());
+    assertArrayEquals(new String[]{"someCommand"},modMojo.getCommandFlags());
+    assertArrayEquals(new String[]{"one","two","three"},modMojo.getTailArguments());
+  }
+  
   @Test
   public void testGolangRunMojoConfiguration() throws Exception {
     final GolangRunMojo runMojo = findMojo(GolangRunMojo.class, "mojoRun.xml", "run");
