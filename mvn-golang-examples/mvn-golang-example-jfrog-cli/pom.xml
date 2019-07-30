@@ -17,6 +17,8 @@
 
   <properties>
     <jfrogcli.path>must be defined</jfrogcli.path>
+    <mvn.golang.fmt.skip>true</mvn.golang.fmt.skip>
+    <mvn.golang.fix.skip>true</mvn.golang.fix.skip>
   </properties>
 
   <profiles>

@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.igormaznitsa</groupId>
     <artifactId>mvn-golang</artifactId>
-    <version>2.3.3-SNAPSHOT</version>
+    <version>2.3.3</version>
   </parent>
 
   <artifactId>mvn-golang-examples</artifactId>
@@ -31,21 +31,13 @@
         <module>mvn-golang-example-plugin</module>
       </modules>
     </profile>
-    <profile>
-      <id>examples-need-jdk8</id>
-      <activation>
-        <jdk>[1.8,)</jdk>
-      </activation>
-      <modules>
-        <module>mvn-golang-example-gui-gwt</module>
-        <module>mvn-golang-example-preprocessing</module>
-      </modules>
-    </profile>
   </profiles>
 
   <name>examples</name>
   <description>Set of examples for mvn-golang-wrapper</description>
   <modules>
+    <module>mvn-golang-example-gui-gwt</module>
+    <module>mvn-golang-example-preprocessing</module>
     <module>mvn-golang-example-jfrog-cli</module>
     <module>mvn-golang-example-helloworld</module>
     <module>mvn-golang-example-helloworld-gomod</module>
@@ -66,7 +58,7 @@
     <module>test-git-cvs</module>
     <module>test-hg-cvs</module>
   </modules>
-  
+
   <build>
     <plugins>
       <plugin>

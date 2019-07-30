@@ -1,4 +1,4 @@
-# __2.3.3 (SNAPSHOT)__
+# __2.3.3 (30-jul-2019)__
  - improved work in parallel mode
  - __minimal supported JDK version increased to 1.8__
  - added `mod` mojo
