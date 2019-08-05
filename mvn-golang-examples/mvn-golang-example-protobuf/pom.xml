@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>mvn-golang-example-protobuf</artifactId>
+  <packaging>mvn-golang</packaging>
+
+  <name>Protobuf with Golang example</name>
+  <description>Example of compilation and use of protobuf script.</description>
+
+  <properties>
+    <proto.gen.folder>${project.build.directory}${file.separator}.protoGen</proto.gen.folder>
+    <os.extension></os.extension>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>win-profile</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <os.extension>.exe</os.extension>
+      </properties>
+    </profile>
+  </profiles>
+
+  <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
+
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+          <addToGoPath>
+            <dir>${proto.gen.folder}</dir>
+          </addToGoPath>
+        </configuration>
+        <executions>
+          <execution>		
+            <id>get-protoc-get-go</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>get</goal>
+            </goals>
+            <configuration>
+              <buildFlags>
+                <flag>-u</flag>
+              </buildFlags>
+              <packages>
+                <package>github.com/golang/protobuf/protoc-gen-go</package>
+              </packages>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-get</id>
+            <configuration>
+              <externalPackageFile>go-dependencies.lst</externalPackageFile>
+            </configuration>  
+          </execution>
+          <execution>
+            <id>do-run</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <packages>
+                <package>main.go</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.os72</groupId>
+        <artifactId>protoc-jar-maven-plugin</artifactId>
+        <version>3.8.0</version>
+        <executions>
+          <execution>
+            <id>generate-go-from-proto</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <type>go</type>
+              <pluginPath>${project.build.directory}${file.separator}protoc-gen-go${os.extension}</pluginPath>
+              <inputDirectories>
+                <dir>${basedir}${file.separator}proto</dir>
+              </inputDirectories>
+              <outputDirectory>${proto.gen.folder}${file.separator}src${file.separator}protoexample</outputDirectory>
+              <outputOptions>.</outputOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
