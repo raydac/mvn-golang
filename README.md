@@ -28,21 +28,6 @@ __2.3.1 (14-apr-2019)__
  - default version of GoSDK updated to 1.12.4
  - added parameter `goCache` to provide `GOCACHE` environment variable, the default value is `${project.build.directory}/.goBuildCache`
 
-__2.3.0 (02-mar-2019)__
- - __added support of work with mvn-golang dependencies in maven repository, so now they can be used as just maven dependencies, it can be disabled through `scanDependencies` property. [example](./mvn-golang-examples/mvn-golang-example-maven-repository)__
- - __repository artifact extension changed to `zip` to provide way to be processed by standard maven plugins__
- - added support of system properties 'mvngo.skip' and `mvngo.disable.ssl.check`
- - added `jfrog-cli` mojo to provide way make call to external [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) in tuned Go SDK environment, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-jfrog-cli).
- - added `connectionTimeout` property to provide timeout (milliseconds) for HTTP connections, default 60000 ms
- - [#55](https://github.com/raydac/mvn-golang/issues/55) print log error stream into debug if command status is not error
- - added check of hash for downloaded SDK archive, can be disabled by `false` in parameter `checkSdkHash`, it checks hash provided in response header `x-goog-hash`
- - improved GoSDK loading
-
-__2.2.0 (13-may-2018)__
- - added property `mvn.golang.go.version` to define value for `goVersion` configuration parameter, it allows decrease configuration section dramatically, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui/pom.xml)
- - added `externalPackageFile` (property `mvn.golang.get.packages.file`) option to the `get` mojo, it allows to keep package list in external file, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-termui)
- - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
-
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
 # GO start!
@@ -81,7 +66,7 @@ To save time, examples excluded from the main build process and activated throug
 mvn clean install -Pexamples
 ```
 # Important note about automatic Golang SDK load
-If you have some problems with certificates during Golang SDK load, then just add `<disableSSLcheck>true</disableSSLcheck>` into plugin configuration to ignore check of certificates (also you can use property 'mvn.golang.disable.ssl.check').
+If you have some problems with certificates during Golang SDK load, then just add `<disableSSLcheck>true</disableSSLcheck>` into plugin configuration to ignore check of certificates (also you can use property 'mvn.golang.disable.ssl.check'). Also it allows property `mvn.golang.disable.ssl.check` to disable SSL certificate check during network actions.
 
 # How to add the plugin into maven project?
 Below described build section for simple golang project which keeps source in `src` forlder and result should be placed into `bin` folder. Because it is golang project and mvn-golang plugin provides its own lifecycle, packaging for the project should be `<packaging>mvn-golang</packaging>`
@@ -258,7 +243,8 @@ Sometime it is useful to use [GoConvey](https://github.com/smartystreets/goconve
 ```
 
 # Some Examples
- - __[Maven repository dependencies example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-repository)__
+- __[Protobuf use example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-protobuf)__
+- __[Maven repository dependencies example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-repository)__
  - __[Maven repository dependencies together with modules example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix)__
  - __[Versioning of dependencies](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/test-git-cvs)__
  - __["Hello world!" console application.](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-helloworld)__
