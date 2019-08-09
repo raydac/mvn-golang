@@ -1,5 +1,5 @@
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Java 7.0+](https://img.shields.io/badge/java-7.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+[![Java 8.0+](https://img.shields.io/badge/java-8.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 [![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.3.3|jar)
 [![Maven 3.0.3+](https://img.shields.io/badge/maven-3.0.3%2b-green.svg)](https://maven.apache.org/)
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-red.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
@@ -136,6 +136,10 @@ Dependency mechanism is enabled by default for all goals which need it, but it c
 </env>
 ```
 __Keep in mind that it is impossible use links to Github and Bitbucket libraries through `<dependencies>` maven mechanism, links to such dependencies should be processed by standard `GET` command and information about it you can find below.__
+
+## Support of Module mode
+
+Since 2.3.3 version, plug-in supports Golang module mode and allows to mix modules and work with golang maven dependencies, [I have made some sample to show the possibility](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix). By default support of module mode is turned off, but it can be turned on through `<moduleMode>true</moduleMode>` or property `mvn.golang.module.mode`.
 
 ## Wrapped GET command
 
