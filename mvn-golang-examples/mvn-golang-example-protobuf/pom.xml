@@ -50,7 +50,7 @@
           </addToGoPath>
         </configuration>
         <executions>
-          <execution>		
+          <execution>
             <id>get-protoc-get-go</id>
             <phase>generate-sources</phase>
             <goals>
@@ -68,8 +68,8 @@
           <execution>
             <id>default-get</id>
             <configuration>
-              <externalPackageFile>go-dependencies.lst</externalPackageFile>
-            </configuration>  
+              <externalPackageFile>${basedir}${file.separator}go-dependencies.lst</externalPackageFile>
+            </configuration>
           </execution>
           <execution>
             <id>do-run</id>
