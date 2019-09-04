@@ -1,67 +1,65 @@
-// Copyright 2016 Zack Guo <gizak@icloud.com>. All rights reserved.
+// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
 // Use of this source code is governed by a MIT license that can
 // be found in the LICENSE file.
 
 package main
 
-import "github.com/gizak/termui"
+import (
+	"log"
+
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
+)
 
 func main() {
-	err := termui.Init()
-	if err != nil {
-		panic(err)
+	if err := ui.Init(); err != nil {
+		log.Fatalf("failed to initialize termui: %v", err)
 	}
-	defer termui.Close()
+	defer ui.Close()
 
-	//termui.UseTheme("helloworld")
+	data := []float64{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
 
-	data := []int{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
-	spl0 := termui.NewSparkline()
-	spl0.Data = data[3:]
-	spl0.Title = "Sparkline 0"
-	spl0.LineColor = termui.ColorGreen
+	sl0 := widgets.NewSparkline()
+	sl0.Data = data[3:]
+	sl0.LineColor = ui.ColorGreen
 
 	// single
-	spls0 := termui.NewSparklines(spl0)
-	spls0.Height = 2
-	spls0.Width = 20
-	spls0.Border = false
+	slg0 := widgets.NewSparklineGroup(sl0)
+	slg0.Title = "Sparkline 0"
+	slg0.SetRect(0, 0, 20, 10)
 
-	spl1 := termui.NewSparkline()
-	spl1.Data = data
-	spl1.Title = "Sparkline 1"
-	spl1.LineColor = termui.ColorRed
+	sl1 := widgets.NewSparkline()
+	sl1.Title = "Sparkline 1"
+	sl1.Data = data
+	sl1.LineColor = ui.ColorRed
 
-	spl2 := termui.NewSparkline()
-	spl2.Data = data[5:]
-	spl2.Title = "Sparkline 2"
-	spl2.LineColor = termui.ColorMagenta
+	sl2 := widgets.NewSparkline()
+	sl2.Title = "Sparkline 2"
+	sl2.Data = data[5:]
+	sl2.LineColor = ui.ColorMagenta
 
-	// group
-	spls1 := termui.NewSparklines(spl0, spl1, spl2)
-	spls1.Height = 8
-	spls1.Width = 20
-	spls1.Y = 3
-	spls1.BorderLabel = "Group Sparklines"
+	slg1 := widgets.NewSparklineGroup(sl0, sl1, sl2)
+	slg1.Title = "Group Sparklines"
+	slg1.SetRect(0, 10, 25, 25)
 
-	spl3 := termui.NewSparkline()
-	spl3.Data = data
-	spl3.Title = "Enlarged Sparkline"
-	spl3.Height = 8
-	spl3.LineColor = termui.ColorYellow
+	sl3 := widgets.NewSparkline()
+	sl3.Title = "Enlarged Sparkline"
+	sl3.Data = data
+	sl3.LineColor = ui.ColorYellow
 
-	spls2 := termui.NewSparklines(spl3)
-	spls2.Height = 11
-	spls2.Width = 30
-	spls2.BorderFg = termui.ColorCyan
-	spls2.X = 21
-	spls2.BorderLabel = "Tweeked Sparkline"
+	slg2 := widgets.NewSparklineGroup(sl3)
+	slg2.Title = "Tweeked Sparkline"
+	slg2.SetRect(20, 0, 50, 10)
+	slg2.BorderStyle.Fg = ui.ColorCyan
 
-	termui.Render(spls0, spls1, spls2)
+	ui.Render(slg0, slg1, slg2)
 
-	termui.Handle("/sys/kbd/q", func(termui.Event) {
-		termui.StopLoop()
-	})
-	termui.Loop()
-
+	uiEvents := ui.PollEvents()
+	for {
+		e := <-uiEvents
+		switch e.ID {
+		case "q", "<C-c>":
+			return
+		}
+	}
 }

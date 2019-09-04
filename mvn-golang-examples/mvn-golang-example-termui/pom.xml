@@ -28,9 +28,7 @@
         <version>${main-project-version}</version>
         <extensions>true</extensions>
         <configuration>
-          <env>
-            <GO111MODULE>on</GO111MODULE>
-          </env>
+          <moduleMode>true</moduleMode>
         </configuration>
       </plugin>
     </plugins>
