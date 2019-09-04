@@ -353,7 +353,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * The Go SDK version. It plays role if goRoot is undefined. Can be defined
    * through system property 'mvn.golang.go.version'
    */
-  @Parameter(name = "goVersion", defaultValue = "1.12.9", property = "mvn.golang.go.version")
+  @Parameter(name = "goVersion", defaultValue = "1.13", property = "mvn.golang.go.version")
   private String goVersion;
 
   /**
