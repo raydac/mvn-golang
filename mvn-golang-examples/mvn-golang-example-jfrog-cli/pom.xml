@@ -70,9 +70,7 @@
         <extensions>true</extensions>
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
-          <env>
-            <GO111MODULE>on</GO111MODULE>
-          </env>
+          <moduleMode>true</moduleMode>
         </configuration>
         <executions>
           <execution>
