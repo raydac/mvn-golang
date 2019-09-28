@@ -234,11 +234,12 @@ public final class MavenUtils {
 
   @Nullable
   public static String findProperty(
+          @Nonnull final MavenSession session,
           @Nonnull final MavenProject project,
           @Nonnull final String key,
           @Nullable final String dflt
   ) {
-    String projectProperty;
+    String projectProperty = session.getUserProperties().getProperty(key);
 
     MavenProject curProject = project;
     do {

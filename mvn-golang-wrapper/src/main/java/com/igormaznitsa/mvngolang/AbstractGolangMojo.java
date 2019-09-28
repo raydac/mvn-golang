@@ -915,11 +915,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public boolean isSkip() {
     final boolean result = this.skip 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.skip", "false"));
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mvn.golang.skip", "false"));
     
     final String skipMojoSuffix = this.getSkipMojoPropertySuffix();
     return skipMojoSuffix == null ? result : result 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
   }
 
   public boolean isEnforceGoPathToEnd() {
@@ -1188,7 +1188,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isDisableSslCheck() {
-    return this.disableSSLcheck || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.disable.ssl.check", "false"));
+    return this.disableSSLcheck || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mvn.golang.disable.ssl.check", "false"));
   }
 
   public void setDisableSslCheck(final boolean flag) {

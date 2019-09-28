@@ -111,7 +111,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
   @Override
   public boolean isSkip() {
     return super.isSkip()
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.install.skip", "false"));
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "maven.install.skip", "false"));
   }
 
   @Override

@@ -57,7 +57,7 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
   public boolean isSkip() {
     return super.isSkip() 
             || Boolean.getBoolean("skipTests") 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.test.skip", "false"));
+            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "maven.test.skip", "false"));
   }
 
   @Override
@@ -87,7 +87,7 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   @Override
   public boolean isIgnoreErrorExitCode() {
-    return Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "maven.test.failure.ignore", "false"))
+    return Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "maven.test.failure.ignore", "false"))
             || super.isIgnoreErrorExitCode();
   }
 

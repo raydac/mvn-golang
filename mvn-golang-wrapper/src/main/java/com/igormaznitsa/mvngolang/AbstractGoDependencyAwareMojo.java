@@ -341,7 +341,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   }
 
   protected boolean isRestoreGoMod() {
-    return Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.restore.go.mod", "true"));
+    return Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mvn.golang.restore.go.mod", "true"));
   }
 
   @Nonnull
@@ -362,7 +362,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
       final boolean doUnpackArch;
       if (outDir.isDirectory()) {
         this.getLog().debug("Unpacked dependemcy folder already exists: " + outDir);
-        if (Boolean.parseBoolean(MavenUtils.findProperty(this.getProject(), "mvn.golang.force.clean.dependency", "false"))) {
+        if (Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mvn.golang.force.clean.dependency", "false"))) {
           this.getLog().debug("Forcing dependency folder delete: " + outDir);
           try {
             FileUtils.deleteDirectory(outDir);
