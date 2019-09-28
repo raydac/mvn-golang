@@ -13,7 +13,7 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <go.sdk.version>1.13</go.sdk.version>
+    <go.sdk.version>1.13.1</go.sdk.version>
   </properties>
 
   <profiles>
@@ -77,8 +77,8 @@
     <module>mvn-golang-example-protobuf</module>
     <module>test-git-cvs</module>
     <module>test-hg-cvs</module>
+    <module>mvn-golang-example-kubernetes</module>
 
     <!--module>mvn-golang-example-jfrog-cli</module-->
-    <!--module>mvn-golang-example-kubernetes</module-->
   </modules>
 </project>
