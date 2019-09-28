@@ -28,6 +28,14 @@
           <goVersion>${go.sdk.version}</goVersion>
           <moduleMode>true</moduleMode>
         </configuration>
+        <executions>
+          <execution>
+            <id>default-get</id>
+            <configuration>
+              <externalPackageFile>${basedir}${file.separator}go-dependencies.lst</externalPackageFile>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
