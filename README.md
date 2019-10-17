@@ -8,6 +8,10 @@
 ![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
 
 # Changelog
+
+__2.3.4 (SNAPSHOT)__
+ - default version of GoSDK updated to 1.12.7
+
 __2.3.3 (30-jul-2019)__
  - improved work in parallel mode
  - __minimal supported JDK version increased to 1.8__
