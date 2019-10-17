@@ -241,12 +241,14 @@ public final class MavenUtils {
   ) {
     String projectProperty = session.getUserProperties().getProperty(key);
 
-    MavenProject curProject = project;
-    do {
-      projectProperty = curProject.getProperties().getProperty(key);
-      curProject = curProject.getParent();
-    } while (projectProperty == null && curProject != null);
-
+    if (projectProperty == null) {
+      MavenProject curProject = project;
+      do {
+        projectProperty = curProject.getProperties().getProperty(key);
+        curProject = curProject.getParent();
+      } while (projectProperty == null && curProject != null);
+    }
+    
     return projectProperty == null ? System.getProperty(key, dflt) : projectProperty;
   }
 
