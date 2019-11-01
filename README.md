@@ -10,7 +10,7 @@
 # Changelog
 
 __2.3.4 (SNAPSHOT)__
- - default version of GoSDK updated to 1.12.7
+ - default version of GoSDK updated to 1.13.4
 
 __2.3.3 (30-jul-2019)__
  - improved work in parallel mode
