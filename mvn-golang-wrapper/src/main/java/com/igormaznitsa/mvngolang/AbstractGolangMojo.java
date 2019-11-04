@@ -677,7 +677,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private static String investigateArch() {
     final String arch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
-    if (arch.contains("arm")) {
+    if (arch.contains("ppc64le")) {
+      return "ppc64le";
+    } else if (arch.contains("arm")) {
       return "arm";
     }
     if (arch.equals("386") || arch.equals("i386") || arch.equals("x86")) {
