@@ -26,6 +26,7 @@ import com.igormaznitsa.meta.common.utils.StrUtils;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
+import com.igormaznitsa.mvngolang.utils.SysUtils;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
 import com.igormaznitsa.mvngolang.utils.WildCardMatcher;
 import com.igormaznitsa.mvngolang.utils.XGoogHashHeader;
@@ -605,7 +606,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   protected File getTempFileFolder() {
     return new File(System.getProperty("java.io.tmpdir"));
   }
-  
+
   /**
    * Internal method to generate session locking file for mvn-golang mojo. If
    * file exists then it will be waiting for its removing to create new one.
@@ -675,20 +676,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nonnull
-  private static String investigateArch() {
-    final String arch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
-    if (arch.contains("ppc64le")) {
-      return "ppc64le";
-    } else if (arch.contains("arm")) {
-      return "arm";
-    }
-    if (arch.equals("386") || arch.equals("i386") || arch.equals("x86")) {
-      return "386";
-    }
-    return "amd64";
-  }
-
-  @Nonnull
   protected static String adaptExecNameForOS(@Nonnull final String execName) {
     return execName + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "");
   }
@@ -730,9 +717,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   private File loadSDKAndUnpackIntoCache(
-          @Nullable final ProxySettings proxySettings, 
-          @Nonnull final File cacheFolder, 
-          @Nonnull final String baseSdkName, 
+          @Nullable final ProxySettings proxySettings,
+          @Nonnull final File cacheFolder,
+          @Nonnull final String baseSdkName,
           final boolean dontLoadIfNotInCache
   ) throws IOException, MojoExecutionException {
     synchronized (AbstractGolangMojo.class) {
@@ -916,11 +903,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isSkip() {
-    final boolean result = this.skip 
+    final boolean result = this.skip
             || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mvn.golang.skip", "false"));
-    
+
     final String skipMojoSuffix = this.getSkipMojoPropertySuffix();
-    return skipMojoSuffix == null ? result : result 
+    return skipMojoSuffix == null ? result : result
             || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
   }
 
@@ -1099,24 +1086,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public String getOs() {
     String result = this.os;
     if (isSafeEmpty(result)) {
-      if (SystemUtils.IS_OS_WINDOWS) {
-        result = "windows";
-      } else if (SystemUtils.IS_OS_LINUX) {
-        result = "linux";
-      } else if (SystemUtils.IS_OS_FREE_BSD) {
-        result = "freebsd";
-      } else {
-        result = "darwin";
+      if (isSafeEmpty(result)) {
+        result = assertNotNull(String.format("Can't recognize OS: %s", SystemUtils.OS_NAME), SysUtils.findGoSdkOsType());
       }
     }
     return result;
   }
 
-  @Nonnull
+  @Nullable
   public String getArch() {
     String result = this.arch;
     if (isSafeEmpty(result)) {
-      result = investigateArch();
+      result = assertNotNull(String.format("Can't recognize ARCH: %s", SystemUtils.OS_ARCH), SysUtils.decodeGoSdkArchType(SystemUtils.OS_ARCH));
     }
     return result;
   }
@@ -2118,7 +2099,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   protected String getSkipMojoPropertySuffix() {
     return null;
   }
-  
+
   protected void processConsoleOut(final int exitCode, @Nonnull final String out, @Nonnull final String err) throws MojoFailureException, MojoExecutionException {
     final File reportsFolderFile = new File(this.getReportsFolder());
 
