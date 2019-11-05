@@ -34,12 +34,12 @@ public final class SysUtils {
     final String result;
     if (SystemUtils.IS_OS_WINDOWS) {
       result = "windows";
-    } else if (SystemUtils.IS_OS_LINUX) {
-      result = "linux";
     } else if (SystemUtils.IS_OS_FREE_BSD) {
       result = "freebsd";
     } else if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) {
       result = "darwin";
+    } else if (SystemUtils.IS_OS_LINUX) {
+      result = "linux";
     } else {
       result = null;
     }
