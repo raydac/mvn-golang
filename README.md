@@ -10,7 +10,9 @@
 # Changelog
 
 __2.3.4 (SNAPSHOT)__
+ - improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
  - default version of GoSDK updated to 1.13.4
+ - minor refactoring
 
 __2.3.3 (30-jul-2019)__
  - improved work in parallel mode
