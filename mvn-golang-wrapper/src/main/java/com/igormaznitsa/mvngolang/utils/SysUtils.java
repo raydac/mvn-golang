@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.SystemUtils;
 
 /**
- * Class contains some auxiliary methods.
+ * Class contains some auxiliary system related methods.
  * @since 2.3.4
  */
 public final class SysUtils {
