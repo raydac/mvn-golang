@@ -25,6 +25,7 @@ public class SysUtilsTest {
     assertNull(SysUtils.decodeGoSdkArchType("some xxx"));
     assertEquals("armv6l",SysUtils.decodeGoSdkArchType("some armv6l xxx"));
     assertEquals("ppc64le",SysUtils.decodeGoSdkArchType("ppc ppc64le"));
+    assertEquals("ppc64le",SysUtils.decodeGoSdkArchType("ppc64le"));
     assertEquals("386",SysUtils.decodeGoSdkArchType("i386"));
     assertEquals("386",SysUtils.decodeGoSdkArchType("i686"));
     assertEquals("amd64",SysUtils.decodeGoSdkArchType("amd64"));
