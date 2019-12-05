@@ -13,7 +13,7 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <go.sdk.version>1.13.4</go.sdk.version>
+    <go.sdk.version>1.13.5</go.sdk.version>
   </properties>
 
   <profiles>
