@@ -86,7 +86,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
    *
    * @since 2.1.9
    */
-  @Parameter(name = "externalPackageFile", property = "mvn.golang.get.packages.file")
+  @Parameter(name = "externalPackageFile")
   private String externalPackageFile;
 
   /**
@@ -194,7 +194,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   
   @Nullable
   public String getExternalPackageFile() {
-    return this.externalPackageFile;
+    return findMvnProperty("mvn.golang.get.packages.file", this.externalPackageFile);
   }
 
   @Override

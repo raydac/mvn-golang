@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -239,17 +240,9 @@ public final class MavenUtils {
           @Nonnull final String key,
           @Nullable final String dflt
   ) {
-    String projectProperty = session.getUserProperties().getProperty(key);
-
-    if (projectProperty == null) {
-      MavenProject curProject = project;
-      do {
-        projectProperty = curProject.getProperties().getProperty(key);
-        curProject = curProject.getParent();
-      } while (projectProperty == null && curProject != null);
-    }
-    
-    return projectProperty == null ? System.getProperty(key, dflt) : projectProperty;
+    final Properties properties = new Properties(project.getProperties());
+    properties.putAll( session.getSystemProperties() );
+    properties.putAll( session.getUserProperties() );
+    return properties.getProperty(key, dflt);
   }
-
 }

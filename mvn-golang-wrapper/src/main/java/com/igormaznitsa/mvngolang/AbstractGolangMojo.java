@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
+
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static com.igormaznitsa.mvngolang.utils.MavenUtils.findProperty;
+
 
 import com.igormaznitsa.meta.annotation.LazyInited;
 import com.igormaznitsa.meta.annotation.MayContainNull;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.meta.common.utils.StrUtils;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
-import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import com.igormaznitsa.mvngolang.utils.SysUtils;
 import com.igormaznitsa.mvngolang.utils.UnpackUtils;
@@ -132,14 +136,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public static final String NAME_PATTERN = "go%s.%s-%s%s";
   private static final List<String> ALLOWED_SDKARCHIVE_CONTENT_TYPE = Collections.unmodifiableList(Arrays.asList("application/octet-stream", "application/zip", "application/x-tar", "application/x-gzip"));
   private static final ReentrantLock LOCKER = new ReentrantLock();
-  private static final String[] BANNER = new String[]{"______  ___             _________     ______",
-    "___   |/  /__   __________  ____/________  / ______ ______________ _",
-    "__  /|_/ /__ | / /_  __ \\  / __ _  __ \\_  /  _  __ `/_  __ \\_  __ `/",
-    "_  /  / / __ |/ /_  / / / /_/ / / /_/ /  /___/ /_/ /_  / / /  /_/ / ",
-    "/_/  /_/  _____/ /_/ /_/\\____/  \\____//_____/\\__,_/ /_/ /_/_\\__, /",
-    "                                                           /____/",
-    "                  https://github.com/raydac/mvn-golang",
-    ""
+  private static final String[] BANNER = new String[] {"______  ___             _________     ______",
+      "___   |/  /__   __________  ____/________  / ______ ______________ _",
+      "__  /|_/ /__ | / /_  __ \\  / __ _  __ \\_  /  _  __ `/_  __ \\_  __ `/",
+      "_  /  / / __ |/ /_  / / / /_/ / / /_/ /  /___/ /_/ /_  / / /  /_/ / ",
+      "/_/  /_/  _____/ /_/ /_/\\____/  \\____//_____/\\__,_/ /_/ /_/_\\__, /",
+      "                                                           /____/",
+      "                  https://github.com/raydac/mvn-golang",
+      ""
   };
   /**
    * set of flags to be ignored among build and extra build flags, for inside
@@ -170,11 +174,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * Flag to turn on support for module mode. Dependencies will not be added
    * into GOPATH, go.mod files will be preprocessed to have replace links to
    * each other locally. After processing all go.mod files are restored from
-   * backup.
+   * backup. Can be overrided by property "mvn.golang.module.mode"
    *
    * @since 2.3.3
    */
-  @Parameter(name = "moduleMode", defaultValue = "false", property = "mvn.golang.module.mode")
+  @Parameter(name = "moduleMode", defaultValue = "false")
   private boolean moduleMode;
 
   /**
@@ -196,7 +200,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isModuleMode() {
-    return this.moduleMode;
+    return Boolean.parseBoolean(findMvnProperty("mvn.golang.module.mode", Boolean.toString(this.moduleMode)));
   }
 
   public void setModuleMode(final boolean value) {
@@ -354,7 +358,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * The Go SDK version. It plays role if goRoot is undefined. Can be defined
    * through system property 'mvn.golang.go.version'
    */
-  @Parameter(name = "goVersion", defaultValue = "1.13.6", property = "mvn.golang.go.version")
+  @Parameter(name = "goVersion", defaultValue = "1.13.6")
   private String goVersion;
 
   /**
@@ -469,7 +473,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   /**
    * Be verbose in logging.
    */
-  @Parameter(name = "verbose", defaultValue = "false", property = "mvn.golang.verbose")
+  @Parameter(name = "verbose", defaultValue = "false")
   private boolean verbose;
 
   /**
@@ -717,10 +721,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   private File loadSDKAndUnpackIntoCache(
-          @Nullable final ProxySettings proxySettings,
-          @Nonnull final File cacheFolder,
-          @Nonnull final String baseSdkName,
-          final boolean dontLoadIfNotInCache
+      @Nullable final ProxySettings proxySettings,
+      @Nonnull final File cacheFolder,
+      @Nonnull final String baseSdkName,
+      final boolean dontLoadIfNotInCache
   ) throws IOException, MojoExecutionException {
     synchronized (AbstractGolangMojo.class) {
       final File sdkFolder = new File(cacheFolder, baseSdkName);
@@ -902,13 +906,17 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return this.filterEnvPath;
   }
 
+  @Nullable
+  protected String findMvnProperty(@Nonnull final String key, @Nullable final String dflt) {
+    return findProperty(this.session, this.project, key, dflt);
+  }
+
   public boolean isSkip() {
-    final boolean result = this.skip
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mvn.golang.skip", "false"));
+    final boolean result = Boolean.parseBoolean(findMvnProperty("mvn.golang.skip", Boolean.toString(this.skip)));
 
     final String skipMojoSuffix = this.getSkipMojoPropertySuffix();
     return skipMojoSuffix == null ? result : result
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
+        || Boolean.parseBoolean(findMvnProperty(String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
   }
 
   public boolean isEnforceGoPathToEnd() {
@@ -1005,7 +1013,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isVerbose() {
-    return this.verbose;
+    return Boolean.parseBoolean(findMvnProperty("mvn.golang.verbose", Boolean.toString(this.verbose)));
   }
 
   public boolean isDisableSdkLoad() {
@@ -1171,7 +1179,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public boolean isDisableSslCheck() {
-    return this.disableSSLcheck || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mvn.golang.disable.ssl.check", "false"));
+    return this.disableSSLcheck || Boolean.parseBoolean(findProperty(this.getSession(), this.getProject(), "mvn.golang.disable.ssl.check", "false"));
   }
 
   public void setDisableSslCheck(final boolean flag) {
@@ -1190,7 +1198,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   public String getGoVersion() {
-    return this.goVersion;
+    return findProperty(this.session, this.project, "mvn.golang.go.version", this.goVersion);
   }
 
   @Nonnull
@@ -1253,7 +1261,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         if (proxy.hasCredentials()) {
           final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
           credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port),
-                  new NTCredentials(GetUtils.ensureNonNull(proxy.username, ""), proxy.password, extractComputerName(), extractDomainName()));
+              new NTCredentials(GetUtils.ensureNonNull(proxy.username, ""), proxy.password, extractComputerName(), extractDomainName()));
           builder.setDefaultCredentialsProvider(credentialsProvider);
           getLog().debug(String.format("Credentials provider has been created for proxy (username : %s): %s", proxy.username, proxy.toString()));
         }
@@ -1321,12 +1329,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             public void checkServerTrusted(@Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull String arg1) throws CertificateException {
             }
           };
-          sslcontext.init(null, new TrustManager[]{tm}, null);
+          sslcontext.init(null, new TrustManager[] {tm}, null);
 
           final SSLConnectionSocketFactory sslfactory = new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
           final Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
-                  .register("https", sslfactory)
-                  .register("http", new PlainConnectionSocketFactory()).build();
+              .register("https", sslfactory)
+              .register("http", new PlainConnectionSocketFactory()).build();
 
           builder.setConnectionManager(new BasicHttpClientConnectionManager(r));
           builder.setSSLSocketFactory(sslfactory);
@@ -1527,7 +1535,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     String result = getSdkArchiveName();
     if (isSafeEmpty(result)) {
       final Document parsed = convertSdkListToDocument(loadGoLangSdkList(proxySettings, URLEncoder.encode(sdkBaseName, "UTF-8")));
-      result = extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
+      result = extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[] {"tar.gz", "zip"});
     } else {
       getLog().info("SDK archive name is predefined : " + result);
     }
@@ -1567,6 +1575,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
         final String definedOsxVersion = this.getOSXVersion();
         final String sdkVersion = this.getGoVersion();
+
+        this.getLog().debug(String.format("SdkVersion = %s, osxVersion = %s", sdkVersion, definedOsxVersion));
 
         if (isSafeEmpty(sdkVersion)) {
           throw new MojoFailureException("GoLang SDK version is not defined!");
@@ -1862,7 +1872,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     final File executableFileInBin = gobin == null ? null : new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
 
-    final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
+    final File[] exeVariants = new File[] {executableFileInBin, executableFileInPathOrRoot};
 
     final File foundExecutableTool = findExisting(exeVariants);
 
@@ -1939,12 +1949,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   protected void registerEnvVars(
-          @Nonnull final ProcessExecutor result,
-          @Nonnull final File theGoRoot,
-          @Nullable final String theGoBin,
-          @Nullable final String theGoCache,
-          @Nonnull final File sourcesFile,
-          @MustNotContainNull @Nonnull final File[] goPathParts
+      @Nonnull final ProcessExecutor result,
+      @Nonnull final File theGoRoot,
+      @Nullable final String theGoBin,
+      @Nullable final String theGoCache,
+      @Nonnull final File sourcesFile,
+      @MustNotContainNull @Nonnull final File[] goPathParts
   ) throws IOException {
     logOptionally("....Environment vars....");
 

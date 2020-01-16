@@ -84,16 +84,16 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   /**
    * Flag to turn on session synchronization to prevent parallel processing of
-   * modules in module mode if session is parallel one,
+   * modules in module mode if session is parallel one. Can be defined through property 'mvn.golang.sync.session.if.modules'
    *
    * @since 2.3.3
    * @see #isModuleMode()
    */
-  @Parameter(name = "syncSessionIfModules", defaultValue = "true", property = "mvn.golang.sync.session.if.modules")
+  @Parameter(name = "syncSessionIfModules", defaultValue = "true")
   private boolean syncSessionIfModules;
 
   public boolean isSyncSessionIfModules() {
-    return this.syncSessionIfModules;
+    return Boolean.parseBoolean(findMvnProperty("mvn.golang.sync.session.if.modules", Boolean.toString(this.syncSessionIfModules)));
   }
 
   public void setSyncSessionIfModules(final boolean value) {
