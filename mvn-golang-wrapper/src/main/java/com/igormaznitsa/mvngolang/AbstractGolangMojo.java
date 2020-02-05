@@ -25,7 +25,6 @@ import com.igormaznitsa.meta.annotation.MayContainNull;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.meta.common.utils.StrUtils;
 import com.igormaznitsa.mvngolang.utils.IOUtils;
@@ -358,7 +357,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * The Go SDK version. It plays role if goRoot is undefined. Can be defined
    * through system property 'mvn.golang.go.version'
    */
-  @Parameter(name = "goVersion", defaultValue = "1.13.6")
+  @Parameter(name = "goVersion", defaultValue = "1.13.7")
   private String goVersion;
 
   /**
@@ -865,7 +864,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
                 if (!xGoogHash.isValid()) {
                   throw new MojoExecutionException("Couldn't parse x-goog-hash from response: " + response);
                 } else {
-                  throw new MojoExecutionException("Parsed x-goog-hash has not needed data: " + xGoogHash);
+                  throw new MojoExecutionException("Parsed x-goog-hash doesn't contain data but marked as valid one: " + xGoogHash);
                 }
               }
             }
