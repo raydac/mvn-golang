@@ -120,7 +120,7 @@
     <dependency>
       <groupId>org.zeroturnaround</groupId>
       <artifactId>zt-zip</artifactId>
-      <version>1.13</version>
+      <version>1.14</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -136,7 +136,7 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.13</version>
+      <version>1.14</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
