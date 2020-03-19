@@ -13,7 +13,7 @@
       <defaultValue>2.3.5-SNAPSHOT</defaultValue>
     </requiredProperty>
     <requiredProperty key="gosdk">
-      <defaultValue>1.14</defaultValue>
+      <defaultValue>1.14.1</defaultValue>
     </requiredProperty>
   </requiredProperties>
 
