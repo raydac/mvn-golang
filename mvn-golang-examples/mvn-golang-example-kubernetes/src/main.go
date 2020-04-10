@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,22 +19,22 @@ package main
 
 import (
 	"bufio"
+	_ "context"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	"k8s.io/client-go/util/retry"
 	//
 	// Uncomment to load all auth plugins
-	// _ "k8s.io/client-go/plugin/pkg/client/auth
+	// _ "k8s.io/client-go/plugin/pkg/client/auth"
 	//
 	// Or uncomment to load specific auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -52,51 +52,44 @@ func main() {
 	}
 	flag.Parse()
 
-	namespace := "default"
-
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
 		panic(err)
 	}
-	client, err := dynamic.NewForConfig(config)
+	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err)
 	}
 
-	deploymentRes := schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
+	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
 
-	deployment := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"apiVersion": "apps/v1",
-			"kind":       "Deployment",
-			"metadata": map[string]interface{}{
-				"name": "demo-deployment",
+	deployment := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "demo-deployment",
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: int32Ptr(2),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": "demo",
+				},
 			},
-			"spec": map[string]interface{}{
-				"replicas": 2,
-				"selector": map[string]interface{}{
-					"matchLabels": map[string]interface{}{
+			Template: apiv1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
 						"app": "demo",
 					},
 				},
-				"template": map[string]interface{}{
-					"metadata": map[string]interface{}{
-						"labels": map[string]interface{}{
-							"app": "demo",
-						},
-					},
-
-					"spec": map[string]interface{}{
-						"containers": []map[string]interface{}{
-							{
-								"name":  "web",
-								"image": "nginx:1.12",
-								"ports": []map[string]interface{}{
-									{
-										"name":          "http",
-										"protocol":      "TCP",
-										"containerPort": 80,
-									},
+				Spec: apiv1.PodSpec{
+					Containers: []apiv1.Container{
+						{
+							Name:  "web",
+							Image: "nginx:1.12",
+							Ports: []apiv1.ContainerPort{
+								{
+									Name:          "http",
+									Protocol:      apiv1.ProtocolTCP,
+									ContainerPort: 80,
 								},
 							},
 						},
@@ -108,11 +101,11 @@ func main() {
 
 	// Create Deployment
 	fmt.Println("Creating deployment...")
-	result, err := client.Resource(deploymentRes).Namespace(namespace).Create(deployment, metav1.CreateOptions{})
+	result, err := deploymentsClient.Create(deployment)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Created deployment %q.\n", result.GetName())
+	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
 
 	// Update Deployment
 	prompt()
@@ -133,65 +126,41 @@ func main() {
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		// Retrieve the latest version of Deployment before attempting update
 		// RetryOnConflict uses exponential backoff to avoid exhausting the apiserver
-		result, getErr := client.Resource(deploymentRes).Namespace(namespace).Get("demo-deployment", metav1.GetOptions{})
+		result, getErr := deploymentsClient.Get("demo-deployment", metav1.GetOptions{})
 		if getErr != nil {
-			panic(fmt.Errorf("failed to get latest version of Deployment: %v", getErr))
+			panic(fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
 		}
 
-		// update replicas to 1
-		if err := unstructured.SetNestedField(result.Object, int64(1), "spec", "replicas"); err != nil {
-			panic(fmt.Errorf("failed to set replica value: %v", err))
-		}
-
-		// extract spec containers
-		containers, found, err := unstructured.NestedSlice(result.Object, "spec", "template", "spec", "containers")
-		if err != nil || !found || containers == nil {
-			panic(fmt.Errorf("deployment containers not found or error in spec: %v", err))
-		}
-
-		// update container[0] image
-		if err := unstructured.SetNestedField(containers[0].(map[string]interface{}), "nginx:1.13", "image"); err != nil {
-			panic(err)
-		}
-		if err := unstructured.SetNestedField(result.Object, containers, "spec", "template", "spec", "containers"); err != nil {
-			panic(err)
-		}
-
-		_, updateErr := client.Resource(deploymentRes).Namespace(namespace).Update(result, metav1.UpdateOptions{})
+		result.Spec.Replicas = int32Ptr(1)                           // reduce replica count
+		result.Spec.Template.Spec.Containers[0].Image = "nginx:1.13" // change nginx version
+		_, updateErr := deploymentsClient.Update(result)
 		return updateErr
 	})
 	if retryErr != nil {
-		panic(fmt.Errorf("update failed: %v", retryErr))
+		panic(fmt.Errorf("Update failed: %v", retryErr))
 	}
 	fmt.Println("Updated deployment...")
 
 	// List Deployments
 	prompt()
 	fmt.Printf("Listing deployments in namespace %q:\n", apiv1.NamespaceDefault)
-	list, err := client.Resource(deploymentRes).Namespace(namespace).List(metav1.ListOptions{})
+	list, err := deploymentsClient.List(metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
 	for _, d := range list.Items {
-		replicas, found, err := unstructured.NestedInt64(d.Object, "spec", "replicas")
-		if err != nil || !found {
-			fmt.Printf("Replicas not found for deployment %s: error=%s", d.GetName(), err)
-			continue
-		}
-		fmt.Printf(" * %s (%d replicas)\n", d.GetName(), replicas)
+		fmt.Printf(" * %s (%d replicas)\n", d.Name, *d.Spec.Replicas)
 	}
 
 	// Delete Deployment
 	prompt()
 	fmt.Println("Deleting deployment...")
 	deletePolicy := metav1.DeletePropagationForeground
-	deleteOptions := &metav1.DeleteOptions{
+	if err := deploymentsClient.Delete("demo-deployment", &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
-	}
-	if err := client.Resource(deploymentRes).Namespace(namespace).Delete("demo-deployment", deleteOptions); err != nil {
+	}); err != nil {
 		panic(err)
 	}
-
 	fmt.Println("Deleted deployment.")
 }
 
@@ -206,3 +175,5 @@ func prompt() {
 	}
 	fmt.Println()
 }
+
+func int32Ptr(i int32) *int32 { return &i }
