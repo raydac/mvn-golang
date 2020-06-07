@@ -1,3 +1,5 @@
+![mvn-golang](assets/git_banner.png)
+
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Java 8.0+](https://img.shields.io/badge/java-8.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 [![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.3.4|jar)
@@ -5,11 +7,9 @@
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-red.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
 [![Yandex.Money donation](https://img.shields.io/badge/donation-Я.деньги-yellow.svg)](http://yasobe.ru/na/iamoss)
 
-![mvn-golang](https://raw.githubusercontent.com/raydac/mvn-golang/master/assets/mvngolang.png)
-
 # Changelog
 __2.3.5 (SNAPSHOT)__
- - default version of GoSDK updated to 1.14.2
+ - default version of GoSDK updated to 1.14.4
 
 __2.3.4 (05-nov-2019)__
  - improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
