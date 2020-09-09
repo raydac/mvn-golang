@@ -76,7 +76,6 @@
     <module>mvn-golang-example-maven-module-mix</module>
     <module>mvn-golang-example-protobuf</module>
     <module>test-git-cvs</module>
-    <module>test-hg-cvs</module>
     <module>mvn-golang-example-kubernetes</module>
 
     <!--module>mvn-golang-example-jfrog-cli</module-->
