@@ -303,7 +303,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     this.getLog().debug(String.format("Restoring go.mod from backup in %s, detected %d files", folder, backupFiles.size()));
 
     for (final File backup : backupFiles) {
-      final File restored = new File(folder, GO_MOD_FILE_NAME);
+      final File restored = new File(backup.getParentFile(), GO_MOD_FILE_NAME);
       if (restored.isFile() && !restored.delete()) {
         throw new IOException("Can't delete file during backup restore: " + restored);
       }
