@@ -1,5 +1,6 @@
 # __2.3.5 (SNAPSHOT)__
- - default version of GoSDK updated to 1.15
+ - fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
+ - default version of GoSDK updated to 1.15.1
 
 # __2.3.4 (05-nov-2019)__
  - improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
