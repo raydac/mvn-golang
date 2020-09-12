@@ -17,26 +17,6 @@ __2.3.4 (05-nov-2019)__
  - default version of GoSDK updated to 1.13.4
  - minor refactoring
 
-__2.3.3 (30-jul-2019)__
- - improved work in parallel mode
- - __minimal supported JDK version increased to 1.8__
- - added `mod` mojo
- - added unified boolean properties `mvn.golang.<MOJO_NAME>.skip` to skip work of selected mojo [#65](https://github.com/raydac/mvn-golang/issues/65)
- - text `none` in `resultName` field of `build` mojo disables auto-adding of `-o` command line option  
- - minor fixes and refactoring
- - added parameter `workingDir` to replace automatically choosen working directory during tool execution.
- - added support of [Golang modules]() with maven dependencies, added [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix) [#60](https://github.com/raydac/mvn-golang/issues/60)
- - default version of GoSDK updated to 1.12.7
-
-__2.3.2 (24-jun-2019)__
- - updated maven archetypes
- - fixed `mvn-golang:vet does not have maven dependency resolution` [#59](https://github.com/raydac/mvn-golang/issues/59)
- - default version of GoSDK updated to 1.12.6
-
-__2.3.1 (14-apr-2019)__
- - default version of GoSDK updated to 1.12.4
- - added parameter `goCache` to provide `GOCACHE` environment variable, the default value is `${project.build.directory}/.goBuildCache`
-
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
 # GO start!
