@@ -1,4 +1,4 @@
-# __2.3.5 (SNAPSHOT)__
+# __2.3.5 (12-sep-2020)__
  - fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
  - default version of GoSDK updated to 1.15.2
 
