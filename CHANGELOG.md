@@ -2,6 +2,7 @@
 
 - improved restoration of `go.mod` and `go.sum` state after build
 - refactoring and minor bugfixing
+- updated dependencies
 - default version of GoSDK updated to 1.15.6
 
 # __2.3.5 (12-sep-2020)__
