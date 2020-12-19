@@ -135,6 +135,11 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     return goModFile.toPath().relativize(folder.toPath()).toString();
   }
 
+  private List<Tuple<Artifact, Tuple<GoMod, File>>> findModsInProject() throws IOException {
+    return findGoModsAndParse(Collections
+        .singletonList(Tuple.of(this.getProject().getArtifact(), this.getSources(false))));
+  }
+
   private void preprocessModules(
       @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedDependencyFolders)
       throws MojoExecutionException {
@@ -143,8 +148,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           preprocessModuleFilesInDependencies(unpackedDependencyFolders);
       final List<Tuple<GoMod, File>> dependencyGoMods = listRightPart(lst);
 
-      final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = fildGoModsAndParse(Collections
-          .singletonList(Tuple.of(this.getProject().getArtifact(), this.getSources(false))));
+      final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = findModsInProject();
 
       for (final Tuple<Artifact, Tuple<GoMod, File>> f : projectGoMods) {
         final File goModFileBak = new File(f.right().right().getParentFile(), GO_MOD_FILE_NAME_BAK);
@@ -152,7 +156,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
         if (goModFileBak.isFile()) {
           if (goModFile.isFile() && !goModFile.delete()) {
-            throw new IOException("Can't detete go.mod file: " + goModFile);
+            throw new IOException("Can't delete go.mod file: " + goModFile);
           }
           FileUtils.copyFile(goModFileBak, goModFile);
         } else {
@@ -176,7 +180,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Nonnull
   @MustNotContainNull
-  private List<Tuple<Artifact, Tuple<GoMod, File>>> fildGoModsAndParse(
+  private List<Tuple<Artifact, Tuple<GoMod, File>>> findGoModsAndParse(
       @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders)
       throws IOException {
     final List<Tuple<Artifact, Tuple<GoMod, File>>> result = new ArrayList<>();
@@ -249,9 +253,9 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   private List<Tuple<Artifact, Tuple<GoMod, File>>> preprocessModuleFilesInDependencies(
       @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders)
       throws IOException {
-    getLog().debug("Findig go.mod descriptors in unpacked artifacts");
+    getLog().debug("Finding go.mod descriptors in unpacked artifacts");
     final List<Tuple<Artifact, Tuple<GoMod, File>>> foundAndParsedGoMods =
-        fildGoModsAndParse(unpackedFolders);
+        findGoModsAndParse(unpackedFolders);
     getLog().debug(String.format("Found %d go.mod descriptors", foundAndParsedGoMods.size()));
     final int changedGoModCounter = generateCrossLinksBetweenArtifactGoMods(foundAndParsedGoMods);
     getLog().debug(
@@ -295,19 +299,19 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         getLog().debug("Mvn golang dependencies are not found");
         this.extraGoPathSectionInOsFormat = "";
       } else {
-        getLog().debug("Found mvn-golang artifactis: " + foundArtifacts);
+        getLog().debug("Found mvn-golang artifacts: " + foundArtifacts);
         final File dependencyTempTargetFolder = new File(this.getDependencyTempFolder());
-        getLog().debug("Depedencies will be unpacked into folder: " + dependencyTempTargetFolder);
+        getLog().debug("Dependencies will be unpacked into folder: " + dependencyTempTargetFolder);
         final List<Tuple<Artifact, File>> unpackedFolders =
             unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
 
         if (this.isModuleMode()) {
-          this.getLog().info("Module mode is activacted");
+          this.getLog().info("Module mode is activated");
           this.preprocessModules(unpackedFolders);
         }
 
         if (this.isModuleMode()) {
-          this.getLog().info("Dependemcies are not added into GOPATH because module mode is on");
+          this.getLog().info("Dependencies are not added into GOPATH because module mode is on");
         } else {
           final List<File> unpackedFolderList = new ArrayList<>();
           for (final Tuple<Artifact, File> f : unpackedFolders) {
@@ -398,7 +402,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
       final boolean doUnpackArch;
       if (outDir.isDirectory()) {
-        this.getLog().debug("Unpacked dependemcy folder already exists: " + outDir);
+        this.getLog().debug("Unpacked dependency folder already exists: " + outDir);
         if (Boolean.parseBoolean(MavenUtils
             .findProperty(this.getSession(), this.getProject(), "mvn.golang.force.clean.dependency",
                 "false"))) {
