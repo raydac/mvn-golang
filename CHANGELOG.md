@@ -1,46 +1,59 @@
+# __2.3.6 (SNAPSHOT)__
+
+- improved restoration of `go,mod` and `go.sum` state after build
+- refactoring and minor bugfixing
+- default version of GoSDK updated to 1.15.6
+
 # __2.3.5 (12-sep-2020)__
- - fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
- - default version of GoSDK updated to 1.15.2
+
+- fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
+- default version of GoSDK updated to 1.15.2
 
 # __2.3.4 (05-nov-2019)__
- - improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
- - default version of GoSDK updated to 1.13.4
- - minor refactoring
+
+- improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
+- default version of GoSDK updated to 1.13.4
+- minor refactoring
 
 # __2.3.3 (30-jul-2019)__
- - improved work in parallel mode
- - __minimal supported JDK version increased to 1.8__
- - added `mod` mojo
- - added unified boolean properties `mvn.golang.<MOJO_NAME>.skip` to skip work of selected mojo [#65](https://github.com/raydac/mvn-golang/issues/65)
- - text `none` in `resultName` field of `build` mojo disables auto-adding of `-o` command line option  
- - minor fixes and refactoring
- - added parameter `workingDir` to replace automatically choosen working directory during tool execution.
- - added support of [Golang modules]() with maven dependencies, added [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix) [#60](https://github.com/raydac/mvn-golang/issues/60)
- - default version of GoSDK updated to 1.12.7
+
+- improved work in parallel mode
+- __minimal supported JDK version increased to 1.8__
+- added `mod` mojo
+- added unified boolean properties `mvn.golang.<MOJO_NAME>.skip` to skip work of selected mojo [#65](https://github.com/raydac/mvn-golang/issues/65)
+- text `none` in `resultName` field of `build` mojo disables auto-adding of `-o` command line option
+- minor fixes and refactoring
+- added parameter `workingDir` to replace automatically choosen working directory during tool execution.
+- added support of [Golang modules]() with maven dependencies, added [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-maven-module-mix) [#60](https://github.com/raydac/mvn-golang/issues/60)
+- default version of GoSDK updated to 1.12.7
 
 # __2.3.2 (24-jun-2019)__
- - updated maven archetypes
- - fixed `mvn-golang:vet does not have maven dependency resolution` [#59](https://github.com/raydac/mvn-golang/issues/59)
- - default version of GoSDK updated to 1.12.6
+
+- updated maven archetypes
+- fixed `mvn-golang:vet does not have maven dependency resolution` [#59](https://github.com/raydac/mvn-golang/issues/59)
+- default version of GoSDK updated to 1.12.6
 
 # __2.3.1 (14-apr-2019)__
- - default version of GoSDK updated to 1.12.4
- - added parameter `goCache` to provide `GOCACHE` environment variable, the default value is `${project.build.directory}/.goBuildCache`
+
+- default version of GoSDK updated to 1.12.4
+- added parameter `goCache` to provide `GOCACHE` environment variable, the default value is `${project.build.directory}/.goBuildCache`
 
 # __2.3.0 (02-mar-2019)__
- - __added support of work with mvn-golang dependencies in maven repository, so now they can be used as just maven dependencies, it can be disabled through `scanDependencies` property. [example](./mvn-golang-examples/mvn-golang-example-maven-repository)__
- - __repository artifact extension changed to `zip` to provide way to be processed by standard maven plugins__
- - added support of system properties 'mvngo.skip' and `mvngo.disable.ssl.check`
- - added `jfrog-cli` mojo to provide way make call to external [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) in tuned Go SDK environment, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-jfrog-cli).
- - added `connectionTimeout` property to provide timeout (milliseconds) for HTTP connections, default 60000 ms
- - [#55](https://github.com/raydac/mvn-golang/issues/55) print log error stream into debug if command status is not error
- - added check of hash for downloaded SDK archive, can be disabled by `false` in parameter `checkSdkHash`, it checks hash provided in response header `x-goog-hash`
- - improved GoSDK loading
+
+- __added support of work with mvn-golang dependencies in maven repository, so now they can be used as just maven dependencies, it can be disabled through `scanDependencies` property. [example](./mvn-golang-examples/mvn-golang-example-maven-repository)__
+- __repository artifact extension changed to `zip` to provide way to be processed by standard maven plugins__
+- added support of system properties 'mvngo.skip' and `mvngo.disable.ssl.check`
+- added `jfrog-cli` mojo to provide way make call to external [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) in tuned Go SDK environment, [example](https://github.com/raydac/mvn-golang/tree/master/mvn-golang-examples/mvn-golang-example-jfrog-cli).
+- added `connectionTimeout` property to provide timeout (milliseconds) for HTTP connections, default 60000 ms
+- [#55](https://github.com/raydac/mvn-golang/issues/55) print log error stream into debug if command status is not error
+- added check of hash for downloaded SDK archive, can be disabled by `false` in parameter `checkSdkHash`, it checks hash provided in response header `x-goog-hash`
+- improved GoSDK loading
 
 # 2.2.0 (13-may-2018)
- - added property `mvn.golang.go.version` to define value for `goVersion` configuration parameter, it allows decrease configuration section dramatically
- - added `externalPackageFile` (property `mvn.golang.get.packages.file`) option to the `get` mojo, it allows to keep package list in external file
- - default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
+
+- added property `mvn.golang.go.version` to define value for `goVersion` configuration parameter, it allows decrease configuration section dramatically
+- added `externalPackageFile` (property `mvn.golang.get.packages.file`) option to the `get` mojo, it allows to keep package list in external file
+- default value of the `useMavenProxy` flag is changed to __true__ to make the plugin more compatible with default maven process
 
 # 2.1.8 (29-apr-2018)
 - added support of `maven.deploy.skip` and `maven.install.skip` prperties in `install` and `deploy` mojos

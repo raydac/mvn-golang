@@ -8,14 +8,23 @@
 [![YooMoney donation](https://img.shields.io/badge/donation-Yoo.money-blue.svg)](https://yoomoney.ru/to/41001158080699)
 
 # Changelog
+
+# __2.3.6 (SNAPSHOT)__
+
+- improved restoration of `go,mod` and `go.sum` state after build
+- refactoring and minor bugfixing
+- default version of GoSDK updated to 1.15.6
+
 __2.3.5 (12-sep-2020)__
- - fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
- - default version of GoSDK updated to 1.15.2
+
+- fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
+- default version of GoSDK updated to 1.15.2
 
 __2.3.4 (05-nov-2019)__
- - improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
- - default version of GoSDK updated to 1.13.4
- - minor refactoring
+
+- improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
+- default version of GoSDK updated to 1.13.4
+- minor refactoring
 
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
