@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
@@ -39,12 +40,12 @@ public class GolangFixMojo extends AbstractGoPackageAndDependencyAwareMojo {
   protected String getSkipMojoPropertySuffix() {
     return "fix";
   }
-  
+
   @Override
   @Nullable
   @MustNotContainNull
   protected String[] getDefaultPackages() {
-    return new String[]{'.' + File.separator + "..."};
+    return new String[] {'.' + File.separator + "..."};
   }
 
   @Override

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
@@ -58,7 +59,7 @@ public class GolangModMojo extends AbstractGoDependencyAwareMojo {
   @MustNotContainNull
   @Override
   public String[] getCommandFlags() {
-    return new String[]{Assertions.assertNotNull(this.command)};
+    return new String[] {Assertions.assertNotNull(this.command)};
   }
 
   @Nonnull

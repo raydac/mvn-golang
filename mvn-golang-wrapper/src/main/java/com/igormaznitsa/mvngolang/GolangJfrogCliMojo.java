@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
@@ -102,10 +103,11 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
   protected String getSkipMojoPropertySuffix() {
     return "jfrog";
   }
-  
+
   @Nonnull
   @Override
-  protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings) throws IOException, MojoFailureException, MojoExecutionException {
+  protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings)
+      throws IOException, MojoFailureException, MojoExecutionException {
     this.initConsoleBuffers();
 
     final File goRoot = this.findGoRoot(proxySettings);
@@ -141,7 +143,7 @@ public class GolangJfrogCliMojo extends AbstractGoDependencyAwareMojo {
 
     return result;
   }
- 
+
   @Nonnull
   @MustNotContainNull
   @Override

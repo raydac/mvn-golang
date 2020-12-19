@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
 
 import java.util.Locale;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 /**
  * Class contains some auxiliary system related methods.
+ *
  * @since 2.3.4
  */
 public final class SysUtils {
@@ -45,7 +47,7 @@ public final class SysUtils {
     }
     return result;
   }
-  
+
   @Nullable
   public static String decodeGoSdkArchType(@Nonnull final String osArchProperty) {
     final String arch = osArchProperty.toLowerCase(Locale.ENGLISH);
@@ -60,12 +62,12 @@ public final class SysUtils {
     }
     if (arch.matches("^(x8632|x86|i[3-6]86|ia32|x32)$")) {
       return "386";
-    } else if (arch.contains("em64t") 
-            || arch.contains("x8664") 
-            || arch.contains("ia32e") 
-            || arch.contains("x64") 
-            || arch.contains("amd64") 
-            || arch.contains("x86_64")) {
+    } else if (arch.contains("em64t")
+        || arch.contains("x8664")
+        || arch.contains("ia32e")
+        || arch.contains("x64")
+        || arch.contains("amd64")
+        || arch.contains("x86_64")) {
       return "amd64";
     }
     return null;

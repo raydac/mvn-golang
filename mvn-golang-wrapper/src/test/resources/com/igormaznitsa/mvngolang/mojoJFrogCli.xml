@@ -19,26 +19,26 @@
                     <goal>jfrog-cli</goal>
                 </goals>
                 <configuration>
-                  <useMavenProxy>false</useMavenProxy>
-                  <checkSdkHash>false</checkSdkHash>
-                  <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>
-                  <target386>387</target386>
-                  <goRoot>some/root</goRoot>
-                  <goPath>some/path</goPath>
-                  <sources>some/sources</sources>
-                  <goCache>some/path/cache</goCache>
+                    <useMavenProxy>false</useMavenProxy>
+                    <checkSdkHash>false</checkSdkHash>
+                    <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>
+                    <target386>387</target386>
+                    <goRoot>some/root</goRoot>
+                    <goPath>some/path</goPath>
+                    <sources>some/sources</sources>
+                    <goCache>some/path/cache</goCache>
 
-                  <cliPath>some/jfrog</cliPath>
-                  <target>mc</target>
-                  <command>s</command>
-                  <arguments>
-                    <argument>add</argument>
-                    <argument>ARTIFACTORY</argument>
-                    <argument>my-arti</argument>
-                    <argument>--service-url=http://10.100.1.127</argument>
-                    <argument>--service-user=admin</argument>
-                    <argument>--service-password=password</argument>
-                  </arguments>
+                    <cliPath>some/jfrog</cliPath>
+                    <target>mc</target>
+                    <command>s</command>
+                    <arguments>
+                        <argument>add</argument>
+                        <argument>ARTIFACTORY</argument>
+                        <argument>my-arti</argument>
+                        <argument>--service-url=http://10.100.1.127</argument>
+                        <argument>--service-user=admin</argument>
+                        <argument>--service-password=password</argument>
+                    </arguments>
                 </configuration>
             </plugin>
         </plugins>

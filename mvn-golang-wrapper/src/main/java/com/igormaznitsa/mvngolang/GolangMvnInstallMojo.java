@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
-import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.mvngolang.utils.IOUtils.closeSilently;
+
+
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
@@ -94,12 +97,12 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
   @Parameter(name = "compression", defaultValue = "9")
   private int compression;
 
-  public void setCompression(final int level) {
-    this.compression = level;
-  }
-
   public int getCompression() {
     return this.compression;
+  }
+
+  public void setCompression(final int level) {
+    this.compression = level;
   }
 
   @Nullable
@@ -111,22 +114,28 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
   @Override
   public boolean isSkip() {
     return super.isSkip()
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "maven.install.skip", "false"));
+        || Boolean.parseBoolean(MavenUtils
+        .findProperty(this.getSession(), this.getProject(), "maven.install.skip", "false"));
   }
 
   @Override
-  protected boolean doMainBusiness(@Nonnull final ProxySettings proxySettings, final int maxAttempts) throws InterruptedException, MojoFailureException, MojoExecutionException, IOException {
+  protected boolean doMainBusiness(@Nonnull final ProxySettings proxySettings,
+                                   final int maxAttempts)
+      throws InterruptedException, MojoFailureException, MojoExecutionException, IOException {
     final File archive = compressProjectFiles();
     this.getProject().getArtifact().setFile(archive);
     return false;
   }
 
-  private void safeCopyDirectory(@Nullable final String src, @Nonnull final File dst, @Nullable @MustNotContainNull final List<File> dstList) throws IOException {
+  private void safeCopyDirectory(@Nullable final String src, @Nonnull final File dst,
+                                 @Nullable @MustNotContainNull final List<File> dstList)
+      throws IOException {
     if (!(src == null || src.isEmpty())) {
       final File srcFile = new File(src);
       if (srcFile.isDirectory()) {
         if (getLog().isDebugEnabled()) {
-          getLog().debug(String.format("Copying %s => %s", srcFile.getAbsolutePath(), dst.getAbsolutePath()));
+          getLog().debug(
+              String.format("Copying %s => %s", srcFile.getAbsolutePath(), dst.getAbsolutePath()));
         }
         FileUtils.copyDirectoryToDirectory(srcFile, dst);
         if (dstList != null) {
@@ -140,7 +149,8 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
     final Model model = this.getProject().getModel();
     Writer writer = null;
     try {
-      writer = new OutputStreamWriter(new FileOutputStream(new File(folder, "pom.xml"), false), StandardCharsets.UTF_8);
+      writer = new OutputStreamWriter(new FileOutputStream(new File(folder, "pom.xml"), false),
+          StandardCharsets.UTF_8);
       new MavenXpp3Writer().write(writer, model);
       if (getLog().isDebugEnabled()) {
         getLog().debug("Effective pom has been written");
@@ -160,12 +170,14 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
       throw new IOException("Can't create build folder: " + buildFolder);
     }
 
-    File resultZip = new File(buildFolder, artifact.getArtifactId() + '-' + artifact.getVersion() + '.' + artifact.getType());
+    File resultZip = new File(buildFolder,
+        artifact.getArtifactId() + '-' + artifact.getVersion() + '.' + artifact.getType());
     if (resultZip.isFile() && !resultZip.delete()) {
       throw new IOException("Can't delete file : " + resultZip);
     }
 
-    final File folderToPack = new File(".tmp_pack_folder_" + Long.toHexString(System.currentTimeMillis()).toUpperCase(Locale.ENGLISH));
+    final File folderToPack = new File(".tmp_pack_folder_" +
+        Long.toHexString(System.currentTimeMillis()).toUpperCase(Locale.ENGLISH));
     if (folderToPack.isDirectory()) {
       FileUtils.deleteDirectory(folderToPack);
     }
@@ -195,19 +207,26 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
       safeCopyDirectory(this.getSources(false).getAbsolutePath(), folderToPack, buildFolders);
 
       if (getLog().isDebugEnabled()) {
-        getLog().debug(String.format("Packing folder %s to %s", folderToPack.getAbsolutePath(), resultZip.getAbsolutePath()));
+        getLog().debug(String.format("Packing folder %s to %s", folderToPack.getAbsolutePath(),
+            resultZip.getAbsolutePath()));
       }
 
       if (mvnGolangBuildFolderListFile.isFile()) {
-        this.getLog().warn("Skip build source folder list descriptor create because detected existing one: " + MVNGOLANG_BUILD_FOLDERS_FILE);
+        this.getLog().warn(
+            "Skip build source folder list descriptor create because detected existing one: " +
+                MVNGOLANG_BUILD_FOLDERS_FILE);
       } else {
         if (buildFolders.isEmpty()) {
-          this.getLog().warn("Skip build source folder list descriptor because there is not any source or resource folders to be used for build");
+          this.getLog().warn(
+              "Skip build source folder list descriptor because there is not any source or resource folders to be used for build");
         } else {
-          final String rooPath = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(folderToPack.getAbsolutePath()));
+          final String rooPath = FilenameUtils
+              .separatorsToUnix(FilenameUtils.normalize(folderToPack.getAbsolutePath()));
           final StringBuilder buffer = new StringBuilder();
           for (final File f : buildFolders) {
-            String relativePath = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(f.getAbsolutePath())).substring(rooPath.length() + 1);
+            String relativePath =
+                FilenameUtils.separatorsToUnix(FilenameUtils.normalize(f.getAbsolutePath()))
+                    .substring(rooPath.length() + 1);
             if (buffer.length() > 0) {
               buffer.append('\n');
             }
@@ -215,13 +234,17 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
             buffer.append(relativePath);
           }
           final String fileContent = buffer.toString();
-          this.getLog().debug("Formed list of mvn-golang project source and resource build folders\n---------" + fileContent + "---------");
-          FileUtils.writeStringToFile(mvnGolangBuildFolderListFile, fileContent, StandardCharsets.UTF_8);
+          this.getLog().debug(
+              "Formed list of mvn-golang project source and resource build folders\n---------" +
+                  fileContent + "---------");
+          FileUtils
+              .writeStringToFile(mvnGolangBuildFolderListFile, fileContent, StandardCharsets.UTF_8);
         }
       }
 
       if (mvnGolangDependencyListFile.isFile()) {
-        this.getLog().warn("Skip dependency descriptor create because detected existing one: " + MVNGOLANG_DEPENDENCIES_FILE);
+        this.getLog().warn("Skip dependency descriptor create because detected existing one: " +
+            MVNGOLANG_DEPENDENCIES_FILE);
       } else {
         final List<Artifact> golangDependencies = new ArrayList<>();
         MavenProject currentProject = this.getProject();
@@ -242,8 +265,10 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
           buffer.append(MavenUtils.makeArtifactRecord(a)).append('\n');
         }
         final String flagFileContent = buffer.toString();
-        this.getLog().debug("Formed list of mvn-golang dependencies\n---------" + flagFileContent + "---------");
-        FileUtils.writeStringToFile(mvnGolangDependencyListFile, flagFileContent, StandardCharsets.UTF_8);
+        this.getLog().debug(
+            "Formed list of mvn-golang dependencies\n---------" + flagFileContent + "---------");
+        FileUtils.writeStringToFile(mvnGolangDependencyListFile, flagFileContent,
+            StandardCharsets.UTF_8);
       }
 
       this.getLog().debug("Restoring all backup go.mod in prepared folder to pack");
@@ -269,7 +294,8 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
       }
     }
 
-    for (final File f : folder.listFiles(pathname -> pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath()))) {
+    for (final File f : folder.listFiles(
+        pathname -> pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath()))) {
       restoreAllBackupGoMod(f);
     }
   }

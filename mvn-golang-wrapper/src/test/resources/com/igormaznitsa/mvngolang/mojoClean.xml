@@ -11,7 +11,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-      <mvn.golang.module.mode>true</mvn.golang.module.mode>
+        <mvn.golang.module.mode>true</mvn.golang.module.mode>
     </properties>
 
     <build>
@@ -23,7 +23,7 @@
                     <goal>clean</goal>
                 </goals>
                 <configuration>
-                  <moduleMode>true</moduleMode>
+                    <moduleMode>true</moduleMode>
                     <goRoot>some/root</goRoot>
                     <goPath>some/path</goPath>
                     <sources>some/sources</sources>

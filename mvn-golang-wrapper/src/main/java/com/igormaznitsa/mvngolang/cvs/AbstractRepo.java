@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.cvs;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
-import org.apache.commons.lang3.SystemUtils;
-import org.apache.maven.plugin.logging.Log;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.ProcessResult;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +26,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.maven.plugin.logging.Log;
 import org.zeroturnaround.exec.InvalidExitValueException;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
 
 public abstract class AbstractRepo {
 
@@ -47,7 +47,9 @@ public abstract class AbstractRepo {
     return this.command;
   }
 
-  public int execute(@Nullable String customCommand, @Nonnull final Log logger, @Nonnull final File cvsFolder, @Nonnull @MustNotContainNull final String... args) {
+  public int execute(@Nullable String customCommand, @Nonnull final Log logger,
+                     @Nonnull final File cvsFolder,
+                     @Nonnull @MustNotContainNull final String... args) {
     final List<String> cli = new ArrayList<>();
     cli.add(GetUtils.findFirstNonNull(customCommand, this.command));
     cli.addAll(Arrays.asList(args));
@@ -64,7 +66,9 @@ public abstract class AbstractRepo {
     int result = -1;
 
     try {
-      final ProcessResult processResult = executor.directory(cvsFolder).redirectError(errorStream).redirectOutput(outStream).executeNoTimeout();
+      final ProcessResult processResult =
+          executor.directory(cvsFolder).redirectError(errorStream).redirectOutput(outStream)
+              .executeNoTimeout();
       result = processResult.getExitValue();
 
       if (logger.isDebugEnabled()) {
@@ -93,28 +97,29 @@ public abstract class AbstractRepo {
 
   public abstract boolean doesContainCVS(@Nonnull File folder);
 
-  public boolean prepareFolder(@Nonnull final Log logger, @Nullable final ProxySettings proxy, @Nullable final String customExe, @Nonnull final File cvsFolder) {
+  public boolean prepareFolder(@Nonnull final Log logger, @Nullable final ProxySettings proxy,
+                               @Nullable final String customExe, @Nonnull final File cvsFolder) {
     return true;
   }
 
   public boolean processCVSForCustomOptions(
-          @Nonnull final Log logger,
-          @Nullable final ProxySettings proxy,
-          @Nonnull final File cvsFolder,
-          @Nullable final String customCommand,
-          @Nonnull @MustNotContainNull final String... options
+      @Nonnull final Log logger,
+      @Nullable final ProxySettings proxy,
+      @Nonnull final File cvsFolder,
+      @Nullable final String customCommand,
+      @Nonnull @MustNotContainNull final String... options
   ) {
     logger.debug("customCvsCall: " + Arrays.toString(options));
     return checkResult(logger, execute(customCommand, logger, cvsFolder, options));
   }
 
   public abstract boolean processCVSRequisites(
-          @Nonnull final Log logger,
-          @Nullable final ProxySettings proxy,
-          @Nullable final String customCommand,
-          @Nonnull final File cvsFolder,
-          @Nullable final String branchId,
-          @Nullable final String tagId,
-          @Nullable final String revisionId
+      @Nonnull final Log logger,
+      @Nullable final ProxySettings proxy,
+      @Nullable final String customCommand,
+      @Nonnull final File cvsFolder,
+      @Nullable final String branchId,
+      @Nullable final String tagId,
+      @Nullable final String revisionId
   );
 }

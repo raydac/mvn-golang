@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
 
-import org.junit.Test;
+import static org.junit.Assert.assertArrayEquals;
+
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.Assert.assertArrayEquals;
+import org.junit.Test;
 
 public class StringComparatorABCTest {
 
-    @Test
-    public void testSorting() {
-        final List<String> list = Arrays.asList("b", "c", "1", "hello", "ABC", "A");
-        Collections.sort(list, StringComparatorABC.getInstance());
-        assertArrayEquals(new String[]{"1", "A", "ABC", "b", "c", "hello"}, list.toArray());
-    }
+  @Test
+  public void testSorting() {
+    final List<String> list = Arrays.asList("b", "c", "1", "hello", "ABC", "A");
+    Collections.sort(list, StringComparatorABC.getInstance());
+    assertArrayEquals(new String[] {"1", "A", "ABC", "b", "c", "hello"}, list.toArray());
+  }
 
 }

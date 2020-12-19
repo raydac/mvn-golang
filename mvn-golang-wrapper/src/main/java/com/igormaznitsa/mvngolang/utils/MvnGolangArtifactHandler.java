@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
 
 import com.igormaznitsa.mvngolang.AbstractGolangMojo;
@@ -20,7 +21,7 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
 /**
  * Artifact handler for mvn-golang artifacts.
- * 
+ *
  * @since 2.3.0
  */
 public final class MvnGolangArtifactHandler extends DefaultArtifactHandler {
@@ -29,5 +30,5 @@ public final class MvnGolangArtifactHandler extends DefaultArtifactHandler {
     super(AbstractGolangMojo.GOARTIFACT_PACKAGING);
     this.setExtension("zip");
     this.setAddedToClasspath(false);
-  } 
+  }
 }

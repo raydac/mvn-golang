@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.common.utils.GetUtils;
@@ -41,7 +42,7 @@ public class GolangCustomMojo extends AbstractGoPackageAndDependencyAwareMojo {
   protected String getSkipMojoPropertySuffix() {
     return "clean";
   }
-  
+
   @Override
   @Nonnull
   public String getGoCommand() {

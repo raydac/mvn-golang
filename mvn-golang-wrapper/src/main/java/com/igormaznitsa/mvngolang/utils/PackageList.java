@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
+
+import static java.util.Arrays.asList;
+
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.Assertions;
@@ -21,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +44,81 @@ import javax.annotation.Nullable;
  */
 public final class PackageList {
 
+  private static final String DIRECTIVE_INCLUDE = "#include";
+  private final List<Package> packages;
+
+  public PackageList(@Nonnull @MustNotContainNull final File file, @Nonnull final String text,
+                     @Nonnull final ContentProvider contentProvider)
+      throws ParseException, IOException {
+    final List<Package> list = new ArrayList<>();
+
+    for (final String s : text.split("\\n")) {
+      final String trimmed = s.trim();
+
+      if (!trimmed.isEmpty() && !trimmed.startsWith("//")) {
+        if (trimmed.startsWith(DIRECTIVE_INCLUDE)) {
+          final String filePath = removeQuotes(
+              removeComment(trimmed.substring(DIRECTIVE_INCLUDE.length()).trim(), true));
+
+          final File includeFile = new File(file, filePath);
+
+          final String includedText = contentProvider.readContent(includeFile);
+          list.addAll(new PackageList(includeFile, includedText, contentProvider).getPackages());
+        } else {
+          list.add(new Package(trimmed));
+        }
+      }
+    }
+
+    this.packages = Collections.unmodifiableList(list);
+  }
+
+  @Nonnull
+  static String removeComment(@Nonnull final String text, final boolean checkQuotes) {
+    int pos = -1;
+    boolean quot = false;
+    boolean found = false;
+    for (int i = 0; i < text.length() && !found; i++) {
+      switch (text.charAt(i)) {
+        case '\"': {
+          quot = !quot;
+          pos = -1;
+        }
+        break;
+        case '/': {
+          if (!checkQuotes || !quot) {
+            if (pos < 0) {
+              pos = i;
+            } else {
+              found = true;
+            }
+          }
+        }
+        break;
+        default: {
+          pos = -1;
+        }
+        break;
+      }
+    }
+    return found ? text.substring(0, pos) : text;
+  }
+
+  @Nonnull
+  static String removeQuotes(@Nonnull final String text) {
+    String result = text;
+    if (text.length() > 1 && text.startsWith("\"") && text.endsWith("\"")) {
+      result = text.substring(1, text.length() - 1);
+    }
+    return result;
+  }
+
+  @Nonnull
+  @MustNotContainNull
+  public List<Package> getPackages() {
+    return this.packages;
+  }
+
   public interface ContentProvider {
 
     @Nonnull
@@ -52,21 +130,22 @@ public final class PackageList {
    */
   public static final class Package {
 
-    private final String pkg;
-    private final String branch;
-    private final String tag;
-    private final String revision;
-
     private static final String TAG_PACKAGE = "package";
     private static final String TAG_BRANCH = "branch";
     private static final String TAG_TAG = "tag";
     private static final String TAG_REVISION = "revision";
+    private static final Set<String> ALLOWED_KEYS =
+        new HashSet<>(asList(TAG_BRANCH, TAG_PACKAGE, TAG_REVISION, TAG_TAG));
+    private final String pkg;
+    private final String branch;
+    private final String tag;
+    private final String revision;
+    private final Pattern PATTERN = Pattern
+        .compile("(?:\\s*([^:\\s]+)\\s*:\\s*([^,\\s]+)\\s*(?:,|$)?)|(.+?)",
+            Pattern.CASE_INSENSITIVE);
 
-    private static final Set<String> ALLOWED_KEYS = new HashSet<>(asList(TAG_BRANCH, TAG_PACKAGE, TAG_REVISION, TAG_TAG));
-
-    private final Pattern PATTERN = Pattern.compile("(?:\\s*([^:\\s]+)\\s*:\\s*([^,\\s]+)\\s*(?:,|$)?)|(.+?)", Pattern.CASE_INSENSITIVE);
-
-    public Package(@Nonnull final String pkg, @Nullable final String branch, @Nullable final String tag, @Nullable final String revision) {
+    public Package(@Nonnull final String pkg, @Nullable final String branch,
+                   @Nullable final String tag, @Nullable final String revision) {
       this.pkg = Assertions.assertNotNull(pkg);
       this.branch = branch;
       this.revision = revision;
@@ -120,7 +199,8 @@ public final class PackageList {
 
     @Nonnull
     public String makeString() {
-      return "package: " + this.pkg + ",branch: " + this.branch + ",tag: " + this.tag + ",revision: " + this.revision;
+      return "package: " + this.pkg + ",branch: " + this.branch + ",tag: " + this.tag +
+          ",revision: " + this.revision;
     }
 
     public boolean doesNeedCvsProcessing() {
@@ -152,78 +232,5 @@ public final class PackageList {
     public String toString() {
       return this.pkg;
     }
-  }
-
-  private final List<Package> packages;
-
-  private static final String DIRECTIVE_INCLUDE = "#include";
-
-  @Nonnull
-  static String removeComment(@Nonnull final String text, final boolean checkQuotes) {
-    int pos = -1;
-    boolean quot = false;
-    boolean found = false;
-    for (int i = 0; i < text.length() && !found; i++) {
-      switch (text.charAt(i)) {
-        case '\"': {
-          quot = !quot;
-          pos = -1;
-        }
-        break;
-        case '/': {
-          if (!checkQuotes || !quot) {
-            if (pos < 0) {
-              pos = i;
-            } else {
-              found = true;
-            }
-          }
-        }
-        break;
-        default: {
-          pos = -1;
-        }
-        break;
-      }
-    }
-    return found ? text.substring(0, pos) : text;
-  }
-
-  @Nonnull
-  static String removeQuotes(@Nonnull final String text) {
-    String result = text;
-    if (text.length() > 1 && text.startsWith("\"") && text.endsWith("\"")) {
-      result = text.substring(1, text.length() - 1);
-    }
-    return result;
-  }
-
-  public PackageList(@Nonnull @MustNotContainNull final File file, @Nonnull final String text, @Nonnull final ContentProvider contentProvider) throws ParseException, IOException {
-    final List<Package> list = new ArrayList<>();
-
-    for (final String s : text.split("\\n")) {
-      final String trimmed = s.trim();
-
-      if (!trimmed.isEmpty() && !trimmed.startsWith("//")) {
-        if (trimmed.startsWith(DIRECTIVE_INCLUDE)) {
-          final String filePath = removeQuotes(removeComment(trimmed.substring(DIRECTIVE_INCLUDE.length()).trim(), true));
-
-          final File includeFile = new File(file, filePath);
-
-          final String includedText = contentProvider.readContent(includeFile);
-          list.addAll(new PackageList(includeFile, includedText, contentProvider).getPackages());
-        } else {
-          list.add(new Package(trimmed));
-        }
-      }
-    }
-
-    this.packages = Collections.unmodifiableList(list);
-  }
-
-  @Nonnull
-  @MustNotContainNull
-  public List<Package> getPackages() {
-    return this.packages;
   }
 }

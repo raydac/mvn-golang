@@ -16,9 +16,9 @@
 
 package com.igormaznitsa.mvngolang.cvs;
 
+import java.io.File;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.File;
 
 public enum CVSType {
   UNKNOWN(new CvsNone()),

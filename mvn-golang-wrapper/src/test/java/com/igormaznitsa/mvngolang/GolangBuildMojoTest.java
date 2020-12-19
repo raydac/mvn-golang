@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.copyOfRange;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+
+import org.junit.Test;
 
 public class GolangBuildMojoTest {
 
   private GolangBuildMojo makeBuildMojo() {
     final GolangBuildMojo buildMojo = new GolangBuildMojo();
-    buildMojo.setPackages(new String[]{"some.pack1", "some.pack2"});
+    buildMojo.setPackages(new String[] {"some.pack1", "some.pack2"});
     buildMojo.setResultFolder("some/folder");
     buildMojo.setResultName("targetName");
     return buildMojo;

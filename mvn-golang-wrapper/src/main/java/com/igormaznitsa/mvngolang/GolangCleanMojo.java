@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
@@ -67,9 +68,10 @@ public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
   protected String getSkipMojoPropertySuffix() {
     return "clean";
   }
-  
+
   @Override
-  public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
+  public void beforeExecution(@Nullable final ProxySettings proxySettings)
+      throws MojoFailureException, MojoExecutionException {
     super.beforeExecution(proxySettings);
     if (this.isModuleMode() && this.getBuildFlags().length == 0) {
       this.addTmpBuildFlagIfNotPresented("-modcache");
@@ -107,7 +109,8 @@ public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
-  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException, MojoExecutionException {
+  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error)
+      throws MojoFailureException, MojoExecutionException {
     if (!error) {
       final File directory;
       if (getProject().getPackaging().equals(GOARTIFACT_PACKAGING)) {

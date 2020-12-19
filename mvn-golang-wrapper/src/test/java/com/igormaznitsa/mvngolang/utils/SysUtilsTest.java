@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class SysUtilsTest {
-  
+
   @Test
   public void testDecodeGoSdkArchType() {
     assertNull(SysUtils.decodeGoSdkArchType("some xxx"));
-    assertEquals("armv6l",SysUtils.decodeGoSdkArchType("some armv6l xxx"));
-    assertEquals("ppc64le",SysUtils.decodeGoSdkArchType("ppc ppc64le"));
-    assertEquals("ppc64le",SysUtils.decodeGoSdkArchType("ppc64le"));
-    assertEquals("386",SysUtils.decodeGoSdkArchType("i386"));
-    assertEquals("386",SysUtils.decodeGoSdkArchType("i686"));
-    assertEquals("amd64",SysUtils.decodeGoSdkArchType("amd64"));
-    assertEquals("s390x",SysUtils.decodeGoSdkArchType("s390"));
+    assertEquals("armv6l", SysUtils.decodeGoSdkArchType("some armv6l xxx"));
+    assertEquals("ppc64le", SysUtils.decodeGoSdkArchType("ppc ppc64le"));
+    assertEquals("ppc64le", SysUtils.decodeGoSdkArchType("ppc64le"));
+    assertEquals("386", SysUtils.decodeGoSdkArchType("i386"));
+    assertEquals("386", SysUtils.decodeGoSdkArchType("i686"));
+    assertEquals("amd64", SysUtils.decodeGoSdkArchType("amd64"));
+    assertEquals("s390x", SysUtils.decodeGoSdkArchType("s390"));
   }
-  
+
 }

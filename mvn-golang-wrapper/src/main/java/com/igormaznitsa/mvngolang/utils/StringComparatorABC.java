@@ -13,31 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.Serializable;
 import java.util.Comparator;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
 public final class StringComparatorABC implements Comparator<String>, Serializable {
 
-    private static final long serialVersionUID = -8700761616096593374L;
+  private static final long serialVersionUID = -8700761616096593374L;
 
-    private static final StringComparatorABC INSTANCE = new StringComparatorABC();
+  private static final StringComparatorABC INSTANCE = new StringComparatorABC();
 
-    private StringComparatorABC() {
-    }
+  private StringComparatorABC() {
+  }
 
-    @Nonnull
-    public static StringComparatorABC getInstance() {
-        return INSTANCE;
-    }
+  @Nonnull
+  public static StringComparatorABC getInstance() {
+    return INSTANCE;
+  }
 
-    @Override
-    public int compare(@Nonnull final String a, @Nonnull final String b) {
-        return a.compareTo(b);
-    }
+  @Override
+  public int compare(@Nonnull final String a, @Nonnull final String b) {
+    return a.compareTo(b);
+  }
 
 }

@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
-import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+
+
+import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
@@ -142,7 +145,8 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
-  public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException {
+  public void beforeExecution(@Nullable final ProxySettings proxySettings)
+      throws MojoFailureException {
     final File folder = new File(getResultFolder());
 
     if (!folder.isDirectory() && !folder.mkdirs()) {
@@ -157,7 +161,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     if (currentPackages != null && currentPackages.length > 1) {
       getLog().warn(String.format(
-              "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%n"
+          "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%n"
               + "!Result file output is ignored because non-single package!%n"
               + "!            see: 'go help build' for more info          !%n"
               + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -166,7 +170,8 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
-  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error) throws MojoFailureException {
+  public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error)
+      throws MojoFailureException {
     if (!error) {
       final File resultFile = getResultFile();
       // check that it exists

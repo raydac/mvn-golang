@@ -16,19 +16,19 @@
 
 package com.igormaznitsa.mvngolang.utils;
 
-import com.igormaznitsa.meta.annotation.MayContainNull;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.System.out;
 
+
+import com.igormaznitsa.meta.annotation.MayContainNull;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Auxiliary class to collect methods for work with IO.
@@ -43,21 +43,25 @@ public final class IOUtils {
 
   /**
    * Print text progress bar.
-   * @param text title of the bar
-   * @param value value to be rendered
-   * @param maxValue max value to be rendered
+   *
+   * @param text             title of the bar
+   * @param value            value to be rendered
+   * @param maxValue         max value to be rendered
    * @param progressBarWidth width of bar
-   * @param lastValue value which was rendered last time, if the same then it will not be rendered
+   * @param lastValue        value which was rendered last time, if the same then it will not be rendered
    * @return rendered value
    * @since 2.3.0
    */
-  public static int printTextProgressBar(@Nonnull final String text, final long value, final long maxValue, final int progressBarWidth, final int lastValue) {
+  public static int printTextProgressBar(@Nonnull final String text, final long value,
+                                         final long maxValue, final int progressBarWidth,
+                                         final int lastValue) {
     final StringBuilder builder = new StringBuilder();
     builder.append("\r\u001B[?25l");
     builder.append(text);
     builder.append("[");
 
-    final int progress = max(0, min(progressBarWidth, (int) Math.round(progressBarWidth * ((double) value / (double) maxValue))));
+    final int progress = max(0, min(progressBarWidth,
+        (int) Math.round(progressBarWidth * ((double) value / (double) maxValue))));
 
     for (int i = 0; i < progress; i++) {
       builder.append('▒');
@@ -74,7 +78,7 @@ public final class IOUtils {
 
     return progress;
   }
-  
+
   /**
    * Make file path appropriate for current OS.
    *
@@ -83,7 +87,8 @@ public final class IOUtils {
    * @since 2.1.7
    */
   @Nonnull
-  public static String makeOsFilePathWithoutDuplications(@Nonnull @MayContainNull final File[] files) {
+  public static String makeOsFilePathWithoutDuplications(
+      @Nonnull @MayContainNull final File[] files) {
     final StringBuilder result = new StringBuilder();
     final Set<File> alreadyAdded = new HashSet<>();
 
@@ -104,12 +109,14 @@ public final class IOUtils {
 
   /**
    * Make file path from provided strings
+   *
    * @param paths path elements
    * @return joined file path with OS file separator
    * @since 2.1.7
    */
   @Nonnull
-  public static String makeOsFilePathWithoutDuplications(@Nonnull @MayContainNull final String... paths) {
+  public static String makeOsFilePathWithoutDuplications(
+      @Nonnull @MayContainNull final String... paths) {
     final StringBuilder result = new StringBuilder();
     final Set<String> alreadyAdded = new HashSet<>();
 

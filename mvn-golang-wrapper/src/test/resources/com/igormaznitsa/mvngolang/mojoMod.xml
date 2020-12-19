@@ -19,12 +19,12 @@
                     <goal>mod</goal>
                 </goals>
                 <configuration>
-                  <command>someCommand</command>
-                  <arguments>
-                    <arg>one</arg>
-                    <arg>two</arg>
-                    <arg>three</arg>
-                  </arguments>
+                    <command>someCommand</command>
+                    <arguments>
+                        <arg>one</arg>
+                        <arg>two</arg>
+                        <arg>three</arg>
+                    </arguments>
                 </configuration>
             </plugin>
         </plugins>

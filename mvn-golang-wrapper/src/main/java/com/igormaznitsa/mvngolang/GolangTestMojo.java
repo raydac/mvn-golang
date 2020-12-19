@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The Mojo wraps the 'test' command.
@@ -51,13 +51,14 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "test";
-  }  
-  
+  }
+
   @Override
   public boolean isSkip() {
-    return super.isSkip() 
-            || Boolean.getBoolean("skipTests") 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "maven.test.skip", "false"));
+    return super.isSkip()
+        || Boolean.getBoolean("skipTests")
+        || Boolean.parseBoolean(
+        MavenUtils.findProperty(this.getSession(), this.getProject(), "maven.test.skip", "false"));
   }
 
   @Override
@@ -69,9 +70,9 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
       final int index = definedTest.indexOf('#');
       final String[] name;
       if (index >= 0) {
-        name = new String[]{definedTest.substring(0, index), definedTest.substring(index + 1)};
+        name = new String[] {definedTest.substring(0, index), definedTest.substring(index + 1)};
       } else {
-        name = new String[]{definedTest};
+        name = new String[] {definedTest};
       }
       final List<String> result = new ArrayList<>();
       result.add(ensureGoExtension(name[0]));
@@ -81,14 +82,15 @@ public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
       }
       return result.toArray(new String[0]);
     } else {
-      return new String[]{'.' + File.separator + "..."};
+      return new String[] {'.' + File.separator + "..."};
     }
   }
 
   @Override
   public boolean isIgnoreErrorExitCode() {
-    return Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "maven.test.failure.ignore", "false"))
-            || super.isIgnoreErrorExitCode();
+    return Boolean.parseBoolean(MavenUtils
+        .findProperty(this.getSession(), this.getProject(), "maven.test.failure.ignore", "false"))
+        || super.isIgnoreErrorExitCode();
   }
 
   @Nullable

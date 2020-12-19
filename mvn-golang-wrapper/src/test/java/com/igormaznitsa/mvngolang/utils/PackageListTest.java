@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +26,6 @@ import java.text.ParseException;
 import javax.annotation.Nonnull;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class PackageListTest {
 
@@ -44,33 +48,38 @@ public class PackageListTest {
     assertEquals("a\"", PackageList.removeQuotes("a\""));
     assertEquals("\"", PackageList.removeQuotes("\"\"\""));
   }
-  
+
   @Test
   public void testRemoveComment_CheckQuotes_False() {
-    assertEquals("", PackageList.removeComment("//",false));
-    assertEquals("a", PackageList.removeComment("a//",false));
-    assertEquals("a", PackageList.removeComment("a//b",false));
-    assertEquals("a ", PackageList.removeComment("a //b",false));
-    assertEquals("#include", PackageList.removeComment("#include//dddd",false));
-    assertEquals("#include a/b/c", PackageList.removeComment("#include a/b/c//dddd",false));
-    assertEquals("#include \"a/b/c", PackageList.removeComment("#include \"a/b/c//dddd\"",false));
-    assertEquals("#include \"a/b/c", PackageList.removeComment("#include \"a/b/c//dddd\" // jjj",false));
-    assertEquals("#include \"a/b/c\"", PackageList.removeComment("#include \"a/b/c\"//dddd\"",false));
+    assertEquals("", PackageList.removeComment("//", false));
+    assertEquals("a", PackageList.removeComment("a//", false));
+    assertEquals("a", PackageList.removeComment("a//b", false));
+    assertEquals("a ", PackageList.removeComment("a //b", false));
+    assertEquals("#include", PackageList.removeComment("#include//dddd", false));
+    assertEquals("#include a/b/c", PackageList.removeComment("#include a/b/c//dddd", false));
+    assertEquals("#include \"a/b/c", PackageList.removeComment("#include \"a/b/c//dddd\"", false));
+    assertEquals("#include \"a/b/c",
+        PackageList.removeComment("#include \"a/b/c//dddd\" // jjj", false));
+    assertEquals("#include \"a/b/c\"",
+        PackageList.removeComment("#include \"a/b/c\"//dddd\"", false));
   }
-  
+
   @Test
   public void testRemoveComment_CheckQuotes_True() {
-    assertEquals("", PackageList.removeComment("//",true));
-    assertEquals("a", PackageList.removeComment("a//",true));
-    assertEquals("a", PackageList.removeComment("a//b",true));
-    assertEquals("a ", PackageList.removeComment("a //b",true));
-    assertEquals("#include", PackageList.removeComment("#include//dddd",true));
-    assertEquals("#include a/b/c", PackageList.removeComment("#include a/b/c//dddd",true));
-    assertEquals("#include \"a/b/c//dddd\"", PackageList.removeComment("#include \"a/b/c//dddd\"",true));
-    assertEquals("#include \"a/b/c//dddd\" ", PackageList.removeComment("#include \"a/b/c//dddd\" // kkkk",true));
-    assertEquals("#include \"a/b/c\"", PackageList.removeComment("#include \"a/b/c\"//dddd\"",true));
+    assertEquals("", PackageList.removeComment("//", true));
+    assertEquals("a", PackageList.removeComment("a//", true));
+    assertEquals("a", PackageList.removeComment("a//b", true));
+    assertEquals("a ", PackageList.removeComment("a //b", true));
+    assertEquals("#include", PackageList.removeComment("#include//dddd", true));
+    assertEquals("#include a/b/c", PackageList.removeComment("#include a/b/c//dddd", true));
+    assertEquals("#include \"a/b/c//dddd\"",
+        PackageList.removeComment("#include \"a/b/c//dddd\"", true));
+    assertEquals("#include \"a/b/c//dddd\" ",
+        PackageList.removeComment("#include \"a/b/c//dddd\" // kkkk", true));
+    assertEquals("#include \"a/b/c\"",
+        PackageList.removeComment("#include \"a/b/c\"//dddd\"", true));
   }
-  
+
   @Test
   public void testEmptyText() throws Exception {
     assertEquals(0, new PackageList(FAKE_FILE, "", STUB_CP).getPackages().size());
@@ -83,7 +92,8 @@ public class PackageListTest {
 
   @Test
   public void testOnlyPackageName() throws Exception {
-    final PackageList parsed = new PackageList(FAKE_FILE, "// text\npackage: github.com/gizak/termui", STUB_CP);
+    final PackageList parsed =
+        new PackageList(FAKE_FILE, "// text\npackage: github.com/gizak/termui", STUB_CP);
     assertEquals(1, parsed.getPackages().size());
     assertEquals("github.com/gizak/termui", parsed.getPackages().get(0).getPackage());
     assertNull(parsed.getPackages().get(0).getBranch());
@@ -94,8 +104,8 @@ public class PackageListTest {
   @Test
   public void testTwoPackages() throws Exception {
     final PackageList parsed = new PackageList(FAKE_FILE, "// text\n"
-            + "package: github.com/gizak/termui // ,tag:mustbeignored\n"
-            + "package: some/pack , branch:445566, tag:sometag, revision: r.33.3434342323", STUB_CP);
+        + "package: github.com/gizak/termui // ,tag:mustbeignored\n"
+        + "package: some/pack , branch:445566, tag:sometag, revision: r.33.3434342323", STUB_CP);
     assertEquals(2, parsed.getPackages().size());
 
     assertEquals("github.com/gizak/termui", parsed.getPackages().get(0).getPackage());
@@ -111,21 +121,23 @@ public class PackageListTest {
 
   @Test
   public void testInclude() throws Exception {
-    final PackageList parsed = new PackageList(FAKE_FILE, "#include \"./another\"//testinclude\npackage: one\npackage: two", new PackageList.ContentProvider() {
-      @Override
-      @Nonnull
-      public String readContent(@Nonnull final File pathElements) throws IOException {
-        assertEquals("another", FilenameUtils.normalize(pathElements.getPath()));
-        return "package: external"; 
-      }
-    });
-    
-    assertEquals(3,parsed.getPackages().size());
+    final PackageList parsed = new PackageList(FAKE_FILE,
+        "#include \"./another\"//testinclude\npackage: one\npackage: two",
+        new PackageList.ContentProvider() {
+          @Override
+          @Nonnull
+          public String readContent(@Nonnull final File pathElements) throws IOException {
+            assertEquals("another", FilenameUtils.normalize(pathElements.getPath()));
+            return "package: external";
+          }
+        });
+
+    assertEquals(3, parsed.getPackages().size());
     assertEquals("external", parsed.getPackages().get(0).getPackage());
     assertEquals("one", parsed.getPackages().get(1).getPackage());
     assertEquals("two", parsed.getPackages().get(2).getPackage());
   }
-  
+
   @Test(expected = ParseException.class)
   public void testWrongFormat_NoKey() throws Exception {
     new PackageList(FAKE_FILE, ":jjj", STUB_CP);
@@ -143,7 +155,8 @@ public class PackageListTest {
 
   @Test(expected = ParseException.class)
   public void testWrongFormat_DoubleQuotes() throws Exception {
-    new PackageList(FAKE_FILE, "package: some/pack , branch:445566, tag:sometag,, revision: r.33.3434342323", STUB_CP);
+    new PackageList(FAKE_FILE,
+        "package: some/pack , branch:445566, tag:sometag,, revision: r.33.3434342323", STUB_CP);
   }
 
 }

@@ -13,36 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
+
+import static org.junit.Assert.assertEquals;
+
 
 import org.apache.maven.artifact.DefaultArtifact;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class MavenUtilsTest {
-  
+
   @Test
   public void testArtifactWithVersion() throws Exception {
-    final DefaultArtifact artifact = new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "1.0", "compile", "jar", null, new MvnGolangArtifactHandler());
-    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact), new MvnGolangArtifactHandler()));
+    final DefaultArtifact artifact =
+        new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "1.0", "compile", "jar", null,
+            new MvnGolangArtifactHandler());
+    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact),
+        new MvnGolangArtifactHandler()));
   }
-  
+
   @Test
   public void testArtifactWithVersionRange_TwoVersions() throws Exception {
-    final DefaultArtifact artifact = new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "1.0,2.3", "compile", "jar", null, new MvnGolangArtifactHandler());
-    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact), new MvnGolangArtifactHandler()));
+    final DefaultArtifact artifact =
+        new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "1.0,2.3", "compile", "jar",
+            null, new MvnGolangArtifactHandler());
+    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact),
+        new MvnGolangArtifactHandler()));
   }
-  
+
   @Test
   public void testArtifactWithVersionRange_RangeDiapasone() throws Exception {
-    final DefaultArtifact artifact = new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "(,1.0]", "compile", "jar", null, new MvnGolangArtifactHandler());
-    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact), new MvnGolangArtifactHandler()));
+    final DefaultArtifact artifact =
+        new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "(,1.0]", "compile", "jar",
+            null, new MvnGolangArtifactHandler());
+    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact),
+        new MvnGolangArtifactHandler()));
   }
-  
+
   @Test
   public void testArtifactWithVersionRange_AllFieldsSet() throws Exception {
-    final DefaultArtifact artifact = new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "(,1.0]", "compile", "jar", "someclassifier", new MvnGolangArtifactHandler());
-    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact), new MvnGolangArtifactHandler()));
+    final DefaultArtifact artifact =
+        new DefaultArtifact("com.igormaznitsa", "some-plugin-test", "(,1.0]", "compile", "jar",
+            "someclassifier", new MvnGolangArtifactHandler());
+    assertEquals(artifact, MavenUtils.parseArtifactRecord(MavenUtils.makeArtifactRecord(artifact),
+        new MvnGolangArtifactHandler()));
   }
-  
+
 }

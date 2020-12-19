@@ -18,16 +18,15 @@ package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * The Mojo allows to run a program, it wraps <b>run</b> command.
@@ -96,7 +95,7 @@ public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
   protected String getSkipMojoPropertySuffix() {
     return "run";
   }
-  
+
   @Override
   @Nonnull
   public String getGoCommand() {

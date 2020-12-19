@@ -13,36 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.cvs;
 
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
-import org.apache.maven.plugin.logging.Log;
-
+import java.io.File;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.File;
+import org.apache.maven.plugin.logging.Log;
 
 class CvsNone extends AbstractRepo {
 
-    CvsNone() {
-        super("%%%+++none+++%%%");
-    }
+  CvsNone() {
+    super("%%%+++none+++%%%");
+  }
 
-    @Override
-    public boolean processCVSRequisites(
-            @Nonnull final Log logger,
-            @Nullable final ProxySettings proxy,
-            @Nullable final String customCommand,
-            @Nonnull final File cvsFolder,
-            @Nullable final String branchId,
-            @Nullable final String tagId,
-            @Nullable final String revisionId
-    ) {
-        return false;
-    }
+  @Override
+  public boolean processCVSRequisites(
+      @Nonnull final Log logger,
+      @Nullable final ProxySettings proxy,
+      @Nullable final String customCommand,
+      @Nonnull final File cvsFolder,
+      @Nullable final String branchId,
+      @Nullable final String tagId,
+      @Nullable final String revisionId
+  ) {
+    return false;
+  }
 
-    @Override
-    public boolean doesContainCVS(@Nonnull File folder) {
-        return false;
-    }
+  @Override
+  public boolean doesContainCVS(@Nonnull File folder) {
+    return false;
+  }
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
@@ -57,8 +58,12 @@ import org.zeroturnaround.exec.ProcessResult;
 @Mojo(name = "get", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
-  private static final Pattern PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT = Pattern.compile("no\\s+submodule\\s+mapping\\s+found\\s+in\\s+.gitmodules for path\\s+\\'([\\S]+?)\\'", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern.compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT = Pattern.compile(
+      "no\\s+submodule\\s+mapping\\s+found\\s+in\\s+.gitmodules for path\\s+\\'([\\S]+?)\\'",
+      Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern
+      .compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$",
+          Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   /**
    * Script to be called in the end of all operations over CVS, <b>it will be
@@ -76,10 +81,10 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
    * Path to a file contains list of packages. Each package takes a line and
    * described in format 'package: NAME [,branch: BRANCH][,tag: TAG][,revsion:
    * REVISION]'
-   *
+   * <p>
    * There is special field value 'none' which allows to efine value but to not
    * make any work, sometime it is useful for multi-profile projects.
-   *
+   * <p>
    * NB! Its value can be provided through property
    * 'mvn.golang.get.packages.file', but keep in mind that the value will be the
    * same for all get goals.
@@ -176,37 +181,13 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**
    * Allow lock maven session during command processing. It increases stability of work in parallel mode.
-   * 
+   *
    * @since 2.3.3
    */
   @Parameter(name = "allowLockSession", defaultValue = "true")
   private boolean allowLockSession;
-  
+
   private List<PackageList.Package> integralPackageList;
-
-  public boolean isAllowLockSession() {
-    return this.allowLockSession;
-  }
-  
-  public void setAllowLockSession(final boolean flag) {
-    this.allowLockSession = flag;
-  }
-  
-  @Nullable
-  public String getExternalPackageFile() {
-    return findMvnProperty("mvn.golang.get.packages.file", this.externalPackageFile);
-  }
-
-  @Override
-  @Nonnull
-  @MustNotContainNull
-  public String[] getPackages() {
-    final String[] result = new String[this.integralPackageList.size()];
-    for (int i = 0; i < this.integralPackageList.size(); i++) {
-      result[i] = this.integralPackageList.get(i).getPackage();
-    }
-    return result;
-  }
 
   @Nonnull
   private static String processSlashes(@Nonnull final String str) {
@@ -239,39 +220,72 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return result.toString();
   }
 
+  public boolean isAllowLockSession() {
+    return this.allowLockSession;
+  }
+
+  public void setAllowLockSession(final boolean flag) {
+    this.allowLockSession = flag;
+  }
+
+  @Nullable
+  public String getExternalPackageFile() {
+    return findMvnProperty("mvn.golang.get.packages.file", this.externalPackageFile);
+  }
+
+  @Override
+  @Nonnull
+  @MustNotContainNull
+  public String[] getPackages() {
+    final String[] result = new String[this.integralPackageList.size()];
+    for (int i = 0; i < this.integralPackageList.size(); i++) {
+      result[i] = this.integralPackageList.get(i).getPackage();
+    }
+    return result;
+  }
+
   @Nullable
   public CustomScript getCustomScript() {
     return this.customScript;
   }
 
-  private synchronized boolean processCVS(@Nonnull @MustNotContainNull final List<PackageList.Package> packages, @Nullable final ProxySettings proxySettings, @Nonnull @MustNotContainNull final File[] goPath) {
+  private synchronized boolean processCVS(
+      @Nonnull @MustNotContainNull final List<PackageList.Package> packages,
+      @Nullable final ProxySettings proxySettings,
+      @Nonnull @MustNotContainNull final File[] goPath) {
     if (!packages.isEmpty()) {
       for (final File f : goPath) {
         for (final PackageList.Package p : packages) {
           File rootCvsFolder = this.makePathToPackageSources(f, p.getPackage());
 
           if (this.getRelativePathToCvsFolder() == null) {
-            rootCvsFolder = this.isDisableCvsAutosearch() ? rootCvsFolder : this.findRootCvsFolderForPackageSources(f, rootCvsFolder);
+            rootCvsFolder = this.isDisableCvsAutosearch() ? rootCvsFolder :
+                this.findRootCvsFolderForPackageSources(f, rootCvsFolder);
           }
 
           if (rootCvsFolder == null) {
-            getLog().error("Can't find CVS folder, may be it was not initially loaded from repository: " + p);
+            getLog().error(
+                "Can't find CVS folder, may be it was not initially loaded from repository: " + p);
             return false;
           }
-          
+
           if (this.getLog().isDebugEnabled()) {
             this.getLog().debug(String.format("CVS folder path for %s is %s", p, rootCvsFolder));
           }
 
           if (!rootCvsFolder.isDirectory()) {
-            this.getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p, rootCvsFolder.getAbsolutePath()));
+            this.getLog().error(String.format("Can't find CVS folder for package '%s' at '%s'", p,
+                rootCvsFolder.getAbsolutePath()));
             return false;
           } else {
             final CVSType repo = CVSType.investigateFolder(rootCvsFolder);
 
             if (repo == CVSType.UNKNOWN) {
-              this.getLog().error("Can't recognize CVS in the folder : " + rootCvsFolder + " (for package '" + p + "')");
-              this.getLog().error("May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
+              this.getLog().error(
+                  "Can't recognize CVS in the folder : " + rootCvsFolder + " (for package '" + p +
+                      "')");
+              this.getLog().error(
+                  "May be to define folder directly through <relativePathToCvsFolder>...</relativePathToCvsFolder>!");
               return false;
             }
 
@@ -279,23 +293,33 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
             if (customcvs != null || p.doesNeedCvsProcessing()) {
 
-              if (!repo.getProcessor().prepareFolder(this.getLog(), proxySettings, this.getCvsExe(), rootCvsFolder)) {
+              if (!repo.getProcessor()
+                  .prepareFolder(this.getLog(), proxySettings, this.getCvsExe(), rootCvsFolder)) {
                 this.getLog().debug("Can't prepare folder : " + rootCvsFolder);
                 return false;
               }
 
               if (customcvs != null && p.doesNeedCvsProcessing()) {
-                this.getLog().warn("CVS branch, tag or revision are ignored for provided custom CVS options!");
+                this.getLog().warn(
+                    "CVS branch, tag or revision are ignored for provided custom CVS options!");
               }
 
               if (customcvs != null) {
                 this.getLog().info("Custom CVS options : " + Arrays.toString(customcvs));
-                if (!repo.getProcessor().processCVSForCustomOptions(this.getLog(), proxySettings, rootCvsFolder, this.getCvsExe(), customcvs)) {
+                if (!repo.getProcessor()
+                    .processCVSForCustomOptions(this.getLog(), proxySettings, rootCvsFolder,
+                        this.getCvsExe(), customcvs)) {
                   return false;
                 }
               } else if (p.doesNeedCvsProcessing()) {
-                this.getLog().info(String.format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p, GetUtils.ensureNonNull(p.getBranch(), "_"), GetUtils.ensureNonNull(p.getTag(), "_"), GetUtils.ensureNonNull(p.getRevision(), "_")));
-                if (!repo.getProcessor().processCVSRequisites(this.getLog(), proxySettings, this.getCvsExe(), rootCvsFolder, p.getBranch(), p.getTag(), p.getRevision())) {
+                this.getLog().info(String
+                    .format("Switch '%s' to branch = '%s', tag = '%s', revision = '%s'", p,
+                        GetUtils.ensureNonNull(p.getBranch(), "_"),
+                        GetUtils.ensureNonNull(p.getTag(), "_"),
+                        GetUtils.ensureNonNull(p.getRevision(), "_")));
+                if (!repo.getProcessor()
+                    .processCVSRequisites(this.getLog(), proxySettings, this.getCvsExe(),
+                        rootCvsFolder, p.getBranch(), p.getTag(), p.getRevision())) {
                   return false;
                 }
               }
@@ -303,7 +327,8 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
           }
 
           if (this.getCustomScript() != null) {
-            if (!processCustomScriptCallForPackage(p.getPackage(), rootCvsFolder, Assertions.assertNotNull(this.getCustomScript()))) {
+            if (!processCustomScriptCallForPackage(p.getPackage(), rootCvsFolder,
+                Assertions.assertNotNull(this.getCustomScript()))) {
               return false;
             }
           }
@@ -314,7 +339,9 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return true;
   }
 
-  private boolean processCustomScriptCallForPackage(@Nonnull final String packageName, @Nonnull final File rootCvsFolder, @Nonnull final CustomScript script) {
+  private boolean processCustomScriptCallForPackage(@Nonnull final String packageName,
+                                                    @Nonnull final File rootCvsFolder,
+                                                    @Nonnull final CustomScript script) {
     final List<String> command = new ArrayList<>();
 
     command.add(script.path);
@@ -328,18 +355,19 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
       getLog().debug("Root CVS folder : " + rootCvsFolder);
     }
 
-    getLog().warn(String.format("Starting script in VCS folder [%s] : %s", packageName, StringUtils.join(command.toArray(), ' ')));
+    getLog().warn(String.format("Starting script in VCS folder [%s] : %s", packageName,
+        StringUtils.join(command.toArray(), ' ')));
 
     final ProcessExecutor processExecutor = new ProcessExecutor(command.toArray(new String[0]));
     processExecutor
-            .exitValueAny()
-            .directory(rootCvsFolder)
-            .environment("MVNGO_CVS_BRANCH", GetUtils.ensureNonNull(this.branch, ""))
-            .environment("MVNGO_CVS_TAG", GetUtils.ensureNonNull(this.tag, ""))
-            .environment("MVNGO_CVS_REVISION", GetUtils.ensureNonNull(this.revision, ""))
-            .environment("MVNGO_CVS_PACKAGE", packageName)
-            .redirectError(System.err)
-            .redirectOutput(System.out);
+        .exitValueAny()
+        .directory(rootCvsFolder)
+        .environment("MVNGO_CVS_BRANCH", GetUtils.ensureNonNull(this.branch, ""))
+        .environment("MVNGO_CVS_TAG", GetUtils.ensureNonNull(this.tag, ""))
+        .environment("MVNGO_CVS_REVISION", GetUtils.ensureNonNull(this.revision, ""))
+        .environment("MVNGO_CVS_PACKAGE", packageName)
+        .redirectError(System.err)
+        .redirectOutput(System.out);
 
     boolean result = false;
 
@@ -367,14 +395,15 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Override
   protected String getSkipMojoPropertySuffix() {
     return "get";
-  }  
-  
+  }
+
   @Override
   public boolean isSkip() {
-    return super.isSkip() 
-            || Boolean.parseBoolean(MavenUtils.findProperty(this.getSession(), this.getProject(), "mdep.skip", "false"));
+    return super.isSkip()
+        || Boolean.parseBoolean(
+        MavenUtils.findProperty(this.getSession(), this.getProject(), "mdep.skip", "false"));
   }
-  
+
   @Nullable
   @MustNotContainNull
   public String[] getCustomCvsOptions() {
@@ -454,7 +483,8 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Nullable
-  private File findRootCvsFolderForPackageSources(@Nonnull final File rootFolder, @Nullable final File packageSourceFolder) {
+  private File findRootCvsFolderForPackageSources(@Nonnull final File rootFolder,
+                                                  @Nullable final File packageSourceFolder) {
     File foundFile = null;
     if (packageSourceFolder != null) {
       final File srcFolder = getSrcFolder(rootFolder);
@@ -509,10 +539,13 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
       path = processSlashes(path);
     }
 
-    return new File(goPath, "pkg" + File.separatorChar + this.getOs() + '_' + this.getArch() + File.separatorChar + path);
+    return new File(goPath,
+        "pkg" + File.separatorChar + this.getOs() + '_' + this.getArch() + File.separatorChar +
+            path);
   }
 
-  private boolean tryToFixGitCacheErrorsForPackages(@Nonnull @MustNotContainNull final List<String> packages) throws IOException {
+  private boolean tryToFixGitCacheErrorsForPackages(
+      @Nonnull @MustNotContainNull final List<String> packages) throws IOException {
     final File[] goPath = findGoPath(true);
 
     int fixed = 0;
@@ -523,14 +556,17 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
         if (packageFolder.isDirectory()) {
           final CVSType repo = CVSType.investigateFolder(packageFolder);
           if (repo == CVSType.GIT) {
-            getLog().warn(String.format("Executing 'git rm -r --cached .' in %s", packageFolder.getAbsolutePath()));
-            final int result = repo.getProcessor().execute(getCvsExe(), getLog(), packageFolder, "rm", "-r", "--cached", ".");
+            getLog().warn(String
+                .format("Executing 'git rm -r --cached .' in %s", packageFolder.getAbsolutePath()));
+            final int result = repo.getProcessor()
+                .execute(getCvsExe(), getLog(), packageFolder, "rm", "-r", "--cached", ".");
             if (result != 0) {
               return false;
             }
             fixed++;
           } else {
-            getLog().warn(String.format("Folder %s is not GIT repository", packageFolder.getAbsolutePath()));
+            getLog().warn(
+                String.format("Folder %s is not GIT repository", packageFolder.getAbsolutePath()));
             return false;
           }
 
@@ -590,7 +626,8 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
         } catch (InterpolationException ex) {
           throw new MojoExecutionException("Interpolation error with file : " + extFile, ex);
         } catch (IOException ex) {
-          throw new MojoExecutionException("Can't load external package list file : " + extFile, ex);
+          throw new MojoExecutionException("Can't load external package list file : " + extFile,
+              ex);
         } catch (ParseException ex) {
           throw new MojoExecutionException("Can't parse external package list file", ex);
         }
@@ -622,11 +659,12 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   @Override
   protected boolean doesNeedSessionLock() {
-    return  this.getSession().isParallel() && this.isAllowLockSession();
+    return this.getSession().isParallel() && this.isAllowLockSession();
   }
-  
+
   @Override
-  public void beforeExecution(@Nullable final ProxySettings proxySettings) throws MojoFailureException, MojoExecutionException {
+  public void beforeExecution(@Nullable final ProxySettings proxySettings)
+      throws MojoFailureException, MojoExecutionException {
 
     preparePackageList();
 
@@ -658,7 +696,8 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     if (isEnforceDeletePackageFiles()) {
       int deletedInstances = 0;
-      getLog().debug("Detected request to delete both package source and binary folders if they are presented");
+      getLog().debug(
+          "Detected request to delete both package source and binary folders if they are presented");
 
       final String[] packages = this.getPackages();
       final File[] goPath;
@@ -729,7 +768,8 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     boolean hasTagBranchOrRevision = false;
 
-    final List<PackageList.Package> packages = Assertions.assertNotNull("Integral package list must be not inited", this.integralPackageList);
+    final List<PackageList.Package> packages = Assertions
+        .assertNotNull("Integral package list must be not inited", this.integralPackageList);
 
     for (final PackageList.Package p : packages) {
       hasTagBranchOrRevision |= p.doesNeedCvsProcessing();
@@ -753,7 +793,9 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
       try {
         final boolean error = this.doMainBusiness(proxySettings, 10);
         if (error) {
-          throw new Exception("error as result of 'get' operation during initial loading of packages " + Arrays.toString(this.getPackages()));
+          throw new Exception(
+              "error as result of 'get' operation during initial loading of packages " +
+                  Arrays.toString(this.getPackages()));
         }
       } catch (Exception ex) {
         throw new MojoExecutionException("Can't get packages", ex);
@@ -762,11 +804,13 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
         this.tempBuildFlags.clear();
       }
 
-      getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s", GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
+      getLog().debug(String.format("Switching branch and tag for packages : branch = %s , tag = %s",
+          GetUtils.ensureNonNull(this.branch, "..."), GetUtils.ensureNonNull(this.tag, "...")));
       getLog().debug("Custom CVS options : " + Arrays.toString(customCvsOptions));
 
       if (!processCVS(packages, proxySettings, goPath)) {
-        throw new MojoFailureException("Can't change branch or tag or execute custom CVS options, see the log for errors!");
+        throw new MojoFailureException(
+            "Can't change branch or tag or execute custom CVS options, see the log for errors!");
       }
     }
   }
@@ -786,13 +830,17 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
   }
 
   @Override
-  protected boolean doesNeedOneMoreAttempt(@Nonnull final ProcessResult processResult, @Nonnull final String consoleOut, @Nonnull final String consoleErr) throws IOException, MojoExecutionException {
+  protected boolean doesNeedOneMoreAttempt(@Nonnull final ProcessResult processResult,
+                                           @Nonnull final String consoleOut,
+                                           @Nonnull final String consoleErr)
+      throws IOException, MojoExecutionException {
     boolean result = false;
     if (processResult.getExitValue() != 0) {
       final Matcher matcher = PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT.matcher(consoleErr);
 
       if (matcher.find()) {
-        final List<String> packagesWithDetectedGitCacheErrors = extractProblemPackagesFromErrorLog(consoleErr);
+        final List<String> packagesWithDetectedGitCacheErrors =
+            extractProblemPackagesFromErrorLog(consoleErr);
         if (!packagesWithDetectedGitCacheErrors.isEmpty()) {
           if (this.autofixGitCache) {
 
@@ -802,7 +850,9 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
           } else {
 
             for (final String s : packagesWithDetectedGitCacheErrors) {
-              getLog().error(String.format("Detected Git cache error for package '%s', can be fixed with 'git rm -r --cached .'", s));
+              getLog().error(String.format(
+                  "Detected Git cache error for package '%s', can be fixed with 'git rm -r --cached .'",
+                  s));
             }
 
           }

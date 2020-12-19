@@ -23,7 +23,7 @@
                     <goPath>some/path</goPath>
                     <sources>some/sources</sources>
                     <packages>
-                    	<package>main.go</package>
+                        <package>main.go</package>
                     </packages>
                     <args>
                         <arg>arg1</arg>
