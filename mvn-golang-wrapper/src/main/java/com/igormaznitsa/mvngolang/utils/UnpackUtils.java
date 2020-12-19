@@ -169,7 +169,7 @@ public final class UnpackUtils {
                 }
               } catch (SecurityException ex) {
                 throw new IOException(
-                    "Can't make file executable for secuity reasons : " + targetFile, ex);
+                    "Can't make file executable for security reasons : " + targetFile, ex);
               }
             }
             unpackedFilesCounter++;

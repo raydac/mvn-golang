@@ -46,7 +46,7 @@ public class XGoogHashHeader {
     String unknownTypeValue = null;
     String unknownValueValue = null;
 
-    boolean dovalid = true;
+    boolean valid = true;
 
     try {
       for (final Header header : headers) {
@@ -64,13 +64,13 @@ public class XGoogHashHeader {
         }
       }
     } catch (ParseException ex) {
-      dovalid = false;
+      valid = false;
     }
     this.md5 = md5value;
     this.crc32c = crc32value;
     this.unknownType = unknownTypeValue;
     this.unknownValue = unknownValueValue;
-    this.valid = dovalid;
+    this.valid = valid;
   }
 
   public boolean hasData() {
@@ -100,14 +100,14 @@ public class XGoogHashHeader {
       if (this.hasMd5()) {
         try (final InputStream in = new FileInputStream(file)) {
           final String calculated = DigestUtils.md5Hex(in);
-          log.debug("Check MD5 hash (etalon " + this.md5 + "): " + calculated);
+          log.debug("Check MD5 hash (reference " + this.md5 + "): " + calculated);
           return this.md5.equalsIgnoreCase(calculated);
         }
       } else if (this.hasCrc32c()) {
         try (final InputStream in = new BufferedInputStream(new FileInputStream(file), 16384)) {
           final Crc32c crc = new Crc32c();
           crc.update(in);
-          log.debug("Check CRC32C hash (etalon " + this.crc32c + "): " + crc.toString());
+          log.debug("Check CRC32C hash (reference " + this.crc32c + "): " + crc.toString());
           return this.crc32c.equalsIgnoreCase(crc.toString());
         }
       }

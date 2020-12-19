@@ -144,6 +144,7 @@ public final class IOUtils {
         closeable.close();
       }
     } catch (final IOException ignoring) {
+      // EXPECTED DO NOTHING
     }
   }
 }

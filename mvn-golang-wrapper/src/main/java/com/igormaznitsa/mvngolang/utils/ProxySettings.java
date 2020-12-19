@@ -52,7 +52,7 @@ public class ProxySettings {
   public String password = "";
 
   /**
-   * The list of non-proxied hosts (delimited by |).
+   * The list of non-proxy hosts (delimited by |).
    */
   public String nonProxyHosts;
 

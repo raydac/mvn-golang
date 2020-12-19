@@ -171,7 +171,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    * Flag to turn on support for module mode. Dependencies will not be added
    * into GOPATH, go.mod files will be preprocessed to have replace links to
    * each other locally. After processing all go.mod files are restored from
-   * backup. Can be overrided by property "mvn.golang.module.mode"
+   * backup. Can be overridden by property "mvn.golang.module.mode"
    *
    * @since 2.3.3
    */
@@ -700,7 +700,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       @Nullable final ProxySettings proxySettings,
       @Nonnull final File cacheFolder,
       @Nonnull final String baseSdkName,
-      final boolean dontLoadIfNotInCache
+      final boolean notLoadIfNotInCache
   ) throws IOException, MojoExecutionException {
     synchronized (AbstractGolangMojo.class) {
       final File sdkFolder = new File(cacheFolder, baseSdkName);
@@ -730,7 +730,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
             this.getLog().info("SDK cache folder : " + sdkFolder);
           }
           return sdkFolder;
-        } else if (dontLoadIfNotInCache || this.session.isOffline()) {
+        } else if (notLoadIfNotInCache || this.session.isOffline()) {
           this.getLog().error(
               "Can't find cached Golang SDK and downloading is disabled or Maven in offline mode");
           throw new IOException(

@@ -111,7 +111,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
     return this.buildMode;
   }
 
-  public void setBuilMode(@Nullable final String buildMode) {
+  public void setBuildMode(@Nullable final String buildMode) {
     this.buildMode = GetUtils.ensureNonNull(buildMode, "default");
   }
 
@@ -187,7 +187,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
         getLog().warn("Security exception during executable flag set : " + resultFile);
       }
 
-      getLog().info("The Result file has been successfuly created : " + resultFile);
+      getLog().info("The Result file has been successfully created : " + resultFile);
     }
   }
 
@@ -204,21 +204,21 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
     flags.add("-buildmode=" + this.getBuildMode());
 
-    final List<String> linkerflags = this.getLdflagsAsList();
+    final List<String> linkerFlags = this.getLdflagsAsList();
 
     if (this.strip) {
-      if (!linkerflags.contains("-s")) {
-        linkerflags.add("-s");
+      if (!linkerFlags.contains("-s")) {
+        linkerFlags.add("-s");
       }
-      if (!linkerflags.contains("-w")) {
-        linkerflags.add("-w");
+      if (!linkerFlags.contains("-w")) {
+        linkerFlags.add("-w");
       }
     }
 
-    if (!linkerflags.isEmpty()) {
+    if (!linkerFlags.isEmpty()) {
       flags.add("-ldflags");
       final StringBuilder buffer = new StringBuilder();
-      for (final String s : linkerflags) {
+      for (final String s : linkerFlags) {
         if (buffer.length() > 0) {
           buffer.append(' ');
         }

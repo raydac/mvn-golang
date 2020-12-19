@@ -192,7 +192,7 @@ public final class MavenUtils {
         if (artifact.getType().equals(AbstractGolangMojo.GOARTIFACT_PACKAGING)) {
           final ArtifactResult artifactResult = resolver.resolveArtifact(
               makeResolveArtifactProjectBuildingRequest(session, remoteRepositories), artifact);
-          final File zipFillePath = artifactResult.getArtifact().getFile();
+          final File zipFilePath = artifactResult.getArtifact().getFile();
 
           mojo.getLog().debug(
               "Detected MVN-GOLANG marker inside ZIP dependency: " + artifact.getGroupId() + ':' +
@@ -200,9 +200,9 @@ public final class MavenUtils {
                   artifact.getType());
 
           if (ZipUtil
-              .containsEntry(zipFillePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE)) {
+              .containsEntry(zipFilePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE)) {
             final byte[] artifactFlagFile = ZipUtil
-                .unpackEntry(zipFillePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE,
+                .unpackEntry(zipFilePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE,
                     StandardCharsets.UTF_8);
 
             for (final String str : new String(artifactFlagFile, StandardCharsets.UTF_8)
@@ -253,11 +253,11 @@ public final class MavenUtils {
       @Nonnull final MavenSession session,
       @Nonnull final MavenProject project,
       @Nonnull final String key,
-      @Nullable final String dflt
+      @Nullable final String defaultValue
   ) {
     final Properties properties = new Properties(project.getProperties());
     properties.putAll(session.getSystemProperties());
     properties.putAll(session.getUserProperties());
-    return properties.getProperty(key, dflt);
+    return properties.getProperty(key, defaultValue);
   }
 }

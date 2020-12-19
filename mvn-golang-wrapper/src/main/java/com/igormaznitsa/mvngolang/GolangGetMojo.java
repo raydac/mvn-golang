@@ -79,10 +79,10 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**
    * Path to a file contains list of packages. Each package takes a line and
-   * described in format 'package: NAME [,branch: BRANCH][,tag: TAG][,revsion:
+   * described in format 'package: NAME [,branch: BRANCH][,tag: TAG][,revision:
    * REVISION]'
    * <p>
-   * There is special field value 'none' which allows to efine value but to not
+   * There is special field value 'none' which allows to define value but to not
    * make any work, sometime it is useful for multi-profile projects.
    * <p>
    * NB! Its value can be provided through property
@@ -259,7 +259,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
           File rootCvsFolder = this.makePathToPackageSources(f, p.getPackage());
 
           if (this.getRelativePathToCvsFolder() == null) {
-            rootCvsFolder = this.isDisableCvsAutosearch() ? rootCvsFolder :
+            rootCvsFolder = this.isDisableCvsAutoSearch() ? rootCvsFolder :
                 this.findRootCvsFolderForPackageSources(f, rootCvsFolder);
           }
 
@@ -377,13 +377,13 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
       result = script.ignoreFail || exitValue == 0;
     } catch (IOException | InterruptedException | InvalidExitValueException ex) {
-      getLog().error("Error in proces custom script", ex);
+      getLog().error("Error in custom script processing", ex);
     }
 
     return result;
   }
 
-  public boolean isDisableCvsAutosearch() {
+  public boolean isDisableCvsAutoSearch() {
     return this.disableCvsAutosearch;
   }
 
@@ -764,12 +764,12 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
       }
     }
 
-    final String[] customcvs = this.getCustomCvsOptions();
+    final String[] customCvs = this.getCustomCvsOptions();
 
     boolean hasTagBranchOrRevision = false;
 
     final List<PackageList.Package> packages = Assertions
-        .assertNotNull("Integral package list must be not inited", this.integralPackageList);
+        .assertNotNull("Integral package list must be not initialized", this.integralPackageList);
 
     for (final PackageList.Package p : packages) {
       hasTagBranchOrRevision |= p.doesNeedCvsProcessing();
@@ -778,7 +778,7 @@ public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
       }
     }
 
-    if (customcvs != null || hasTagBranchOrRevision) {
+    if (customCvs != null || hasTagBranchOrRevision) {
       final File[] goPath;
       try {
         goPath = findGoPath(true);
