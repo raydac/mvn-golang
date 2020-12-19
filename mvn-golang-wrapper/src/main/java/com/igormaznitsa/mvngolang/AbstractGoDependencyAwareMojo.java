@@ -48,6 +48,7 @@ import org.zeroturnaround.zip.ZipUtil;
 public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   public static final String GO_MOD_FILE_NAME_BAK = ".#go.mod.mvn.orig";
+  public static final String DELETE_GO_SUM_FLAG_FILE = ".#go.mod.mvn.delete.sum";
 
   /**
    * Internal variable to keep GOPATH part containing folders of unpacked
@@ -138,8 +139,13 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Nonnull
   @MustNotContainNull
   private List<Tuple<Artifact, Tuple<GoMod, File>>> findModsInProject() throws IOException {
-    return findGoModsAndParse(Collections
-        .singletonList(Tuple.of(this.getProject().getArtifact(), this.getSources(false))));
+    final File sourceFolder = this.getSources(false);
+    if (sourceFolder.isDirectory()) {
+      return findGoModsAndParse(Collections
+          .singletonList(Tuple.of(this.getProject().getArtifact(), sourceFolder)));
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   private void preprocessModules(
@@ -153,17 +159,27 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
       final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = findModsInProject();
 
       for (final Tuple<Artifact, Tuple<GoMod, File>> f : projectGoMods) {
-        final File goModFileBak = new File(f.right().right().getParentFile(), GO_MOD_FILE_NAME_BAK);
         final File goModFile = f.right().right();
+        final File workingFolder = goModFile.getParentFile();
+        final File sumFile = new File(workingFolder, GO_SUM_FILE_NAME);
+        final File goModFileBak = new File(workingFolder, GO_MOD_FILE_NAME_BAK);
+        final File deleteSumFileFlag = new File(workingFolder, DELETE_GO_SUM_FLAG_FILE);
 
         if (goModFileBak.isFile()) {
           if (goModFile.isFile() && !goModFile.delete()) {
             throw new IOException("Can't delete go.mod file: " + goModFile);
           }
+          if (deleteSumFileFlag.isFile() && sumFile.isFile() && !sumFile.delete()) {
+            throw new IOException("Can't delete file " + sumFile);
+          }
           FileUtils.copyFile(goModFileBak, goModFile);
         } else {
           if (goModFile.isFile()) {
             FileUtils.copyFile(goModFile, goModFileBak);
+          }
+          if (!sumFile.isFile() && !deleteSumFileFlag.isFile() &&
+              !deleteSumFileFlag.createNewFile()) {
+            throw new IOException("Can't create file " + deleteSumFileFlag);
           }
         }
 
@@ -172,6 +188,10 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
               GoMod.from(FileUtils.readFileToString(goModFile, StandardCharsets.UTF_8));
           if (replaceLinksToModules(Tuple.of(parsed, goModFile), dependencyGoMods)) {
             FileUtils.write(goModFile, parsed.toString(), StandardCharsets.UTF_8);
+          }
+          if (sumFile.isFile() && !deleteSumFileFlag.isFile() &&
+              !deleteSumFileFlag.createNewFile()) {
+            throw new IOException("Can't create file " + deleteSumFileFlag);
           }
         }
       }
@@ -340,12 +360,25 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
             backupFiles.size()));
 
     for (final File backup : backupFiles) {
-      final File restored = new File(backup.getParentFile(), GO_MOD_FILE_NAME);
+      final File workingFolder = backup.getParentFile();
+      final File restored = new File(workingFolder, GO_MOD_FILE_NAME);
+      final File goSumFile = new File(workingFolder, GO_SUM_FILE_NAME);
+      final File deleteGoSumFileFlag = new File(workingFolder, DELETE_GO_SUM_FLAG_FILE);
+
       if (restored.isFile() && !restored.delete()) {
         throw new IOException("Can't delete file during backup restore: " + restored);
       }
       if (!backup.renameTo(restored)) {
         throw new IOException("Can't rename backup: " + backup + " -> " + restored);
+      }
+
+      if (deleteGoSumFileFlag.isFile()) {
+        if (!deleteGoSumFileFlag.delete()) {
+          throw new IOException("Can't delete file " + deleteGoSumFileFlag);
+        }
+        if (goSumFile.isFile() && !goSumFile.delete()) {
+          throw new IOException("Can't delete file " + goSumFile);
+        }
       }
     }
   }

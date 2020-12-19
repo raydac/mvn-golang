@@ -127,6 +127,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public static final String GOARTIFACT_PACKAGING = "mvn-golang";
   public static final String GO_MOD_FILE_NAME = "go.mod";
+  public static final String GO_SUM_FILE_NAME = "go.sum";
   public static final String ENV_GO111MODULE = "GO111MODULE";
 
   /**
