@@ -208,17 +208,17 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   }
 
   private int generateCrossLinksBetweenArtifactGoMods(@Nonnull @MustNotContainNull final List<Tuple<Artifact, Tuple<GoMod, File>>> unpackedFolders) throws IOException {
-    int changedCounter = 0;
+    int changes = 0;
 
     final List<Tuple<GoMod, File>> parsed = listRightPart(unpackedFolders);
 
     for (final Tuple<GoMod, File> i : parsed) {
       if (replaceLinksToModules(i, parsed)) {
-        changedCounter = 0;
+        changes++;
         FileUtils.write(i.right(), i.left().toString(), StandardCharsets.UTF_8);
       }
     }
-    return changedCounter;
+    return changes;
   }
 
   @Nonnull
@@ -240,9 +240,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     if (this.isModuleMode()) {
       try {
         final File src = this.getSources(false);
-        if (src != null) {
-          this.restoreGoModFromBackupAndRemoveBackup(src);
-        }
+        this.restoreGoModFromBackupAndRemoveBackup(src);
       } catch (IOException ex) {
         throw new MojoExecutionException("Error during restoring of detected go.mod backup in source folder", ex);
       }
