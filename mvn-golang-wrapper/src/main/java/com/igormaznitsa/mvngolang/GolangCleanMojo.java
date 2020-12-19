@@ -111,6 +111,8 @@ public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Override
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error)
       throws MojoFailureException, MojoExecutionException {
+    super.afterExecution(proxySettings, false);
+
     if (!error) {
       final File directory;
       if (getProject().getPackaging().equals(GOARTIFACT_PACKAGING)) {

@@ -319,7 +319,9 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
       if (foundArtifacts.isEmpty()) {
         getLog().debug("Mvn golang dependencies are not found");
-        this.preprocessModules(Collections.emptyList());
+        if (this.isModuleMode()) {
+          this.preprocessModules(Collections.emptyList());
+        }
         this.extraGoPathSectionInOsFormat = "";
       } else {
         getLog().debug("Found mvn-golang artifacts: " + foundArtifacts);
@@ -388,7 +390,9 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
       throws MojoFailureException, MojoExecutionException {
     try {
       if (this.isModuleMode()) {
+        this.getLog().debug("module mode is on");
         final File srcFolder = this.getSources(false);
+        this.getLog().debug("Detected source folder: " + srcFolder);
         if (srcFolder.isDirectory()) {
           if (this.isRestoreGoMod()) {
             this.getLog().debug("Restoring go.mod from backup in source folder: " + srcFolder);
@@ -396,7 +400,12 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           } else {
             this.getLog().debug("Restoring of go.mod from backup is disabled by project property");
           }
+        } else {
+          this.getLog()
+              .debug("Restore backup mod files is ignored because source folder is not directory");
         }
+      } else {
+        this.getLog().debug("module mode is off");
       }
     } catch (IOException ex) {
       throw new MojoExecutionException("Error during restore go.mod from backup", ex);
