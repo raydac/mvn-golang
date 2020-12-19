@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.mvngolang.utils;
 
 import com.igormaznitsa.meta.common.utils.Assertions;
@@ -47,6 +48,12 @@ public class Tuple<A, B> {
       return this.left.equals(that.left) && this.right.equals(that.right);
     }
     return false;
+  }
+
+  @Override
+  @Nonnull
+  public String toString() {
+    return "Tuple(" + this.left + " ; " + this.right + ')';
   }
 
   @Override
