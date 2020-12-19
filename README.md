@@ -9,7 +9,7 @@
 
 # Changelog
 
-__2.3.6 (SNAPSHOT)__
+__2.3.6 (19-dec-2020)__
 - improved restoration of `go.mod` and `go.sum` state after build
 - refactoring and minor bugfixing
 - default version of GoSDK updated to 1.15.6
