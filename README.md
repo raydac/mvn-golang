@@ -9,7 +9,12 @@
 
 # Changelog
 
+__2.3.7 (SNAPSHOT)__
+
+- fixed [#80](https://github.com/raydac/mvn-golang/issues/80) (thanks [fmazoyer](https://github.com/fmazoyer))
+
 __2.3.6 (19-dec-2020)__
+
 - improved restoration of `go.mod` and `go.sum` state after build
 - refactoring and minor bugfixing
 - updated dependencies
@@ -19,12 +24,6 @@ __2.3.5 (12-sep-2020)__
 
 - fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
 - default version of GoSDK updated to 1.15.2
-
-__2.3.4 (05-nov-2019)__
-
-- improved host arch detection [#70](https://github.com/raydac/mvn-golang/issues/70)
-- default version of GoSDK updated to 1.13.4
-- minor refactoring
 
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
