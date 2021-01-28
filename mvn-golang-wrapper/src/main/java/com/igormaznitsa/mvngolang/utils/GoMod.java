@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 public final class GoMod {
 
   private static final Pattern TOKENIZER =
-      Pattern.compile("(\\/\\/|\\\"[^\\\"]+\\\"|[<>=\\w.+\\-/]+|[<>=-]+|\\(|\\)|[\\s\\n]+)");
+      Pattern.compile("(\\/\\/|\\\"[^\\\"]+\\\"|[<>=\\w.+\\-/\\\\]+|[<>=-]+|\\(|\\)|[\\s\\n]+)");
   private final List<GoModItem> items;
 
   private GoMod(@Nonnull @MustNotContainNull final List<GoModItem> items) {

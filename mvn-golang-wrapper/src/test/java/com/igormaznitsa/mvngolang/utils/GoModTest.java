@@ -141,6 +141,24 @@ public class GoModTest {
   }
 
   @Test
+  public void testComplex4WindowsPath() {
+    final GoMod model = GoMod.from("module example.com/me/hello\n"
+        + "\n"
+        + "    require (\n"
+        + "     example.com/me/goodbye v0.0.0\n"
+        + "     rsc.io/quote v1.5.2\n"
+        + "    )\n"
+        + "\n"
+        + "    replace example.com/me/goodbye => ..\\..\\goodbye");
+    assertEquals(4, model.size());
+
+    assertEquals("module example.com/me/hello\n"
+        + "require example.com/me/goodbye v0.0.0\n"
+        + "require rsc.io/quote v1.5.2\n"
+        + "replace example.com/me/goodbye => ..\\..\\goodbye", model.toString());
+  }
+  
+  @Test
   public void testComplex5() {
     final GoMod model = GoMod.from("module github.com/example/project\n"
         + "\n"
