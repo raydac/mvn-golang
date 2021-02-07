@@ -11,6 +11,7 @@
 
 __2.3.7 (SNAPSHOT)__
 
+- default version of GoSDK updated to 1.15.8
 - fixed [#80](https://github.com/raydac/mvn-golang/issues/80) (thanks [fmazoyer](https://github.com/fmazoyer))
 
 __2.3.6 (19-dec-2020)__
