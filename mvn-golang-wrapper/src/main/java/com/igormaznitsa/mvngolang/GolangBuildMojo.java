@@ -28,17 +28,43 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.project.MavenProjectHelper;
 
 /**
  * The Mojo wraps the 'build' command.
  */
 @Mojo(name = "build", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
+
+  @Component
+  private MavenProjectHelper projectHelper;
+
+  /**
+   * Flag to attach build result file as artifact to the maven session.
+   * Also can be set through property <i>mvn.golang.build.attach</i>
+   * @since 2.3.7
+   */
+  @Parameter(name = "attach", defaultValue = "false")
+  private boolean attach;
+
+  /**
+   * Classifier for result file attachment.
+   * Also can be set through property <i>mvn.golang.build.attach.classifier</i>
+   * @since 2.3.7
+   */
+  @Parameter(name = "attachClassifier")
+  private String attachClassifier;
+
+  /**
+   * Type for result file attachment.
+   * Also can be set through property <i>mvn.golang.build.attach.type</i>
+   * @since 2.3.7
+   */
+  @Parameter(name = "attachType", defaultValue = "bin")
+  private String attachType;
 
   /**
    * Target folder where to place the result file.
@@ -85,6 +111,21 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
    */
   @Parameter(name = "ldFlags")
   private String[] ldFlags;
+
+  public boolean isAttach() {
+    return Boolean.parseBoolean(findMvnProperty("mvn.golang.build.attach", Boolean.toString(this.attach)));
+  }
+
+  @Nullable
+  public String getAttachClassifier() {
+    return findMvnProperty("mvn.golang.build.attach.classifier", this.attachClassifier);
+  }
+
+  @Nonnull
+  public String getAttachType() {
+    final String found = findMvnProperty("mvn.golang.build.attach.type", this.attachType);
+    return GetUtils.ensureNonNull(found, "bin");
+  }
 
   @MustNotContainNull
   @Nonnull
@@ -188,12 +229,25 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
       }
 
       getLog().info("The Result file has been successfully created : " + resultFile);
+
+      this.processAttach(resultFile);
     }
   }
 
   @Override
   public boolean isCommandSupportVerbose() {
     return true;
+  }
+
+  private void processAttach(@Nonnull final File resultFile) {
+    if (this.isAttach()) {
+      final String classifier = this.getAttachClassifier();
+      final String type = this.getAttachType();
+      this.getLog().info("Activated attach as artifact (classifier=" + classifier + ", type=" + type + "): " + resultFile);
+      this.projectHelper.attachArtifact(this.getProject(), type, classifier, resultFile);
+    } else {
+      this.getLog().debug("Attach as artifact is turned off");
+    }
   }
 
   @Override
