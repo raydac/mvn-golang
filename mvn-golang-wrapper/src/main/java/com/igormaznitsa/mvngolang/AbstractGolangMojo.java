@@ -548,7 +548,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       try {
         result = InetAddress.getLocalHost().getHostName();
       } catch (UnknownHostException ex) {
-        result = null;
+        // do nothing, let be null
       }
     }
     return GetUtils.ensureNonNull(result, "<Unknown computer>");
@@ -1212,117 +1212,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
   }
 
-  @Nonnull
-  private synchronized HttpClient getHttpClient(@Nullable final ProxySettings proxy)
-          throws MojoExecutionException {
-    if (this.httpClient == null) {
-      final HttpClientBuilder builder = HttpClients.custom();
-
-      if (proxy != null) {
-        if (proxy.hasCredentials()) {
-          final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-          credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port),
-                  new NTCredentials(GetUtils.ensureNonNull(proxy.username, ""), proxy.password,
-                          extractComputerName(), extractDomainName()));
-          builder.setDefaultCredentialsProvider(credentialsProvider);
-          getLog().debug(String
-                  .format("Credentials provider has been created for proxy (username : %s): %s",
-                          proxy.username, proxy.toString()));
-        }
-
-        final String[] ignoreForAddresses =
-                proxy.nonProxyHosts == null ? new String[0] : proxy.nonProxyHosts.split("\\|");
-
-        final WildCardMatcher[] matchers;
-
-        if (ignoreForAddresses.length > 0) {
-          matchers = new WildCardMatcher[ignoreForAddresses.length];
-          for (int i = 0; i < ignoreForAddresses.length; i++) {
-            matchers[i] = new WildCardMatcher(ignoreForAddresses[i]);
-          }
-        } else {
-          matchers = new WildCardMatcher[0];
-        }
-
-        getLog().debug("Regular routing mode");
-
-        final HttpRoutePlanner routePlanner =
-                new DefaultProxyRoutePlanner(new HttpHost(proxy.host, proxy.port, proxy.protocol)) {
-                  @Override
-                  @Nonnull
-                  public HttpRoute determineRoute(@Nonnull final HttpHost host,
-                                                  @Nonnull final HttpRequest request,
-                                                  @Nonnull final HttpContext context)
-                          throws HttpException {
-                    HttpRoute result = null;
-                    final String hostName = host.getHostName();
-                    for (final WildCardMatcher m : matchers) {
-                      if (m.match(hostName)) {
-                        getLog().debug("Ignoring proxy for host : " + hostName);
-                        result = new HttpRoute(host);
-                        break;
-                      }
-                    }
-                    if (result == null) {
-                      result = super.determineRoute(host, request, context);
-                    }
-                    getLog().debug("Made connection route : " + result);
-                    return result;
-                  }
-                };
-
-        builder.setRoutePlanner(routePlanner);
-        getLog().debug("Proxy will ignore: " + Arrays.toString(matchers));
-      }
-
-      builder.setUserAgent("mvn-golang-wrapper-agent/1.0");
-      builder.disableCookieManagement();
-
-      if (this.isDisableSslCheck()) {
-        this.getLog().warn("SSL certificate check is disabled");
-        try {
-          final SSLContext sslcontext = SSLContext.getInstance("TLS");
-          X509TrustManager tm = new X509TrustManager() {
-            @Override
-            @Nullable
-            @MustNotContainNull
-            public X509Certificate[] getAcceptedIssuers() {
-              return null;
-            }
-
-            @Override
-            public void checkClientTrusted(
-                    @Nonnull @MustNotContainNull final X509Certificate[] arg0,
-                    @Nonnull final String arg1) throws CertificateException {
-            }
-
-            @Override
-            public void checkServerTrusted(
-                    @Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull String arg1)
-                    throws CertificateException {
-            }
-          };
-          sslcontext.init(null, new TrustManager[]{tm}, null);
-
-          final SSLConnectionSocketFactory sslfactory =
-                  new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
-          final Registry<ConnectionSocketFactory> r =
-                  RegistryBuilder.<ConnectionSocketFactory>create()
-                          .register("https", sslfactory)
-                          .register("http", new PlainConnectionSocketFactory()).build();
-
-          builder.setConnectionManager(new BasicHttpClientConnectionManager(r));
-          builder.setSSLSocketFactory(sslfactory);
-          builder.setSSLContext(sslcontext);
-        } catch (final KeyManagementException | NoSuchAlgorithmException ex) {
-          throw new MojoExecutionException("Can't disable SSL certificate check", ex);
-        }
-      } else {
-        this.getLog().debug("SSL check is enabled");
-      }
-      this.httpClient = builder.build();
-    }
-    return this.httpClient;
+  @Nullable
+  private static String nullIfBlank(@Nullable final String text) {
+    return text == null || text.trim().isEmpty() ? null : text;
   }
 
   @Nullable
@@ -1884,100 +1776,117 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     executor.environment(name, value);
   }
 
-  @Nullable
-  protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings)
-          throws IOException, MojoFailureException, MojoExecutionException {
-    initConsoleBuffers();
+  @Nonnull
+  private synchronized HttpClient getHttpClient(@Nullable final ProxySettings proxy)
+          throws MojoExecutionException {
+    if (this.httpClient == null) {
+      final HttpClientBuilder builder = HttpClients.custom();
 
-    final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
-    final File detectedRoot = findGoRoot(proxySettings);
-    final String gobin = getGoBin();
-    final String gocache = getGoCache();
-    final File[] gopathParts = findGoPath(true);
+      if (proxy != null) {
+        if (proxy.hasCredentials()) {
+          final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+          credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port),
+                  new NTCredentials(GetUtils.ensureNonNull(proxy.username, ""), proxy.password,
+                          extractComputerName(), extractDomainName()));
+          builder.setDefaultCredentialsProvider(credentialsProvider);
+          getLog().debug(String
+                  .format("Credentials provider has been created for proxy (username : %s): %s",
+                          proxy.username, proxy));
+        }
 
-    if (isMojoMustNotBeExecuted()) {
-      return null;
-    }
+        final String[] ignoreForAddresses =
+                proxy.nonProxyHosts == null ? new String[0] : proxy.nonProxyHosts.split("\\|");
 
-    final String toolName =
-            FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs));
-    final File executableFileInPathOrRoot = new File(getPathToFolder(detectedRoot) + toolName);
+        final WildCardMatcher[] matchers;
 
-    final File executableFileInBin =
-            gobin == null ? null : new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
+        if (ignoreForAddresses.length > 0) {
+          matchers = new WildCardMatcher[ignoreForAddresses.length];
+          for (int i = 0; i < ignoreForAddresses.length; i++) {
+            matchers[i] = new WildCardMatcher(ignoreForAddresses[i]);
+          }
+        } else {
+          matchers = new WildCardMatcher[0];
+        }
 
-    final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
+        getLog().debug("Regular routing mode");
 
-    final File foundExecutableTool = findExisting(exeVariants);
+        final HttpRoutePlanner routePlanner =
+                new DefaultProxyRoutePlanner(new HttpHost(proxy.host, proxy.port, proxy.protocol)) {
+                  @Override
+                  @Nonnull
+                  public HttpRoute determineRoute(@Nonnull final HttpHost host,
+                                                  @Nonnull final HttpRequest request,
+                                                  @Nonnull final HttpContext context)
+                          throws HttpException {
+                    HttpRoute result = null;
+                    final String hostName = host.getHostName();
+                    for (final WildCardMatcher m : matchers) {
+                      if (m.match(hostName)) {
+                        getLog().debug("Ignoring proxy for host : " + hostName);
+                        result = new HttpRoute(host);
+                        break;
+                      }
+                    }
+                    if (result == null) {
+                      result = super.determineRoute(host, request, context);
+                    }
+                    getLog().debug("Made connection route : " + result);
+                    return result;
+                  }
+                };
 
-    if (foundExecutableTool == null) {
-      throw new MojoFailureException(
-              "Can't find executable file : " + Arrays.toString(exeVariants));
-    } else {
-      logOptionally("Executable file detected : " + foundExecutableTool);
-    }
-
-    final List<String> commandLine = new ArrayList<>();
-    commandLine.add(foundExecutableTool.getAbsolutePath());
-
-    final String gocommand = getGoCommand();
-    if (!gocommand.isEmpty()) {
-      commandLine.add(getGoCommand());
-    }
-
-    boolean verboseAdded = false;
-
-    for (final String s : getCommandFlags()) {
-      if (s.equals("-v")) {
-        verboseAdded = true;
+        builder.setRoutePlanner(routePlanner);
+        getLog().debug("Proxy will ignore: " + Arrays.toString(matchers));
       }
-      commandLine.add(s);
-    }
-    if (this.isVerbose() && !verboseAdded && isCommandSupportVerbose()) {
-      commandLine.add("-v");
-    }
 
-    commandLine.addAll(Arrays.asList(getBuildFlags()));
-    commandLine.addAll(Arrays.asList(getTailArguments()));
-    commandLine.addAll(Arrays.asList(getOptionalExtraTailArguments()));
+      builder.setUserAgent("mvn-golang-wrapper-agent/1.0");
+      builder.disableCookieManagement();
 
-    final StringBuilder cli = new StringBuilder();
-    int index = 0;
-    for (final String s : commandLine) {
-      if (cli.length() > 0) {
-        cli.append(' ');
-      }
-      if (index == 0) {
-        cli.append(execNameAdaptedForOs);
+      if (this.isDisableSslCheck()) {
+        this.getLog().warn("SSL certificate check is disabled");
+        try {
+          final SSLContext sslcontext = SSLContext.getInstance("TLS");
+          X509TrustManager tm = new X509TrustManager() {
+            @Override
+            @Nullable
+            @MustNotContainNull
+            public X509Certificate[] getAcceptedIssuers() {
+              return null;
+            }
+
+            @Override
+            public void checkClientTrusted(
+                    @Nonnull @MustNotContainNull final X509Certificate[] arg0,
+                    @Nonnull final String arg1) throws CertificateException {
+            }
+
+            @Override
+            public void checkServerTrusted(
+                    @Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull String arg1)
+                    throws CertificateException {
+            }
+          };
+          sslcontext.init(null, new TrustManager[]{tm}, null);
+
+          final SSLConnectionSocketFactory sslfactory =
+                  new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
+          final Registry<ConnectionSocketFactory> r =
+                  RegistryBuilder.<ConnectionSocketFactory>create()
+                          .register("https", sslfactory)
+                          .register("http", new PlainConnectionSocketFactory()).build();
+
+          builder.setConnectionManager(new BasicHttpClientConnectionManager(r));
+          builder.setSSLSocketFactory(sslfactory);
+          builder.setSSLContext(sslcontext);
+        } catch (final KeyManagementException | NoSuchAlgorithmException ex) {
+          throw new MojoExecutionException("Can't disable SSL certificate check", ex);
+        }
       } else {
-        cli.append(s);
+        this.getLog().debug("SSL check is enabled");
       }
-      index++;
+      this.httpClient = builder.build();
     }
-
-    getLog().info(String.format("Prepared command line : %s", cli.toString()));
-
-    final ProcessExecutor result = new ProcessExecutor(commandLine);
-
-    final File workingDirectory = this.getWorkingDirectoryForExecutor();
-    if (workingDirectory.isDirectory()) {
-      logOptionally("Working directory: " + workingDirectory);
-      result.directory(workingDirectory);
-    } else {
-      logOptionally("Working directory is not set because provided folder doesn't exist: " +
-              workingDirectory);
-    }
-
-    logOptionally("");
-
-    registerEnvVars(result, detectedRoot, gobin, gocache,
-            this.getSources(this.isSourceFolderRequired()), gopathParts);
-
-    logOptionally("........................");
-
-    registerOutputBuffers(result);
-
-    return result;
+    return this.httpClient;
   }
 
   protected void registerOutputBuffers(@Nonnull final ProcessExecutor executor) {
@@ -2165,19 +2074,115 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return null;
   }
 
+  @Nullable
+  protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings)
+          throws IOException, MojoFailureException, MojoExecutionException {
+    initConsoleBuffers();
+
+    final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
+    final File detectedRoot = findGoRoot(proxySettings);
+    final String gobin = getGoBin();
+    final String gocache = getGoCache();
+    final File[] gopathParts = findGoPath(true);
+
+    if (isMojoMustNotBeExecuted()) {
+      return null;
+    }
+
+    final String toolName =
+            FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs));
+    final File executableFileInPathOrRoot = new File(getPathToFolder(detectedRoot) + toolName);
+
+    final File executableFileInBin =
+            gobin == null ? null : new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
+
+    final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
+
+    final File foundExecutableTool = findExisting(exeVariants);
+
+    if (foundExecutableTool == null) {
+      throw new MojoFailureException(
+              "Can't find executable file : " + Arrays.toString(exeVariants));
+    } else {
+      logOptionally("Executable file detected : " + foundExecutableTool);
+    }
+
+    final List<String> commandLine = new ArrayList<>();
+    commandLine.add(foundExecutableTool.getAbsolutePath());
+
+    final String gocommand = getGoCommand();
+    if (!gocommand.isEmpty()) {
+      commandLine.add(getGoCommand());
+    }
+
+    boolean verboseAdded = false;
+
+    for (final String s : getCommandFlags()) {
+      if (s.equals("-v")) {
+        verboseAdded = true;
+      }
+      commandLine.add(s);
+    }
+    if (this.isVerbose() && !verboseAdded && isCommandSupportVerbose()) {
+      commandLine.add("-v");
+    }
+
+    commandLine.addAll(Arrays.asList(getBuildFlags()));
+    commandLine.addAll(Arrays.asList(getTailArguments()));
+    commandLine.addAll(Arrays.asList(getOptionalExtraTailArguments()));
+
+    final StringBuilder cli = new StringBuilder();
+    int index = 0;
+    for (final String s : commandLine) {
+      if (cli.length() > 0) {
+        cli.append(' ');
+      }
+      if (index == 0) {
+        cli.append(execNameAdaptedForOs);
+      } else {
+        cli.append(s);
+      }
+      index++;
+    }
+
+    getLog().info(String.format("Prepared command line : %s", cli));
+
+    final ProcessExecutor result = new ProcessExecutor(commandLine);
+
+    final File workingDirectory = this.getWorkingDirectoryForExecutor();
+    if (workingDirectory.isDirectory()) {
+      logOptionally("Working directory: " + workingDirectory);
+      result.directory(workingDirectory);
+    } else {
+      logOptionally("Working directory is not set because provided folder doesn't exist: " +
+              workingDirectory);
+    }
+
+    logOptionally("");
+
+    registerEnvVars(result, detectedRoot, gobin, gocache,
+            this.getSources(this.isSourceFolderRequired()), gopathParts);
+
+    logOptionally("........................");
+
+    registerOutputBuffers(result);
+
+    return result;
+  }
+
   private void processLogFiles(@Nonnull final String logOut, @Nonnull final String logErr)
           throws MojoExecutionException {
     final File reportsFolderFile = new File(this.getReportsFolder());
 
-    final String targetOutFileName = this.getOutLogFile();
-    final String targetErrFileName = this.getErrLogFile();
+    final String targetOutFileName = nullIfBlank(this.getOutLogFile());
+    final String targetErrFileName = nullIfBlank(this.getErrLogFile());
 
     if (targetErrFileName != null ^ targetOutFileName != null) {
       if (targetOutFileName == null && !logOut.isEmpty()) {
-        this.getLog().warn("File logging for ERR stream is ON but also detected text in output stream");
+        this.getLog().warn("File logging for ERR stream is ON but also detected text in output stream!");
       }
       if (targetErrFileName == null && !logErr.isEmpty()) {
-        this.getLog().warn("File logging for OUT stream is ON but also detected text in error stream");
+        this.getLog().warn("File logging for OUT stream is ON but also detected text in error stream!");
       }
     }
 
@@ -2185,9 +2190,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     this.getLog().debug("log.file.err: " + targetErrFileName);
 
     final File targetOutFile =
-            targetOutFileName == null || targetOutFileName.trim().isEmpty() ? null : new File(reportsFolderFile, targetOutFileName);
+            targetOutFileName == null ? null : new File(reportsFolderFile, targetOutFileName);
     final File targetErrFile =
-            targetErrFileName == null || targetErrFileName.trim().isEmpty() ? null : new File(reportsFolderFile, targetErrFileName);
+            targetErrFileName == null ? null : new File(reportsFolderFile, targetErrFileName);
 
 
     if (targetOutFile == null) {

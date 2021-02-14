@@ -16,19 +16,19 @@
 
 package com.igormaznitsa.mvngolang.utils;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.System.out;
-
-
 import com.igormaznitsa.meta.annotation.MayContainNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.System.out;
 
 /**
  * Auxiliary class to collect methods for work with IO.
@@ -72,7 +72,7 @@ public final class IOUtils {
     builder.append("]\u001B[?25h");
 
     if (progress != lastValue) {
-      out.print(builder.toString());
+      out.print(builder);
       out.flush();
     }
 

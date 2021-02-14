@@ -17,13 +17,6 @@
 package com.igormaznitsa.mvngolang.utils;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -31,6 +24,10 @@ import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.ParseException;
 import org.apache.maven.plugin.logging.Log;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.*;
 
 public class XGoogHashHeader {
 
@@ -107,7 +104,7 @@ public class XGoogHashHeader {
         try (final InputStream in = new BufferedInputStream(new FileInputStream(file), 16384)) {
           final Crc32c crc = new Crc32c();
           crc.update(in);
-          log.debug("Check CRC32C hash (reference " + this.crc32c + "): " + crc.toString());
+          log.debug("Check CRC32C hash (reference " + this.crc32c + "): " + crc);
           return this.crc32c.equalsIgnoreCase(crc.toString());
         }
       }

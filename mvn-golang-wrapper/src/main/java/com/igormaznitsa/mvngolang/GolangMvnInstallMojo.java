@@ -109,7 +109,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
   }
 
   @Override
-  protected boolean doMainBusiness(@Nonnull final ProxySettings proxySettings,
+  protected boolean doMainBusiness(@Nullable final ProxySettings proxySettings,
                                    final int maxAttempts)
           throws IOException {
     final File archive = compressProjectFiles();
