@@ -30,6 +30,9 @@
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
           <sources>${src.preprocessed}</sources>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
         </configuration>
         <executions>
           <execution>

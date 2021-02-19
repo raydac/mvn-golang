@@ -14,7 +14,7 @@ __2.3.7 (SNAPSHOT)__
 - refactoring, improved informing about file log state [#83](https://github.com/raydac/mvn-golang/issues/83)
 - improved `build` mojo, added support to attach build result as project
   artifact[#82](https://github.com/raydac/mvn-golang/issues/82)
-- default version of GoSDK updated to 1.15.8
+- default version of GoSDK updated to 1.16
 - fixed slash processing in go.mod under windows [#80](https://github.com/raydac/mvn-golang/issues/80) (
   thanks [fmazoyer](https://github.com/fmazoyer))
 
@@ -130,18 +130,28 @@ Since 2.3.3 version, plug-in supports Golang module mode and allows to mix modul
 
 ## Wrapped GET command
 
-Plugin provides wrapper for Golang GET command and you can just define some external file contains package info through system property `mvn.golang.get.packages.file`, the file will be loaded and parsed and its definitions will be added into package depedencies.
-Format of the file is very easy. Each package described on a line in format `package: <PACKAGE_NAME>[,branch: <BRANCH>][,tag: <TAG>][,revision: <REVISION>]` also it supports single line comments through `//` and directive `#include <FILE_NAME>` to load packages from some external file. Also it supports interpolation of properties defined in format `${property.name}` and provide access to maven, system and environment variables.   
-Example:   
+Plugin provides wrapper for Golang GET command and you can just define some external file contains package info through
+system property `mvn.golang.get.packages.file`, the file will be loaded and parsed and its definitions will be added
+into package dependencies. Format of the file is very easy. Each package described on a line in
+format `package: <PACKAGE_NAME>[,branch: <BRANCH>][,tag: <TAG>][,revision: <REVISION>]` also it supports single line
+comments through `//` and directive `#include <FILE_NAME>` to load packages from some external file. Also it supports
+interpolation of properties defined in format `${property.name}` and provide access to maven, system and environment
+variables.   
+Example:
+
 ```
 // example package file
 #include "${basedir}/external/file.txt"
 package:github.com/maruel/panicparse,tag:v1.0.2 // added because latest changes in panicparse is incompatible with termui
 package:github.com/gizak/termui,branch:v2
 ```
-This mechanism just makes work with dependencies easier and if you want to provide some specific flags and scripts to process CVS folders you have to define configuration parameters in pom.xml, pacages defined in the external file and in the pom.xml will be mixed.
 
-The Plug-in doesn't work with standard maven dependencies and they must be defined through task of the plugin, the example of easiest case of dependencies is
+This mechanism just makes work with dependencies easier and if you want to provide some specific flags and scripts to
+process CVS folders you have to define configuration parameters in pom.xml, packages defined in the external file and in
+the pom.xml will be mixed.
+
+The Plug-in doesn't work with standard maven dependencies and they must be defined through task of the plugin, the
+example of easiest case of dependencies is
 ```xml
 <execution>
    <id>default-get</id>

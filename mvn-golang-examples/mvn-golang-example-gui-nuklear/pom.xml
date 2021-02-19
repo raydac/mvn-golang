@@ -33,6 +33,9 @@
 
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
         </configuration>
         
         <executions>

@@ -27,6 +27,9 @@
         <extensions>true</extensions>
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
           <addToGoPath>
             <lib1>${basedir}${file.separator}lib1</lib1>
             <lib2>${basedir}${file.separator}lib2</lib2>

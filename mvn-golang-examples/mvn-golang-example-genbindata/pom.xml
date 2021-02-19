@@ -34,6 +34,9 @@
           <addToGoPath>
             <folder>${basedir}${file.separator}bin</folder>
           </addToGoPath>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
         </configuration>
         <executions>
           <execution>

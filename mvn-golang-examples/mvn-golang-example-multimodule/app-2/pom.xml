@@ -31,6 +31,9 @@
         <extensions>true</extensions>
         <configuration>
           <goVersion>${go.sdk.version}</goVersion>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
           <addToGoPath>
             <common>${basedir}/../common</common>
           </addToGoPath>

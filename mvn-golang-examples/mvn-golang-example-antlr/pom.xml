@@ -68,11 +68,14 @@
         <artifactId>mvn-golang-wrapper</artifactId>
         <version>${main-project-version}</version>
         <extensions>true</extensions>
-        <configuration> 
+        <configuration>
           <goVersion>${go.sdk.version}</goVersion>
           <addToGoPath>
             <path>${generated.dir}</path>
           </addToGoPath>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
         </configuration>
         <executions>
           <execution>

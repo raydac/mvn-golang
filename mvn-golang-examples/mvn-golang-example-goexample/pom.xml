@@ -25,6 +25,9 @@
         <version>${main-project-version}</version>
         <extensions>true</extensions>
         <configuration>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
           <goVersion>${go.sdk.version}</goVersion>
         </configuration>
       </plugin>
