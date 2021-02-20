@@ -1980,7 +1980,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (ENV_GO111MODULE.equals(record.getKey().toString())) {
         go111moduleDetected = true;
       }
-      addEnvVar(result, record.getKey().toString(), record.getValue().toString());
+      addEnvVar(result, record.getKey().toString(), GetUtils.ensureNonNull(record.getValue(),"").toString());
     }
 
     if (this.isModuleMode()) {
