@@ -1,4 +1,4 @@
-# __2.3.7 (SNAPSHOT)__
+# __2.3.7 (22-feb-2021)__
 
 - refactoring, improved informing about file log state [#83](https://github.com/raydac/mvn-golang/issues/83)
 - improved `build` mojo, added support to attach build result as project
