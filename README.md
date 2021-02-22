@@ -14,7 +14,7 @@ __2.3.7 (SNAPSHOT)__
 - refactoring, improved informing about file log state [#83](https://github.com/raydac/mvn-golang/issues/83)
 - improved `build` mojo, added support to attach build result as project
   artifact[#82](https://github.com/raydac/mvn-golang/issues/82)
-- default version of GoSDK updated to 1.16
+- default version of GoSDK updated to 1.15.8
 - fixed slash processing in go.mod under windows [#80](https://github.com/raydac/mvn-golang/issues/80) (
   thanks [fmazoyer](https://github.com/fmazoyer))
 
