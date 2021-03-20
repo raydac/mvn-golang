@@ -9,6 +9,11 @@
 
 # Changelog
 
+__2.3.8 (SNAPSHOT)
+
+- added `mod` property for commands support it
+- go.sum excluded from delete during build by default [#84](https://github.com/raydac/mvn-golang/issues/84)
+
 __2.3.7 (22-feb-2021)__
 
 - refactoring, improved informing about file log state [#83](https://github.com/raydac/mvn-golang/issues/83)
@@ -17,18 +22,6 @@ __2.3.7 (22-feb-2021)__
 - default version of GoSDK updated to 1.15.8
 - fixed slash processing in go.mod under windows [#80](https://github.com/raydac/mvn-golang/issues/80) (
   thanks [fmazoyer](https://github.com/fmazoyer))
-
-__2.3.6 (19-dec-2020)__
-
-- improved restoration of `go.mod` and `go.sum` state after build
-- refactoring and minor bugfixing
-- updated dependencies
-- default version of GoSDK updated to 1.15.6
-
-__2.3.5 (12-sep-2020)__
-
-- fixed bug in go.mod backup restore [#73](https://github.com/raydac/mvn-golang/issues/73)
-- default version of GoSDK updated to 1.15.2
 
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 

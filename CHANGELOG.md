@@ -1,3 +1,7 @@
+# __2.3.8 (SNAPSHOT)
+- added `mod` property for commands support it
+- go.sum excluded from delete during build by default [#84](https://github.com/raydac/mvn-golang/issues/84)
+
 # __2.3.7 (22-feb-2021)__
 
 - refactoring, improved informing about file log state [#83](https://github.com/raydac/mvn-golang/issues/83)
