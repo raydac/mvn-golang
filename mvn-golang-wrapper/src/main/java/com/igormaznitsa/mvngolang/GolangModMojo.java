@@ -18,12 +18,13 @@ package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.Assertions;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * The Mojo wraps the 'mod' command.
@@ -31,7 +32,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @since 2.3.3
  */
 @Mojo(name = "mod", defaultPhase = LifecyclePhase.NONE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangModMojo extends AbstractModuleModAware {
+public class GolangModMojo extends AbstractModuleAware {
 
   /**
    * Command to be executed. Must be defined.

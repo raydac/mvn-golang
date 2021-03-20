@@ -17,18 +17,19 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.mvngolang.utils.MavenUtils;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
  * The Mojo wraps the 'install' command.
  */
 @Mojo(name = "install", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangInstallMojo extends AbstractModuleModAware {
+public class GolangInstallMojo extends AbstractModuleAware {
 
   @Nullable
   @Override

@@ -17,18 +17,19 @@
 package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import java.io.File;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
 
 /**
  * The Mojo wraps the 'generate' command.
  */
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangGenerateMojo extends AbstractGoPackageAndDependencyAwareMojo {
+public class GolangGenerateMojo extends AbstractModuleAware {
 
   @Override
   @Nonnull

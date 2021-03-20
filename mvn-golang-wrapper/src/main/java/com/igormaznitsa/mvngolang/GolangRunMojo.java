@@ -18,15 +18,16 @@ package com.igormaznitsa.mvngolang;
 
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The Mojo allows to run a program, it wraps <b>run</b> command.
@@ -35,7 +36,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  */
 @SuppressWarnings("SpellCheckingInspection")
 @Mojo(name = "run", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
-public class GolangRunMojo extends AbstractGoPackageAndDependencyAwareMojo {
+public class GolangRunMojo extends AbstractModuleAware {
 
   /**
    * If the parameter is defined then <b>-exec</b> will be used with the parameter value.

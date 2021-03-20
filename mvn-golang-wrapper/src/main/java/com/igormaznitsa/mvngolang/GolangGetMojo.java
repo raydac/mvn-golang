@@ -53,14 +53,14 @@ import java.util.regex.Pattern;
  * The Mojo wraps the 'get' command.
  */
 @Mojo(name = "get", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangGetMojo extends AbstractModuleModAware {
+public class GolangGetMojo extends AbstractModuleAware {
 
   private static final Pattern PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT = Pattern.compile(
-      "no\\s+submodule\\s+mapping\\s+found\\s+in\\s+.gitmodules for path\\s+\\'([\\S]+?)\\'",
-      Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern
-      .compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$",
+          "no\\s+submodule\\s+mapping\\s+found\\s+in\\s+.gitmodules for path\\s+\\'([\\S]+?)\\'",
           Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_EXTRACT_PACKAGE_AND_STATUS = Pattern
+          .compile("^package ([\\S]+?)\\s*:\\s*exit\\s+status\\s+([\\d]+?)\\s*$",
+                  Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   /**
    * Script to be called in the end of all operations over CVS, <b>it will be

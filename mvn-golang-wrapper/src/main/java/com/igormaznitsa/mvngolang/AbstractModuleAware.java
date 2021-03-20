@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractModuleModAware extends AbstractGoPackageAndDependencyAwareMojo {
+public abstract class AbstractModuleAware extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**
    * Parameter allows define '-mod' parameter for command in format '-mod=value'.

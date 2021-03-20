@@ -16,12 +16,8 @@
 
 package com.igormaznitsa.mvngolang;
 
-import static org.junit.Assert.assertArrayEquals;
-
-
 import com.igormaznitsa.mvngolang.utils.IOUtils;
 import com.igormaznitsa.mvngolang.utils.ProxySettings;
-import java.io.File;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
@@ -30,7 +26,11 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.junit.Test;
 
-public class GolangMojoCfgTest extends AbstractMojoTestCase {
+import java.io.File;
+
+import static org.junit.Assert.assertArrayEquals;
+
+public class GolangModMojoCfgTest extends AbstractMojoTestCase {
 
   private static void assertEqualsPath(final String etalon, final String toCheck) {
     assertFalse("Must contain single path : " + etalon, etalon.contains(File.pathSeparator));
@@ -48,7 +48,7 @@ public class GolangMojoCfgTest extends AbstractMojoTestCase {
 
   private <T> T findMojo(final Class<T> klazz, final String pomName, final String goal)
       throws Exception {
-    final File pomFile = new File(GolangMojoCfgTest.class.getResource(pomName).toURI());
+    final File pomFile = new File(GolangModMojoCfgTest.class.getResource(pomName).toURI());
     final MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
     final ProjectBuildingRequest buildingRequest = executionRequest.getProjectBuildingRequest();
     buildingRequest.setSystemProperties(System.getProperties());
