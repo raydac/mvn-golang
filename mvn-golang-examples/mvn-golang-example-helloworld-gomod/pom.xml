@@ -33,6 +33,17 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>go-list</id>
+                        <goals>
+                            <goal>list</goal>
+                        </goals>
+                        <configuration>
+                            <format>{{.String}}</format>
+                            <json>true</json>
+                            <listModules>true</listModules>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>do-run</id>
                         <goals>
                             <goal>run</goal>
