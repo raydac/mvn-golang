@@ -25,6 +25,7 @@ import com.igormaznitsa.mvngolang.utils.ProxySettings;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,7 +38,7 @@ import org.apache.maven.project.MavenProjectHelper;
  * The Mojo wraps the 'build' command.
  */
 @Mojo(name = "build", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
+public class GolangBuildMojo extends AbstractModuleModAware {
 
   @Component
   private MavenProjectHelper projectHelper;
@@ -253,7 +254,7 @@ public class GolangBuildMojo extends AbstractGoPackageAndDependencyAwareMojo {
   @Override
   @Nonnull
   @MustNotContainNull
-  public String[] getCommandFlags() {
+  protected String[] getAdditionalCommandFlags() {
     final List<String> flags = new ArrayList<>();
 
     flags.add("-buildmode=" + this.getBuildMode());

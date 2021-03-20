@@ -31,7 +31,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @since 2.3.3
  */
 @Mojo(name = "mod", defaultPhase = LifecyclePhase.NONE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangModMojo extends AbstractGoDependencyAwareMojo {
+public class GolangModMojo extends AbstractModuleModAware {
 
   /**
    * Command to be executed. Must be defined.
@@ -58,7 +58,7 @@ public class GolangModMojo extends AbstractGoDependencyAwareMojo {
   @Nonnull
   @MustNotContainNull
   @Override
-  public String[] getCommandFlags() {
+  protected String[] getAdditionalCommandFlags() {
     return new String[] {Assertions.assertNotNull(this.command)};
   }
 

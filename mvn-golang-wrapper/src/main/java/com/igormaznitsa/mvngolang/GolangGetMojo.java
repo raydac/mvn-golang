@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
  * The Mojo wraps the 'get' command.
  */
 @Mojo(name = "get", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true, requiresDependencyResolution = ResolutionScope.NONE)
-public class GolangGetMojo extends AbstractGoPackageAndDependencyAwareMojo {
+public class GolangGetMojo extends AbstractModuleModAware {
 
   private static final Pattern PATTERN_NO_SUBMODULE_MAPPING_FOUND_IN_GIT = Pattern.compile(
       "no\\s+submodule\\s+mapping\\s+found\\s+in\\s+.gitmodules for path\\s+\\'([\\S]+?)\\'",

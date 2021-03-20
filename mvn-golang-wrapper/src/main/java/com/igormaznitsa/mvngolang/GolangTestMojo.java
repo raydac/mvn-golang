@@ -34,7 +34,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * The Mojo wraps the 'test' command.
  */
 @Mojo(name = "test", defaultPhase = LifecyclePhase.TEST, threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
-public class GolangTestMojo extends AbstractGoPackageAndDependencyAwareMojo {
+public class GolangTestMojo extends AbstractModuleModAware {
 
   /**
    * List of test binary flags.
