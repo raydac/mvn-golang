@@ -16,24 +16,8 @@
 
 package com.igormaznitsa.mvngolang;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-
-
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
-import com.igormaznitsa.mvngolang.utils.GoMod;
-import com.igormaznitsa.mvngolang.utils.IOUtils;
-import com.igormaznitsa.mvngolang.utils.MavenUtils;
-import com.igormaznitsa.mvngolang.utils.ProxySettings;
-import com.igormaznitsa.mvngolang.utils.Tuple;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.igormaznitsa.mvngolang.utils.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -45,10 +29,32 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.zeroturnaround.zip.ZipUtil;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+
 public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   public static final String GO_MOD_FILE_NAME_BAK = ".#go.mod.mvn.orig";
   public static final String DELETE_GO_SUM_FLAG_FILE = ".#go.mod.mvn.delete.sum";
+
+  /**
+   * Flag shows that sum file should be deleted during build.
+   * Since GoSDK 1.16, work with sum files was changed and they should not be removed anymore because will not be restored automatically.
+   * Also can be reached through 'mvn.golang.delete.sum.file'
+   *
+   * @since 2.3.8
+   */
+  @Parameter(name = "deleteSumFile", defaultValue = "false")
+  private boolean deleteSumFile = false;
 
   /**
    * Internal variable to keep GOPATH part containing folders of unpacked
@@ -98,7 +104,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   public boolean isSyncSessionIfModules() {
     return Boolean.parseBoolean(findMvnProperty("mvn.golang.sync.session.if.modules",
-        Boolean.toString(this.syncSessionIfModules)));
+            Boolean.toString(this.syncSessionIfModules)));
   }
 
   public void setSyncSessionIfModules(final boolean value) {
@@ -108,6 +114,11 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Nonnull
   public String getDependencyTempFolder() {
     return this.dependencyTempFolder;
+  }
+
+  public boolean isDeleteSumFile() {
+    return Boolean.parseBoolean(findMvnProperty("mvn.golang.delete.sum.file",
+            Boolean.toString(this.deleteSumFile)));
   }
 
   public void setDependencyTempFolder(@Nonnull final String path) {
@@ -142,18 +153,18 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     final File sourceFolder = this.getSources(false);
     if (sourceFolder.isDirectory()) {
       return findGoModsAndParse(Collections
-          .singletonList(Tuple.of(this.getProject().getArtifact(), sourceFolder)));
+              .singletonList(Tuple.of(this.getProject().getArtifact(), sourceFolder)));
     } else {
       return Collections.emptyList();
     }
   }
 
   private void preprocessModules(
-      @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedDependencyFolders)
-      throws MojoExecutionException {
+          @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedDependencyFolders)
+          throws MojoExecutionException {
     try {
       final List<Tuple<Artifact, Tuple<GoMod, File>>> lst =
-          preprocessModuleFilesInDependencies(unpackedDependencyFolders);
+              preprocessModuleFilesInDependencies(unpackedDependencyFolders);
       final List<Tuple<GoMod, File>> dependencyGoMods = listRightPart(lst);
 
       final List<Tuple<Artifact, Tuple<GoMod, File>>> projectGoMods = findModsInProject();
@@ -165,11 +176,17 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         final File goModFileBak = new File(workingFolder, GO_MOD_FILE_NAME_BAK);
         final File deleteSumFileFlag = new File(workingFolder, DELETE_GO_SUM_FLAG_FILE);
 
+        final boolean deleteSum = this.isDeleteSumFile();
+
+        if (deleteSum) {
+          this.getLog().warn("SUM file will be deleted for artifact: " + f.left());
+        }
+
         if (goModFileBak.isFile()) {
           if (goModFile.isFile() && !goModFile.delete()) {
             throw new IOException("Can't delete go.mod file: " + goModFile);
           }
-          if (deleteSumFileFlag.isFile() && sumFile.isFile() && !sumFile.delete()) {
+          if (deleteSum && deleteSumFileFlag.isFile() && sumFile.isFile() && !sumFile.delete()) {
             throw new IOException("Can't delete file " + sumFile);
           }
           FileUtils.copyFile(goModFileBak, goModFile);
@@ -177,20 +194,20 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           if (goModFile.isFile()) {
             FileUtils.copyFile(goModFile, goModFileBak);
           }
-          if (!sumFile.isFile() && !deleteSumFileFlag.isFile() &&
-              !deleteSumFileFlag.createNewFile()) {
+          if (deleteSum && !sumFile.isFile() && !deleteSumFileFlag.isFile() &&
+                  !deleteSumFileFlag.createNewFile()) {
             throw new IOException("Can't create file " + deleteSumFileFlag);
           }
         }
 
         if (goModFile.isFile()) {
           final GoMod parsed =
-              GoMod.from(FileUtils.readFileToString(goModFile, StandardCharsets.UTF_8));
+                  GoMod.from(FileUtils.readFileToString(goModFile, StandardCharsets.UTF_8));
           if (replaceLinksToModules(Tuple.of(parsed, goModFile), dependencyGoMods)) {
             FileUtils.write(goModFile, parsed.toString(), StandardCharsets.UTF_8);
           }
-          if (sumFile.isFile() && !deleteSumFileFlag.isFile() &&
-              !deleteSumFileFlag.createNewFile()) {
+          if (deleteSum && sumFile.isFile() && !deleteSumFileFlag.isFile() &&
+                  !deleteSumFileFlag.createNewFile()) {
             throw new IOException("Can't create file " + deleteSumFileFlag);
           }
         }
@@ -203,14 +220,14 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Nonnull
   @MustNotContainNull
   private List<Tuple<Artifact, Tuple<GoMod, File>>> findGoModsAndParse(
-      @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders)
-      throws IOException {
+          @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders)
+          throws IOException {
     final List<Tuple<Artifact, Tuple<GoMod, File>>> result = new ArrayList<>();
 
     for (final Tuple<Artifact, File> tuple : unpackedFolders) {
       for (final File f : FileUtils
-          .listFiles(tuple.right(), FileFilterUtils.nameFileFilter("go.mod"),
-              TrueFileFilter.INSTANCE)) {
+              .listFiles(tuple.right(), FileFilterUtils.nameFileFilter("go.mod"),
+                      TrueFileFilter.INSTANCE)) {
         final GoMod model = GoMod.from(FileUtils.readFileToString(f, StandardCharsets.UTF_8));
         result.add(Tuple.of(tuple.left(), Tuple.of(model, f)));
       }
@@ -220,8 +237,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   }
 
   private boolean replaceLinksToModules(@Nonnull final Tuple<GoMod, File> source,
-                                        @Nonnull @MustNotContainNull
-                                        final List<Tuple<GoMod, File>> targets) throws IOException {
+                                        @Nonnull @MustNotContainNull final List<Tuple<GoMod, File>> targets) throws IOException {
     boolean changed = false;
     for (final Tuple<GoMod, File> j : targets) {
       if (!source.equals(j)) {
@@ -229,13 +245,13 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         final File thatGoModFile = j.right();
 
         if (source.left().hasRequireFor(thatParsedGoMod.getModule(), null) &&
-            !source.left().hasReplaceFor(thatParsedGoMod.getModule(), null)) {
+                !source.left().hasReplaceFor(thatParsedGoMod.getModule(), null)) {
 
           final String relativePath = makeRelativePathToFolder(source.right().getParentFile(),
-              thatGoModFile.getParentFile());
+                  thatGoModFile.getParentFile());
           source.left().addItem(
-              new GoMod.GoReplace(new GoMod.ModuleInfo(thatParsedGoMod.getModule()),
-                  new GoMod.ModuleInfo(relativePath)));
+                  new GoMod.GoReplace(new GoMod.ModuleInfo(thatParsedGoMod.getModule()),
+                          new GoMod.ModuleInfo(relativePath)));
           changed = true;
         }
       }
@@ -246,7 +262,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Nonnull
   @MustNotContainNull
   private List<Tuple<GoMod, File>> listRightPart(
-      @Nonnull @MustNotContainNull final List<Tuple<Artifact, Tuple<GoMod, File>>> list) {
+          @Nonnull @MustNotContainNull final List<Tuple<Artifact, Tuple<GoMod, File>>> list) {
     final List<Tuple<GoMod, File>> parsed = new ArrayList<>();
     for (final Tuple<Artifact, Tuple<GoMod, File>> i : list) {
       parsed.add(i.right());
@@ -255,8 +271,8 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   }
 
   private int generateCrossLinksBetweenArtifactGoMods(
-      @Nonnull @MustNotContainNull final List<Tuple<Artifact, Tuple<GoMod, File>>> unpackedFolders)
-      throws IOException {
+          @Nonnull @MustNotContainNull final List<Tuple<Artifact, Tuple<GoMod, File>>> unpackedFolders)
+          throws IOException {
     int changes = 0;
 
     final List<Tuple<GoMod, File>> parsed = listRightPart(unpackedFolders);
@@ -273,15 +289,15 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   @Nonnull
   @MustNotContainNull
   private List<Tuple<Artifact, Tuple<GoMod, File>>> preprocessModuleFilesInDependencies(
-      @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders)
-      throws IOException {
+          @Nonnull @MustNotContainNull final List<Tuple<Artifact, File>> unpackedFolders)
+          throws IOException {
     getLog().debug("Finding go.mod descriptors in unpacked artifacts");
     final List<Tuple<Artifact, Tuple<GoMod, File>>> foundAndParsedGoMods =
-        findGoModsAndParse(unpackedFolders);
+            findGoModsAndParse(unpackedFolders);
     getLog().debug(String.format("Found %d go.mod descriptors", foundAndParsedGoMods.size()));
     final int changedGoModCounter = generateCrossLinksBetweenArtifactGoMods(foundAndParsedGoMods);
     getLog().debug(
-        String.format("Changed %d go.mod descriptors in unpacked artifacts", changedGoModCounter));
+            String.format("Changed %d go.mod descriptors in unpacked artifacts", changedGoModCounter));
 
     return foundAndParsedGoMods;
   }
@@ -296,7 +312,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         this.restoreGoModFromBackupAndRemoveBackup(src);
       } catch (IOException ex) {
         throw new MojoExecutionException(
-            "Error during restoring of detected go.mod backup in source folder", ex);
+                "Error during restoring of detected go.mod backup in source folder", ex);
       }
     }
 
@@ -306,13 +322,13 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
       try {
         foundArtifacts = MavenUtils.scanForMvnGoArtifacts(
-            this.getProject(),
-            this.isIncludeTestDependencies(),
-            this,
-            this.getSession(),
-            this.getExecution(),
-            this.getArtifactResolver(),
-            this.getRemoteRepositories());
+                this.getProject(),
+                this.isIncludeTestDependencies(),
+                this,
+                this.getSession(),
+                this.getExecution(),
+                this.getArtifactResolver(),
+                this.getRemoteRepositories());
       } catch (ArtifactResolverException ex) {
         throw new MojoFailureException("Can't resolve artifact", ex);
       }
@@ -328,7 +344,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         final File dependencyTempTargetFolder = new File(this.getDependencyTempFolder());
         getLog().debug("Dependencies will be unpacked into folder: " + dependencyTempTargetFolder);
         final List<Tuple<Artifact, File>> unpackedFolders =
-            unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
+                unpackArtifactsIntoFolder(foundArtifacts, dependencyTempTargetFolder);
 
         if (this.isModuleMode()) {
           this.getLog().info("Module mode is activated");
@@ -341,7 +357,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           }
 
           final String preparedExtraPartForGoPath =
-              IOUtils.makeOsFilePathWithoutDuplications(unpackedFolderList.toArray(new File[0]));
+                  IOUtils.makeOsFilePathWithoutDuplications(unpackedFolderList.toArray(new File[0]));
           getLog().debug("Prepared dependency path for GOPATH: " + preparedExtraPartForGoPath);
           this.extraGoPathSectionInOsFormat = preparedExtraPartForGoPath;
         }
@@ -352,14 +368,14 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   }
 
   private void restoreGoModFromBackupAndRemoveBackup(@Nonnull final File folder)
-      throws IOException {
+          throws IOException {
     final Collection<File> backupFiles = FileUtils
-        .listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME_BAK),
-            TrueFileFilter.INSTANCE);
+            .listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME_BAK),
+                    TrueFileFilter.INSTANCE);
 
     this.getLog().debug(String
-        .format("Restoring go.mod from backup in %s, detected %d files", folder,
-            backupFiles.size()));
+            .format("Restoring go.mod from backup in %s, detected %d files", folder,
+                    backupFiles.size()));
 
     for (final File backup : backupFiles) {
       final File workingFolder = backup.getParentFile();
@@ -374,12 +390,14 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
         throw new IOException("Can't rename backup: " + backup + " -> " + restored);
       }
 
-      if (deleteGoSumFileFlag.isFile()) {
-        if (!deleteGoSumFileFlag.delete()) {
-          throw new IOException("Can't delete file " + deleteGoSumFileFlag);
-        }
-        if (goSumFile.isFile() && !goSumFile.delete()) {
-          throw new IOException("Can't delete file " + goSumFile);
+      if (this.isDeleteSumFile()) {
+        if (deleteGoSumFileFlag.isFile()) {
+          if (!deleteGoSumFileFlag.delete()) {
+            throw new IOException("Can't delete file " + deleteGoSumFileFlag);
+          }
+          if (goSumFile.isFile() && !goSumFile.delete()) {
+            throw new IOException("Can't delete file " + goSumFile);
+          }
         }
       }
     }
@@ -387,7 +405,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   @Override
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error)
-      throws MojoFailureException, MojoExecutionException {
+          throws MojoFailureException, MojoExecutionException {
     try {
       if (this.isModuleMode()) {
         this.getLog().debug("module mode is on");
@@ -402,7 +420,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
           }
         } else {
           this.getLog()
-              .debug("Restore backup mod files is ignored because source folder is not directory");
+                  .debug("Restore backup mod files is ignored because source folder is not directory");
         }
       } else {
         this.getLog().debug("module mode is off");
@@ -421,33 +439,32 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
   protected boolean isRestoreGoMod() {
     return Boolean.parseBoolean(MavenUtils
-        .findProperty(this.getSession(), this.getProject(), "mvn.golang.restore.go.mod", "true"));
+            .findProperty(this.getSession(), this.getProject(), "mvn.golang.restore.go.mod", "true"));
   }
 
   @Nonnull
   @MustNotContainNull
   private List<Tuple<Artifact, File>> unpackArtifactsIntoFolder(@Nonnull
-                                                                @MustNotContainNull
-                                                                final List<Tuple<Artifact, File>> zippedArtifacts,
+                                                                @MustNotContainNull final List<Tuple<Artifact, File>> zippedArtifacts,
                                                                 @Nonnull final File targetFolder)
-      throws MojoExecutionException {
+          throws MojoExecutionException {
     final List<Tuple<Artifact, File>> resultFolders = new ArrayList<>();
 
     if (!targetFolder.isDirectory() && !targetFolder.mkdirs()) {
       throw new MojoExecutionException(
-          "Can't create folder to unpack dependencies: " + targetFolder);
+              "Can't create folder to unpack dependencies: " + targetFolder);
     }
 
     for (final Tuple<Artifact, File> zipFile : zippedArtifacts) {
       final File outDir =
-          new File(targetFolder, FilenameUtils.getBaseName(zipFile.right().getName()));
+              new File(targetFolder, FilenameUtils.getBaseName(zipFile.right().getName()));
 
       final boolean doUnpackArch;
       if (outDir.isDirectory()) {
         this.getLog().debug("Unpacked dependency folder already exists: " + outDir);
         if (Boolean.parseBoolean(MavenUtils
-            .findProperty(this.getSession(), this.getProject(), "mvn.golang.force.clean.dependency",
-                "false"))) {
+                .findProperty(this.getSession(), this.getProject(), "mvn.golang.force.clean.dependency",
+                        "false"))) {
           this.getLog().debug("Forcing dependency folder delete: " + outDir);
           try {
             FileUtils.deleteDirectory(outDir);
@@ -465,14 +482,14 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
 
       if (doUnpackArch) {
         if (ZipUtil
-            .containsEntry(zipFile.right(), GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE)) {
+                .containsEntry(zipFile.right(), GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE)) {
           final File srcTargetFolder = new File(outDir, "src");
           try {
             unzipSrcFoldersContent(zipFile.right(), srcTargetFolder);
           } catch (Exception ex) {
             throw new MojoExecutionException(
-                "Can't unpack source folders from dependency archive '" +
-                    zipFile.right().getName() + "' into folder '" + srcTargetFolder + '\'', ex);
+                    "Can't unpack source folders from dependency archive '" +
+                            zipFile.right().getName() + "' into folder '" + srcTargetFolder + '\'', ex);
           }
         } else {
           try {
@@ -480,8 +497,8 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
             ZipUtil.unpack(zipFile.right(), outDir, StandardCharsets.UTF_8);
           } catch (Exception ex) {
             throw new MojoExecutionException(
-                "Can't unpack dependency archive '" + zipFile.right().getName() +
-                    "' into folder '" + targetFolder + '\'', ex);
+                    "Can't unpack dependency archive '" + zipFile.right().getName() +
+                            "' into folder '" + targetFolder + '\'', ex);
           }
         }
       }
@@ -494,13 +511,13 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
   private boolean unzipSrcFoldersContent(@Nonnull final File artifactZip,
                                          @Nonnull final File targetFolder) {
     final byte[] buildFolderListFile =
-        ZipUtil.unpackEntry(artifactZip, GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE);
+            ZipUtil.unpackEntry(artifactZip, GolangMvnInstallMojo.MVNGOLANG_BUILD_FOLDERS_FILE);
     if (buildFolderListFile == null) {
       return false;
     } else {
       final List<String> folderList = new ArrayList<>();
       for (final String folder : new String(buildFolderListFile, StandardCharsets.UTF_8)
-          .split("\\n")) {
+              .split("\\n")) {
         final String trimmed = folder.trim();
         if (trimmed.isEmpty()) {
           continue;
