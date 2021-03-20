@@ -1,0 +1,7 @@
+azul3d.org/engine v0.0.0-20180624221640-25c8eab2d474 h1:HrLWoqa15YkXa5jtwSRy7mEmmO9ZOPEFe0uMNmH+iyI=
+azul3d.org/engine v0.0.0-20180624221640-25c8eab2d474/go.mod h1:3y1cwzJTKvXXop+EAg+AUVfNm3bfHf3djeX+l1UBuUE=
+azul3d.org/examples v0.0.0-20170219024453-39fa3be83226 h1:xgmG3cM8LmSAfPiQhvOZp5JNqOgPr+Kb6wF5o1H5RHQ=
+azul3d.org/examples v0.0.0-20170219024453-39fa3be83226/go.mod h1:ggGp3QbtOy/bIBpAnqnmPMF3tl+rnGb3BlFA663bdnI=
+github.com/azul3d/engine v0.0.0-20180624221640-25c8eab2d474/go.mod h1:XJaK+eQA5QZRq/Y8jYtJnUGhqAfHxG3z2PgwiHvE2BA=
+github.com/go-gl/glfw v0.0.0-20210311203641-62640a716d48 h1:2Ql7UigDMdlF+Ii12kdox7RKw3J1+uGhXn9FyYbbd20=
+github.com/go-gl/glfw v0.0.0-20210311203641-62640a716d48/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=

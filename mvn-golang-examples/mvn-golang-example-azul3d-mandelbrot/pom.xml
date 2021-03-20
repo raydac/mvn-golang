@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>mvn-golang-example-azul3d-mandelbrot</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>mvn-golang</packaging>
+
+  <name>Azul3d mandelbrot example</name>
+  <description>Example of Azul3d mandelbrot project build.</description>
+
+  <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}${file.separator}resources</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+          <moduleMode>true</moduleMode>
+          <mod>mod</mod>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-fix</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
