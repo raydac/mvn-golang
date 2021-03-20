@@ -20,4 +20,3 @@ buildNumber.properties
 .settings
 .project
 .classpath
-*.sum
