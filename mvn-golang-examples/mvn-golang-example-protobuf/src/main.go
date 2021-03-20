@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"log"
-	"protoexample"
+	protoexample "protoexample/github.com/raydac"
 )
 
 func main() {

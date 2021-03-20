@@ -1,6 +1,7 @@
 syntax="proto3";
 
 package protoexample;
+option go_package="github.com/raydac";
 
 message Person {
       string name = 1;
