@@ -76,6 +76,7 @@
     <module>mvn-golang-example-maven-module-mix</module>
     <module>mvn-golang-example-protobuf</module>
     <module>mvn-golang-example-azul3d-mandelbrot</module>
+    <module>mvn-golang-example-oak-shooter</module>
     <module>test-git-cvs</module>
   </modules>
 </project>
