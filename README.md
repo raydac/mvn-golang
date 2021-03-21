@@ -11,6 +11,7 @@
 
 __2.3.8 (SNAPSHOT)
 
+- added [Azul3D](https://azul3d.org/) and [Oak](https://github.com/oakmound/oak) build examples
 - added `list` mojo wrapping `go list`
 - added `mod` property for module aware commands
 - go.sum excluded from delete during build by default [#84](https://github.com/raydac/mvn-golang/issues/84)
