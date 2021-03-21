@@ -20,7 +20,7 @@ public abstract class AbstractModuleAware extends AbstractGoPackageAndDependency
    * @since 2.3.8
    */
   @Parameter(name = "mod")
-  private String mod = null;
+  protected String mod = null;
 
   @Nullable
   public String getMod() {
@@ -32,19 +32,23 @@ public abstract class AbstractModuleAware extends AbstractGoPackageAndDependency
   @MustNotContainNull
   public final String[] getCommandFlags() {
     final List<String> result = new ArrayList<>();
+    Collections.addAll(result, this.getAdditionalCommandFlags());
 
     final String moduleMod = this.getMod();
-    if (moduleMod != null  && moduleMod.trim().length() != 0) {
-      this.getLog().debug("Detected mod value: " + moduleMod);
-      result.add(String.format("-mod=%s", moduleMod.trim()));
+    if (moduleMod != null && moduleMod.trim().length() != 0) {
+      if (result.stream().anyMatch(x -> x.startsWith("-mod="))) {
+        this.getLog().warn("Detected direct 'mod' flag, configuration 'mod' option will be ignored");
+      } else {
+        this.getLog().debug("Detected mod value: " + moduleMod);
+        result.add(0, String.format("-mod=%s", moduleMod.trim()));
+      }
     }
-    Collections.addAll(result, this.getAdditionalCommandFlags());
     return result.toArray(new String[0]);
   }
 
   @Nonnull
   @MustNotContainNull
-  protected String [] getAdditionalCommandFlags() {
+  protected String[] getAdditionalCommandFlags() {
     return ArrayUtils.EMPTY_STRING_ARRAY;
   }
 
