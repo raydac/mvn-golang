@@ -1,8 +1,12 @@
-# __2.3.8 (SNAPSHOT)
+# __2.3.8 (22-mar-2021)
+
+- improved maven archetypes
+- default GoSDK version is 1.16.2
 - added [Azul3D](https://azul3d.org/) and [Oak](https://github.com/oakmound/oak) build examples
 - added `list` mojo wrapping `go list`
 - added `mod` property for module aware commands
 - go.sum excluded from delete during build by default [#84](https://github.com/raydac/mvn-golang/issues/84)
+- minor refactoring
 
 # __2.3.7 (22-feb-2021)__
 
