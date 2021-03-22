@@ -53,5 +53,20 @@
   
   <build>
     <defaultGoal>clean package</defaultGoal>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.igormaznitsa</groupId>
+          <artifactId>mvn-golang-wrapper</artifactId>
+          <version>${dollar}{go.wrapper.plugin.version}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <env>
+              <GO111MODULE>off</GO111MODULE>
+            </env>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

@@ -41,15 +41,6 @@
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>${dollar}{go.wrapper.plugin.version}</version>
-        <extensions>true</extensions>
-        <configuration>
-          <configuration>
-            <env>
-              <GO111MODULE>off</GO111MODULE>
-            </env>
-          </configuration>
-        </configuration>
       </plugin>
     </plugins>
   </build>
