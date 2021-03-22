@@ -208,7 +208,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
       } else {
         if (buildFolders.isEmpty()) {
           this.getLog().warn(
-                  "Skip build source folder list descriptor because there is not any source or resource folders to be used for build");
+                  "Skip build source folder list descriptor because there is not either source or resource folder for build");
         } else {
           final String rooPath = FilenameUtils
                   .separatorsToUnix(FilenameUtils.normalize(folderToPack.getAbsolutePath()));

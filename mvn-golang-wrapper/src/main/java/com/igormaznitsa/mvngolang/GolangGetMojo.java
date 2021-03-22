@@ -456,7 +456,7 @@ public class GolangGetMojo extends AbstractModuleAware {
     final String[] packages = getTailArguments();
     final boolean result;
     if (packages.length == 0) {
-      getLog().info("There are no packages to get");
+      getLog().info("There are no packages directly provided as tail arguments");
       result = true;
     } else {
       result = super.isMojoMustNotBeExecuted();
@@ -753,7 +753,7 @@ public class GolangGetMojo extends AbstractModuleAware {
 
       if (deletedInstances > 0) {
         try {
-          getLog().info("1.5 second delay to be visible by systems analyzing file time stamp");
+          getLog().info("making 1.5 second delay to provide time for host-OS to analyze file time stamp");
           Thread.sleep(1500L);
         } catch (InterruptedException ex) {
           throw new MojoExecutionException("Interrupted");

@@ -456,6 +456,9 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     }
 
     for (final Tuple<Artifact, File> zipFile : zippedArtifacts) {
+      if (this.isVerbose()) {
+        this.getLog().info("mvn-golang dependency: " + zipFile.left());
+      }
       final File outDir =
               new File(targetFolder, FilenameUtils.getBaseName(zipFile.right().getName()));
 

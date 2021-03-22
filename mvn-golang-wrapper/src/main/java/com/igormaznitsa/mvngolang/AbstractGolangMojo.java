@@ -2033,7 +2033,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         } else {
           final File gomodFolder = foundGoMods.get(0).getParentFile();
           this.getLog().info(String
-                  .format("Detected module folder '%s' to be used as working folder", gomodFolder));
+                  .format("Detected module folder '%s' in use as working folder", gomodFolder));
           return gomodFolder;
         }
       } else {
