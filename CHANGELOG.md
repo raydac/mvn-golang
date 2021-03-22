@@ -1,4 +1,4 @@
-# __2.3.8 (22-mar-2021)
+# __2.3.8 (22-mar-2021)__
 
 - improved maven archetypes
 - default GoSDK version is 1.16.2
