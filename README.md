@@ -9,6 +9,10 @@
 
 # Changelog
 
+__2.3.9 (SNAPSHOT)__
+
+- added autodetect for aarch64 [#87](https://github.com/raydac/mvn-golang/issues/87)
+
 __2.3.8 (22-mar-2021)__
 
 - improved maven archetypes

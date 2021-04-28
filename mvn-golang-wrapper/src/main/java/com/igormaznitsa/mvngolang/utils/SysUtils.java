@@ -16,10 +16,11 @@
 
 package com.igormaznitsa.mvngolang.utils;
 
-import java.util.Locale;
+import org.apache.commons.lang3.SystemUtils;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.SystemUtils;
+import java.util.Locale;
 
 /**
  * Class contains some auxiliary system related methods.
@@ -55,7 +56,7 @@ public final class SysUtils {
       return "ppc64le";
     } else if (arch.contains("armv6l")) {
       return "armv6l";
-    } else if (arch.contains("arm64")) {
+    } else if (arch.contains("arm64") || arch.contains("aarch64")) {
       return "arm64";
     } else if (arch.contains("s390")) {
       return "s390x";
