@@ -1,3 +1,8 @@
+# __2.3.9 (SNAPSHOT)__
+
+- default GoSDK version is 1.16.4
+- added autodetect for aarch64 [#87](https://github.com/raydac/mvn-golang/issues/87)
+
 # __2.3.8 (22-mar-2021)__
 
 - improved maven archetypes
@@ -11,8 +16,7 @@
 # __2.3.7 (22-feb-2021)__
 
 - refactoring, improved informing about file log state [#83](https://github.com/raydac/mvn-golang/issues/83)
-- improved `build` mojo, added support to attach build result as project
-  artifact[#82](https://github.com/raydac/mvn-golang/issues/82)
+- improved `build` mojo, added support to attach build result as project artifact[#82](https://github.com/raydac/mvn-golang/issues/82)
 - default version of GoSDK updated to 1.15.8
 - fixed slash processing in go.mod under windows [#80](https://github.com/raydac/mvn-golang/issues/80) (
   thanks [fmazoyer](https://github.com/fmazoyer))

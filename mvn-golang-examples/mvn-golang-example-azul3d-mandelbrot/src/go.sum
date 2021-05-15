@@ -5,3 +5,5 @@ azul3d.org/examples v0.0.0-20170219024453-39fa3be83226/go.mod h1:ggGp3QbtOy/bIBp
 github.com/azul3d/engine v0.0.0-20180624221640-25c8eab2d474/go.mod h1:XJaK+eQA5QZRq/Y8jYtJnUGhqAfHxG3z2PgwiHvE2BA=
 github.com/go-gl/glfw v0.0.0-20210311203641-62640a716d48 h1:2Ql7UigDMdlF+Ii12kdox7RKw3J1+uGhXn9FyYbbd20=
 github.com/go-gl/glfw v0.0.0-20210311203641-62640a716d48/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
+github.com/go-gl/glfw v0.0.0-20210410170116-ea3d685f79fb h1:yMlfD+jmoG8wwBVLaFwtcgNBY207iWsYwtNC9u+T2yk=
+github.com/go-gl/glfw v0.0.0-20210410170116-ea3d685f79fb/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
