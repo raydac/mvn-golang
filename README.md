@@ -11,7 +11,7 @@
 
 __2.3.9 (SNAPSHOT)__
 
-- default GoSDK version is 1.16.4
+- default GoSDK version is 1.16.5
 - added autodetect for aarch64 [#87](https://github.com/raydac/mvn-golang/issues/87)
 
 __2.3.8 (22-mar-2021)__
