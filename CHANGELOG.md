@@ -1,5 +1,7 @@
 # __2.3.9 (SNAPSHOT)__
 
+- fix for seldom error "Can't create temp folder" when building modules
+  concurrently [#88](https://github.com/raydac/mvn-golang/issues/88)
 - default GoSDK version is 1.16.5
 - added autodetect for aarch64 [#87](https://github.com/raydac/mvn-golang/issues/87)
 
