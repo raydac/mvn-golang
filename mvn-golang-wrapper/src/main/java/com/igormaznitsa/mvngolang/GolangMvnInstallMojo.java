@@ -166,7 +166,7 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
       throw new IOException("Can't delete file : " + resultZip);
     }
 
-    final File folderToPack = new File(".tmp_pack_folder_" +
+    final File folderToPack = new File(buildFolder, ".tmp_pack_folder_" +
             Long.toHexString(System.currentTimeMillis()).toUpperCase(Locale.ENGLISH));
     if (folderToPack.isDirectory()) {
       FileUtils.deleteDirectory(folderToPack);
