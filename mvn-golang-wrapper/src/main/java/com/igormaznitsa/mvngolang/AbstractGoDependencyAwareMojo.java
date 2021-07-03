@@ -323,6 +323,7 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
       try {
         foundArtifacts = MavenUtils.scanForMvnGoArtifacts(
                 this.getProject(),
+                this.isIgnoreNonResolvableArtifact(),
                 this.isIncludeTestDependencies(),
                 this,
                 this.getSession(),
@@ -365,6 +366,10 @@ public abstract class AbstractGoDependencyAwareMojo extends AbstractGolangMojo {
     } else {
       getLog().info("Maven dependency scanning is off");
     }
+  }
+
+  public boolean isIgnoreNonResolvableArtifact() {
+    return false;
   }
 
   private void restoreGoModFromBackupAndRemoveBackup(@Nonnull final File folder)

@@ -20,18 +20,6 @@ import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mvngolang.AbstractGolangMojo;
 import com.igormaznitsa.mvngolang.GolangMvnInstallMojo;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -48,6 +36,14 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.zeroturnaround.zip.ZipUtil;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Auxiliary methods to work with maven entities.
@@ -148,6 +144,7 @@ public final class MavenUtils {
    * project.
    *
    * @param mavenProject            maven project, must not be null
+   * @param ignoreNonResolvedArtifact   if true then missing artifact will be ignored, otherwise exception will be thrown
    * @param includeTestDependencies flag to process dependencies marked for test
    *                                phases
    * @param mojo                    calling mojo, must not be null
@@ -162,13 +159,14 @@ public final class MavenUtils {
   @Nonnull
   @MustNotContainNull
   public static List<Tuple<Artifact, File>> scanForMvnGoArtifacts(
-      @Nonnull final MavenProject mavenProject,
-      final boolean includeTestDependencies,
-      @Nonnull final AbstractMojo mojo,
-      @Nonnull final MavenSession session,
-      @Nonnull final MojoExecution execution,
-      @Nonnull final ArtifactResolver resolver,
-      @Nonnull @MustNotContainNull final List<ArtifactRepository> remoteRepositories
+          @Nonnull final MavenProject mavenProject,
+          final boolean ignoreNonResolvedArtifact,
+          final boolean includeTestDependencies,
+          @Nonnull final AbstractMojo mojo,
+          @Nonnull final MavenSession session,
+          @Nonnull final MojoExecution execution,
+          @Nonnull final ArtifactResolver resolver,
+          @Nonnull @MustNotContainNull final List<ArtifactRepository> remoteRepositories
   ) throws ArtifactResolverException {
     final List<Tuple<Artifact, File>> result = new ArrayList<>();
 //    final String phase = execution.getLifecyclePhase();
@@ -190,17 +188,27 @@ public final class MavenUtils {
         }
 
         if (artifact.getType().equals(AbstractGolangMojo.GOARTIFACT_PACKAGING)) {
-          final ArtifactResult artifactResult = resolver.resolveArtifact(
-              makeResolveArtifactProjectBuildingRequest(session, remoteRepositories), artifact);
+          final ArtifactResult artifactResult;
+          try {
+            artifactResult = resolver.resolveArtifact(
+                    makeResolveArtifactProjectBuildingRequest(session, remoteRepositories), artifact);
+          } catch (ArtifactResolverException ex) {
+            if (ignoreNonResolvedArtifact) {
+              mojo.getLog().debug("Can't resolve artifact: " + artifact, ex);
+              continue;
+            } else {
+              throw ex;
+            }
+          }
           final File zipFilePath = artifactResult.getArtifact().getFile();
 
           mojo.getLog().debug(
-              "Detected MVN-GOLANG marker inside ZIP dependency: " + artifact.getGroupId() + ':' +
-                  artifact.getArtifactId() + ':' + artifact.getVersion() + ':' +
-                  artifact.getType());
+                  "Detected MVN-GOLANG marker inside ZIP dependency: " + artifact.getGroupId() + ':' +
+                          artifact.getArtifactId() + ':' + artifact.getVersion() + ':' +
+                          artifact.getType());
 
           if (ZipUtil
-              .containsEntry(zipFilePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE)) {
+                  .containsEntry(zipFilePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE)) {
             final byte[] artifactFlagFile = ZipUtil
                 .unpackEntry(zipFilePath, GolangMvnInstallMojo.MVNGOLANG_DEPENDENCIES_FILE,
                     StandardCharsets.UTF_8);
