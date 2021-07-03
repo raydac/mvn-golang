@@ -11,6 +11,8 @@
 
 __2.3.9 (SNAPSHOT)__
 
+- fix for clean fail for multi-module project if some artifacts
+  unresolvable [#90](https://github.com/raydac/mvn-golang/issues/90)
 - fix for seldom error "Can't create temp folder" when building modules
   concurrently [#88](https://github.com/raydac/mvn-golang/issues/88)
 - default GoSDK version is 1.16.5
