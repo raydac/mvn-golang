@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.FileUtils;
 /**
  * The Mojo wraps the 'clean' command.
  */
-@Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "clean", defaultPhase = LifecyclePhase.CLEAN, threadSafe = true)
 public class GolangCleanMojo extends AbstractGoPackageAndDependencyAwareMojo {
 
   /**
