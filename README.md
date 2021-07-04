@@ -2,47 +2,26 @@
 
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Java 8.0+](https://img.shields.io/badge/java-8.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.3.8|jar)
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.3.9|jar)
 [![Maven 3.0.3+](https://img.shields.io/badge/maven-3.0.3%2b-green.svg)](https://maven.apache.org/)
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-cyan.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
 [![YooMoney donation](https://img.shields.io/badge/donation-Yoo.money-blue.svg)](https://yoomoney.ru/to/41001158080699)
 
 # Changelog
 
-__2.3.9 (SNAPSHOT)__
+__2.3.9 (04-jul-2021)__
 
-- fix for clean fail for multi-module project if some artifacts
-  unresolvable [#90](https://github.com/raydac/mvn-golang/issues/90)
-- fix for seldom error "Can't create temp folder" when building modules
-  concurrently [#88](https://github.com/raydac/mvn-golang/issues/88)
+- fix for clean fail for multi-module project if some artifacts unresolvable [#90](https://github.com/raydac/mvn-golang/issues/90)
+- fix for seldom error "Can't create temp folder" when building modules concurrently [#88](https://github.com/raydac/mvn-golang/issues/88)
 - default GoSDK version is 1.16.5
 - added autodetect for aarch64 [#87](https://github.com/raydac/mvn-golang/issues/87)
-
-__2.3.8 (22-mar-2021)__
-
-- improved maven archetypes
-- default GoSDK version is 1.16.2
-- added [Azul3D](https://azul3d.org/) and [Oak](https://github.com/oakmound/oak) build examples
-- added `list` mojo wrapping `go list`
-- added `mod` property for module aware commands
-- go.sum excluded from delete during build by default [#84](https://github.com/raydac/mvn-golang/issues/84)
-- minor refactoring
-
-__2.3.7 (22-feb-2021)__
-
-- refactoring, improved informing about file log state [#83](https://github.com/raydac/mvn-golang/issues/83)
-- improved `build` mojo, added support to attach build result as project
-  artifact[#82](https://github.com/raydac/mvn-golang/issues/82)
-- default version of GoSDK updated to 1.15.8
-- fixed slash processing in go.mod under windows [#80](https://github.com/raydac/mvn-golang/issues/80) (
-  thanks [fmazoyer](https://github.com/fmazoyer))
 
 [full changelog](https://github.com/raydac/mvn-golang/blob/master/CHANGELOG.md)
 
 # GO start!
 __Taste Go in just two commands!__
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.3.8 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello -DarchetypeVersion=2.3.9 -DgroupId=com.go.test -DartifactId=gohello -Dversion=1.0-SNAPSHOT
 mvn -f ./gohello/pom.xml package
 ```
 The First command in th snippet above generates a maven project with some test files and the second command builds the project.
@@ -50,7 +29,7 @@ The First command in th snippet above generates a maven project with some test f
 
 If you want to generate a multi-module project, then you can use such snippet
 ```
-mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.3.8 -DgroupId=com.go.test -DartifactId=gohello-multi -Dversion=1.0-SNAPSHOT
+mvn archetype:generate -B -DarchetypeGroupId=com.igormaznitsa -DarchetypeArtifactId=mvn-golang-hello-multi -DarchetypeVersion=2.3.9 -DgroupId=com.go.test -DartifactId=gohello-multi -Dversion=1.0-SNAPSHOT
 ```
 
 # Introduction
@@ -90,7 +69,7 @@ Below described build section for simple golang project which keeps source in `s
       <plugin>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>mvn-golang-wrapper</artifactId>
-        <version>2.3.8</version>
+        <version>2.3.9</version>
         <extensions>true</extensions>
         <executions>
           <execution>
