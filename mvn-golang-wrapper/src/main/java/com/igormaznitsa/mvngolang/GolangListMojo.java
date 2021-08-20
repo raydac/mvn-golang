@@ -79,6 +79,10 @@ public class GolangListMojo extends AbstractModuleAware {
     }
 
     if (this.isJson()) {
+      if (result.contains("-f")) {
+        this.getLog().warn("Since GoSDK 1.17, options '-f' and '-json' can't be presented together in the same time");
+      }
+
       if (result.contains("-json")) {
         this.getLog().warn("Json flag ignored because detected already defined '-json' option");
       } else {
