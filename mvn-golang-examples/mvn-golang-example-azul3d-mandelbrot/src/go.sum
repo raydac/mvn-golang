@@ -1,5 +1,7 @@
 azul3d.org/engine v0.0.0-20180624221640-25c8eab2d474 h1:HrLWoqa15YkXa5jtwSRy7mEmmO9ZOPEFe0uMNmH+iyI=
 azul3d.org/engine v0.0.0-20180624221640-25c8eab2d474/go.mod h1:3y1cwzJTKvXXop+EAg+AUVfNm3bfHf3djeX+l1UBuUE=
+azul3d.org/engine v0.0.0-20211024043305-793ea6c2839d h1:oLr8Nu7iEKm8OKfHNznBnBj8Z/SKBa20yl7JKqJn4W8=
+azul3d.org/engine v0.0.0-20211024043305-793ea6c2839d/go.mod h1:3y1cwzJTKvXXop+EAg+AUVfNm3bfHf3djeX+l1UBuUE=
 azul3d.org/examples v0.0.0-20170219024453-39fa3be83226 h1:xgmG3cM8LmSAfPiQhvOZp5JNqOgPr+Kb6wF5o1H5RHQ=
 azul3d.org/examples v0.0.0-20170219024453-39fa3be83226/go.mod h1:ggGp3QbtOy/bIBpAnqnmPMF3tl+rnGb3BlFA663bdnI=
 github.com/azul3d/engine v0.0.0-20180624221640-25c8eab2d474/go.mod h1:XJaK+eQA5QZRq/Y8jYtJnUGhqAfHxG3z2PgwiHvE2BA=
@@ -9,3 +11,5 @@ github.com/go-gl/glfw v0.0.0-20210410170116-ea3d685f79fb h1:yMlfD+jmoG8wwBVLaFwt
 github.com/go-gl/glfw v0.0.0-20210410170116-ea3d685f79fb/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw v0.0.0-20210715014612-ab6297867137 h1:2aB3ABFHtLwpLF3EIMAzv757PfpJ0o8auPE4WW9u5Cc=
 github.com/go-gl/glfw v0.0.0-20210715014612-ab6297867137/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
+github.com/go-gl/glfw v0.0.0-20211024062804-40e447a793be h1:oYR4JFQpVEKyqRCJB8wsdDLUJ2i+MrEFSGiKQyueTtY=
+github.com/go-gl/glfw v0.0.0-20211024062804-40e447a793be/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
