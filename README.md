@@ -9,7 +9,7 @@
 
 # Changelog
 
-# __2.3.10 (SNAPSHOT)__
+__2.3.10 (SNAPSHOT)__
 
 - default GoSDK version is 1.17.3
 
