@@ -11,7 +11,7 @@
 
 __2.3.10 (SNAPSHOT)__
 
-- default GoSDK version is 1.17.6
+- default GoSDK version is 1.17.7
 
 __2.3.9 (04-jul-2021)__
 
