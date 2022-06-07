@@ -6,15 +6,15 @@
   <parent>
     <groupId>com.igormaznitsa</groupId>
     <artifactId>mvn-golang</artifactId>
-    <version>2.3.10-SNAPSHOT</version>
+    <version>2.3.10</version>
   </parent>
   
   <groupId>com.igormaznitsa</groupId>
   <artifactId>mvn-golang-hello-multi</artifactId>
   <packaging>jar</packaging>
   
-  <name>Maven GoLang Multimodule archetype</name>
-  <description>Archetype generates a sample multimodule mvn-golang project</description>
+  <name>Maven GoLang Multi-module archetype</name>
+  <description>Archetype generates a sample multi-module mvn-golang project</description>
   
   <profiles>
     <profile>

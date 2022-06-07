@@ -1,8 +1,9 @@
-# __2.3.10 (SNAPSHOT)__
+# __2.3.10 (08-jun-2022)__
 
+- updated dependencies
 - default GoSDK version is 1.18.3
 
-# __2.3.9 (04-jl-2021)__
+# __2.3.9 (04-jul-2021)__
 
 - fix for clean fail for multi-module project if some artifacts
   unresolvable [#90](https://github.com/raydac/mvn-golang/issues/90)
