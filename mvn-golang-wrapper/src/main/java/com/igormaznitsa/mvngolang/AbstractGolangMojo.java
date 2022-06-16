@@ -586,7 +586,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return GetUtils.ensureNonNull(result, "");
   }
 
-  private static boolean tryRenameFolder(final File sourceFolder, final File targetFolder,
+  private static boolean tryRenameFolder(@Nonnull final File sourceFolder, @Nonnull final File targetFolder,
                                          final int attempts, final long retryDelayMs) {
     boolean result = false;
     for (int i = 0; i < attempts && !result; i++) {
