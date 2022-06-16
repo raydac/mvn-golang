@@ -16,6 +16,9 @@
 
 package com.igormaznitsa.mvngolang;
 
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static com.igormaznitsa.mvngolang.utils.MavenUtils.findProperty;
+
 import com.igormaznitsa.meta.annotation.LazyInited;
 import com.igormaznitsa.meta.annotation.MayContainNull;
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
@@ -23,13 +26,60 @@ import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.meta.common.utils.ArrayUtils;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.meta.common.utils.StrUtils;
-import com.igormaznitsa.mvngolang.utils.*;
+import com.igormaznitsa.mvngolang.utils.IOUtils;
+import com.igormaznitsa.mvngolang.utils.ProxySettings;
+import com.igormaznitsa.mvngolang.utils.SysUtils;
+import com.igormaznitsa.mvngolang.utils.UnpackUtils;
+import com.igormaznitsa.mvngolang.utils.WildCardMatcher;
+import com.igormaznitsa.mvngolang.utils.XGoogHashHeader;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.net.InetAddress;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -72,30 +122,6 @@ import org.xml.sax.SAXException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Pattern;
-
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import static com.igormaznitsa.mvngolang.utils.MavenUtils.findProperty;
-
 public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public static final String GOARTIFACT_PACKAGING = "mvn-golang";
@@ -108,21 +134,21 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
    */
   public static final String NAME_PATTERN = "go%s.%s-%s%s";
   private static final List<String> ALLOWED_SDKARCHIVE_CONTENT_TYPE = Collections.unmodifiableList(
-          Arrays.asList("application/octet-stream", "application/zip", "application/x-tar",
-                  "application/x-gzip"));
+      Arrays.asList("application/octet-stream", "application/zip", "application/x-tar",
+          "application/x-gzip"));
   private static final ReentrantLock LOCKER = new ReentrantLock();
   private static final String[] BANNER =
-          new String[]{"______  ___             _________     ______",
-                  "___   |/  /__   __________  ____/________  / ______ ______________ _",
-                  "__  /|_/ /__ | / /_  __ \\  / __ _  __ \\_  /  _  __ `/_  __ \\_  __ `/",
-                  "_  /  / / __ |/ /_  / / / /_/ / / /_/ /  /___/ /_/ /_  / / /  /_/ / ",
-                  "/_/  /_/  _____/ /_/ /_/\\____/  \\____//_____/\\__,_/ /_/ /_/_\\__, /",
-                  "                                                           /____/",
-                  "                  https://github.com/raydac/mvn-golang",
-                  ""
-          };
+      new String[] {"______  ___             _________     ______",
+          "___   |/  /__   __________  ____/________  / ______ ______________ _",
+          "__  /|_/ /__ | / /_  __ \\  / __ _  __ \\_  /  _  __ `/_  __ \\_  __ `/",
+          "_  /  / / __ |/ /_  / / / /_/ / / /_/ /  /___/ /_/ /_  / / /  /_/ / ",
+          "/_/  /_/  _____/ /_/ /_/\\____/  \\____//_____/\\__,_/ /_/ /_/_\\__, /",
+          "                                                           /____/",
+          "                  https://github.com/raydac/mvn-golang",
+          ""
+      };
   private static final Pattern GOBINFOLDER_PATTERN = Pattern
-          .compile("(?:\\\\|/)go[0-9\\-\\+.]*(?:\\\\|/)bin(?:\\\\|/)?$", Pattern.CASE_INSENSITIVE);
+      .compile("(?:\\\\|/)go[0-9\\-\\+.]*(?:\\\\|/)bin(?:\\\\|/)?$", Pattern.CASE_INSENSITIVE);
   /**
    * set of flags to be ignored among build and extra build flags, for inside
    * use
@@ -470,7 +496,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       result = result.substring(1);
     }
     if (!result.isEmpty() &&
-            (result.charAt(result.length() - 1) == '/' || result.charAt(result.length() - 1) == '\\')) {
+        (result.charAt(result.length() - 1) == '/' || result.charAt(result.length() - 1) == '\\')) {
       result = result.substring(0, result.length() - 1);
     }
     return result;
@@ -560,6 +586,28 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     return GetUtils.ensureNonNull(result, "");
   }
 
+  private static boolean tryRenameFolder(final File sourceFolder, final File targetFolder,
+                                         final int attempts, final long retryDelayMs) {
+    boolean result = false;
+    for (int i = 0; i < attempts && !result; i++) {
+      result = sourceFolder.renameTo(targetFolder);
+      if (!result && i < attempts - 1) {
+        try {
+          Thread.sleep(retryDelayMs);
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          return false;
+        }
+      }
+    }
+    return result;
+  }
+
+  @Nullable
+  private static String nullIfBlank(@Nullable final String text) {
+    return text == null || text.trim().isEmpty() ? null : text;
+  }
+
   @Nullable
   public final String getWorkingDir() {
     return this.workingDir;
@@ -571,7 +619,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public boolean isModuleMode() {
     return Boolean
-            .parseBoolean(findMvnProperty("mvn.golang.module.mode", Boolean.toString(this.moduleMode)));
+        .parseBoolean(findMvnProperty("mvn.golang.module.mode", Boolean.toString(this.moduleMode)));
   }
 
   public void setModuleMode(final boolean value) {
@@ -581,7 +629,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   public ArtifactResolver getArtifactResolver() {
     return assertNotNull("Artifact resolver component is not provided by Maven",
-            this.artifactResolver);
+        this.artifactResolver);
   }
 
   @Nonnull
@@ -603,7 +651,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private String makeSessionLockFileName() {
     final String id =
-            Long.toHexString(this.getSession().getStartTime().getTime()).toUpperCase(Locale.ENGLISH);
+        Long.toHexString(this.getSession().getStartTime().getTime()).toUpperCase(Locale.ENGLISH);
     return ".#mvn.go.session.lock." + id;
   }
 
@@ -630,7 +678,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         locked = lockFile.createNewFile();
       } catch (IOException ex) {
         throw new MojoExecutionException(
-                "Detected error during attempt to make locker file: " + lockFile, ex);
+            "Detected error during attempt to make locker file: " + lockFile, ex);
       }
 
       if (locked) {
@@ -671,10 +719,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   private File loadSDKAndUnpackIntoCache(
-          @Nullable final ProxySettings proxySettings,
-          @Nonnull final File cacheFolder,
-          @Nonnull final String baseSdkName,
-          final boolean notLoadIfNotInCache
+      @Nullable final ProxySettings proxySettings,
+      @Nonnull final File cacheFolder,
+      @Nonnull final String baseSdkName,
+      final boolean notLoadIfNotInCache
   ) throws IOException, MojoExecutionException {
     synchronized (AbstractGolangMojo.class) {
       final File sdkFolder = new File(cacheFolder, baseSdkName);
@@ -706,9 +754,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           return sdkFolder;
         } else if (notLoadIfNotInCache || this.session.isOffline()) {
           this.getLog().error(
-                  "Can't find cached Golang SDK and downloading is disabled or Maven in offline mode");
+              "Can't find cached Golang SDK and downloading is disabled or Maven in offline mode");
           throw new IOException(
-                  "Can't find " + baseSdkName + " in the cache but loading is directly disabled");
+              "Can't find " + baseSdkName + " in the cache but loading is directly disabled");
         }
 
         final String predefinedLink = this.getSdkDownloadUrl();
@@ -731,7 +779,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
         if (archiveFile.exists()) {
           this.logOptionally(
-                  "Detected existing archive " + archiveFile + ", deleting it and reload");
+              "Detected existing archive " + archiveFile + ", deleting it and reload");
           if (!archiveFile.delete()) {
             throw new IOException("Can't delete archive file: " + archiveFile);
           }
@@ -739,8 +787,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
         final HttpGet methodGet = new HttpGet(linkForDownloading);
         final RequestConfig config =
-                this.processRequestConfig(proxySettings, this.getConnectionTimeout(),
-                        RequestConfig.custom()).build();
+            this.processRequestConfig(proxySettings, this.getConnectionTimeout(),
+                RequestConfig.custom()).build();
         methodGet.setConfig(config);
 
         boolean errorsDuringLoading = true;
@@ -757,12 +805,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
             if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
               throw new IOException(String
-                      .format("Can't load SDK archive from %s : %d %s", linkForDownloading,
-                              statusLine.getStatusCode(), statusLine.getReasonPhrase()));
+                  .format("Can't load SDK archive from %s : %d %s", linkForDownloading,
+                      statusLine.getStatusCode(), statusLine.getReasonPhrase()));
             }
 
             final XGoogHashHeader xGoogHash =
-                    new XGoogHashHeader(response.getHeaders("x-goog-hash"));
+                new XGoogHashHeader(response.getHeaders("x-goog-hash"));
             this.getLog().debug("XGoogHashHeader: " + xGoogHash);
 
             final HttpEntity entity = response.getEntity();
@@ -783,11 +831,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
               final String LOADING_TITLE = "Loading " + size / (1024L * 1024L) + " Mb ";
               if (showProgressBar) {
                 lastRenderedValue = IOUtils
-                        .printTextProgressBar(LOADING_TITLE, 0, size, PROGRESSBAR_WIDTH,
-                                lastRenderedValue);
+                    .printTextProgressBar(LOADING_TITLE, 0, size, PROGRESSBAR_WIDTH,
+                        lastRenderedValue);
               }
               final OutputStream fileOutStream =
-                      new BufferedOutputStream(new FileOutputStream(archiveFile), 128 * 16384);
+                  new BufferedOutputStream(new FileOutputStream(archiveFile), 128 * 16384);
               try {
                 while (!Thread.currentThread().isInterrupted()) {
                   final int readCounter = inStream.read(buffer);
@@ -798,8 +846,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
                   loadedCounter += readCounter;
                   if (showProgressBar) {
                     lastRenderedValue = IOUtils
-                            .printTextProgressBar(LOADING_TITLE, loadedCounter, size, PROGRESSBAR_WIDTH,
-                                    lastRenderedValue);
+                        .printTextProgressBar(LOADING_TITLE, loadedCounter, size, PROGRESSBAR_WIDTH,
+                            lastRenderedValue);
                   }
                 }
               } finally {
@@ -812,7 +860,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
                 throw new MojoExecutionException("Interrupted");
               }
               this.getLog().info("Archived SDK has been succesfully downloaded, its size is " +
-                      (archiveFile.length() / 1024L) + " Kb");
+                  (archiveFile.length() / 1024L) + " Kb");
             }
 
             if (this.isCheckSdkHash()) {
@@ -828,11 +876,11 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
               } else {
                 if (!xGoogHash.isValid()) {
                   throw new MojoExecutionException(
-                          "Couldn't parse x-goog-hash from response: " + response);
+                      "Couldn't parse x-goog-hash from response: " + response);
                 } else {
                   throw new MojoExecutionException(
-                          "Parsed x-goog-hash doesn't contain data but marked as valid one: " +
-                                  xGoogHash);
+                      "Parsed x-goog-hash doesn't contain data but marked as valid one: " +
+                          xGoogHash);
                 }
               }
             }
@@ -844,14 +892,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           errorsDuringLoading = false;
 
           final File interFolder =
-                  this.unpackArchToFolder(archiveFile, "go", new File(cacheFolder, ".#" + baseSdkName));
+              this.unpackArchToFolder(archiveFile, "go", new File(cacheFolder, ".#" + baseSdkName));
 
           this.getLog().info("Renaming " + interFolder.getName() + " to " + sdkFolder.getName());
-          if (interFolder.renameTo(sdkFolder)) {
+
+          if (tryRenameFolder(interFolder, sdkFolder, 3, 5000L)) {
             this.logOptionally("Renamed successfully: " + interFolder + " -> " + sdkFolder);
           } else {
             throw new IOException(
-                    "Can't rename temp GoSDK folder: " + interFolder + " -> " + sdkFolder);
+                "Can't rename temp GoSDK folder: " + interFolder + " -> " + sdkFolder);
           }
 
           return sdkFolder;
@@ -859,7 +908,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           methodGet.releaseConnection();
           if (errorsDuringLoading || !this.isKeepSdkArchive()) {
             this.logOptionally("Deleting archive : " + archiveFile +
-                    (errorsDuringLoading ? " (because error during loading)" : ""));
+                (errorsDuringLoading ? " (because error during loading)" : ""));
             deleteFileIfExists(archiveFile);
           } else {
             this.logOptionally("Archive file is kept for special flag : " + archiveFile);
@@ -886,12 +935,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public boolean isSkip() {
     final boolean result =
-            Boolean.parseBoolean(findMvnProperty("mvn.golang.skip", Boolean.toString(this.skip)));
+        Boolean.parseBoolean(findMvnProperty("mvn.golang.skip", Boolean.toString(this.skip)));
 
     final String skipMojoSuffix = this.getSkipMojoPropertySuffix();
     return skipMojoSuffix == null ? result : result
-            || Boolean.parseBoolean(
-            findMvnProperty(String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
+        || Boolean.parseBoolean(
+        findMvnProperty(String.format("mvn.golang.%s.skip", skipMojoSuffix), "false"));
   }
 
   public boolean isEnforceGoPathToEnd() {
@@ -989,7 +1038,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public boolean isVerbose() {
     return Boolean
-            .parseBoolean(findMvnProperty("mvn.golang.verbose", Boolean.toString(this.verbose)));
+        .parseBoolean(findMvnProperty("mvn.golang.verbose", Boolean.toString(this.verbose)));
   }
 
   public boolean isDisableSdkLoad() {
@@ -1006,8 +1055,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   public String[] getBuildFlags() {
     final List<String> result = new ArrayList<>();
     for (final String s : ArrayUtils
-            .joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY),
-                    getExtraBuildFlags())) {
+        .joinArrays(GetUtils.ensureNonNull(this.buildFlags, ArrayUtils.EMPTY_STRING_ARRAY),
+            getExtraBuildFlags())) {
       if (!this.buildFlagsToIgnore.contains(s)) {
         result.add(s);
       }
@@ -1074,7 +1123,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if (isSafeEmpty(result)) {
       if (isSafeEmpty(result)) {
         result = assertNotNull(String.format("Can't recognize OS: %s", SystemUtils.OS_NAME),
-                SysUtils.findGoSdkOsType());
+            SysUtils.findGoSdkOsType());
       }
     }
     return result;
@@ -1085,7 +1134,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     String result = this.arch;
     if (isSafeEmpty(result)) {
       result = assertNotNull(String.format("Can't recognize ARCH: %s", SystemUtils.OS_ARCH),
-              SysUtils.decodeGoSdkArchType(SystemUtils.OS_ARCH));
+          SysUtils.decodeGoSdkArchType(SystemUtils.OS_ARCH));
     }
     return result;
   }
@@ -1160,8 +1209,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   public boolean isDisableSslCheck() {
     return this.disableSSLcheck || Boolean.parseBoolean(
-            findProperty(this.getSession(), this.getProject(), "mvn.golang.disable.ssl.check",
-                    "false"));
+        findProperty(this.getSession(), this.getProject(), "mvn.golang.disable.ssl.check",
+            "false"));
   }
 
   public void setDisableSslCheck(final boolean flag) {
@@ -1213,11 +1262,6 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   @Nullable
-  private static String nullIfBlank(@Nullable final String text) {
-    return text == null || text.trim().isEmpty() ? null : text;
-  }
-
-  @Nullable
   private ProxySettings extractProxySettings() {
     final ProxySettings result;
     if (this.isUseMavenProxy()) {
@@ -1239,10 +1283,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
                                                      final int timeout,
                                                      @Nonnull final RequestConfig.Builder config) {
     this.getLog()
-            .debug("Connection(timeout=" + timeout + "ms, proxySettings=" + proxySettings + ')');
+        .debug("Connection(timeout=" + timeout + "ms, proxySettings=" + proxySettings + ')');
     if (proxySettings != null) {
       final HttpHost proxyHost =
-              new HttpHost(proxySettings.host, proxySettings.port, proxySettings.protocol);
+          new HttpHost(proxySettings.host, proxySettings.port, proxySettings.protocol);
       config.setProxy(proxyHost);
     }
     return config.setConnectTimeout(timeout).setSocketTimeout(timeout);
@@ -1251,15 +1295,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private String loadGoLangSdkList(@Nullable final ProxySettings proxySettings,
                                    @Nullable final String keyPrefix)
-          throws IOException, MojoExecutionException {
+      throws IOException, MojoExecutionException {
     final String sdksite = getSdkSite() + (keyPrefix == null ? "" : "?prefix=" + keyPrefix);
 
     getLog().warn("Loading list of available GoLang SDKs from " + sdksite);
     final HttpGet get = new HttpGet(sdksite);
 
     final RequestConfig config =
-            processRequestConfig(proxySettings, this.getConnectionTimeout(), RequestConfig.custom())
-                    .build();
+        processRequestConfig(proxySettings, this.getConnectionTimeout(), RequestConfig.custom())
+            .build();
     get.setConfig(config);
 
     get.addHeader("Accept", "application/xml");
@@ -1274,8 +1318,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         return content;
       } else {
         throw new IOException(String
-                .format("Can't load list of SDKs from %s : %d %s", sdksite, statusLine.getStatusCode(),
-                        statusLine.getReasonPhrase()));
+            .format("Can't load list of SDKs from %s : %d %s", sdksite, statusLine.getStatusCode(),
+                statusLine.getReasonPhrase()));
       }
     } finally {
       get.releaseConnection();
@@ -1284,7 +1328,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   private Document convertSdkListToDocument(@Nonnull final String sdkListAsString)
-          throws IOException {
+      throws IOException {
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -1333,16 +1377,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
                                   @Nonnull final String folderInArchive,
                                   @Nonnull final File destinationFolder) throws IOException {
     getLog().info(String.format("Unpacking archive %s to folder %s", archiveFile.getName(),
-            destinationFolder.getName()));
+        destinationFolder.getName()));
 
     boolean detectedError = true;
     try {
 
       final int unpackedFileCounter = UnpackUtils
-              .unpackFileToFolder(getLog(), folderInArchive, archiveFile, destinationFolder, true);
+          .unpackFileToFolder(getLog(), folderInArchive, archiveFile, destinationFolder, true);
       if (unpackedFileCounter == 0) {
         throw new IOException(
-                "Couldn't find folder '" + folderInArchive + "' in archive or the archive is empty");
+            "Couldn't find folder '" + folderInArchive + "' in archive or the archive is empty");
       } else {
         getLog().info("Unpacked " + unpackedFileCounter + " file(s)");
       }
@@ -1362,7 +1406,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   private String extractSDKFileName(@Nonnull final String listUrl, @Nonnull final Document doc,
                                     @Nonnull final String sdkBaseName,
                                     @Nonnull @MustNotContainNull final String[] allowedExtensions)
-          throws IOException {
+      throws IOException {
     getLog().debug("Looking for SDK started with base name : " + sdkBaseName);
 
     final Set<String> variants = new HashSet<>();
@@ -1391,7 +1435,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
       if (this.supposeSdkArchiveFileName) {
         final String supposedSdkName =
-                sdkBaseName + '.' + (SystemUtils.IS_OS_WINDOWS ? "zip" : "tar.gz");
+            sdkBaseName + '.' + (SystemUtils.IS_OS_WINDOWS ? "zip" : "tar.gz");
         getLog().warn("Can't find SDK file in the loaded list");
         getLog().debug("..................................................");
         for (final String s : listedSdk) {
@@ -1400,14 +1444,14 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         getLog().debug("..................................................");
 
         getLog().warn("Supposed name of SDK archive is " + supposedSdkName +
-                ", trying to load it directly! It can be disabled with <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>)");
+            ", trying to load it directly! It can be disabled with <supposeSdkArchiveFileName>false</supposeSdkArchiveFileName>)");
         return supposedSdkName;
       }
 
       getLog().error("Can't find any SDK to be used as " + sdkBaseName);
       getLog().error("GoLang list contains listed SDKs (" + listUrl + ")");
       getLog().error(
-              "It is possible directly define link to SDK through configuration parameter <sdkDownloadUrl>..</sdkDownloadUrl>");
+          "It is possible directly define link to SDK through configuration parameter <sdkDownloadUrl>..</sdkDownloadUrl>");
       getLog().error("..................................................");
       for (final String s : listedSdk) {
         getLog().error(s);
@@ -1422,13 +1466,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   private String findSdkArchiveFileName(@Nullable final ProxySettings proxySettings,
                                         @Nonnull final String sdkBaseName)
-          throws IOException, MojoExecutionException {
+      throws IOException, MojoExecutionException {
     String result = getSdkArchiveName();
     if (isSafeEmpty(result)) {
       final Document parsed = convertSdkListToDocument(
-              loadGoLangSdkList(proxySettings, URLEncoder.encode(sdkBaseName, "UTF-8")));
+          loadGoLangSdkList(proxySettings, URLEncoder.encode(sdkBaseName, "UTF-8")));
       result =
-              extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[]{"tar.gz", "zip"});
+          extractSDKFileName(getSdkSite(), parsed, sdkBaseName, new String[] {"tar.gz", "zip"});
     } else {
       getLog().info("SDK archive name is predefined : " + result);
     }
@@ -1450,7 +1494,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   protected File findGoRoot(@Nullable final ProxySettings proxySettings)
-          throws IOException, MojoFailureException, MojoExecutionException {
+      throws IOException, MojoFailureException, MojoExecutionException {
     final File result;
     LOCKER.lock();
     try {
@@ -1462,7 +1506,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         if (!cacheFolder.isDirectory()) {
           if (cacheFolder.isFile()) {
             throw new IOException("Can't create folder '" + cacheFolder +
-                    "' because there is presented a file with such name!");
+                "' because there is presented a file with such name!");
           }
           logOptionally("Making SDK cache folder : " + cacheFolder);
           FileUtils.forceMkdir(cacheFolder);
@@ -1472,18 +1516,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         final String sdkVersion = this.getGoVersion();
 
         this.getLog().debug(
-                String.format("SdkVersion = %s, osxVersion = %s", sdkVersion, definedOsxVersion));
+            String.format("SdkVersion = %s, osxVersion = %s", sdkVersion, definedOsxVersion));
 
         if (isSafeEmpty(sdkVersion)) {
           throw new MojoFailureException("GoLang SDK version is not defined!");
         }
 
         final String sdkBaseName = String
-                .format(NAME_PATTERN, sdkVersion, this.getOs(), this.getArch(),
-                        isSafeEmpty(definedOsxVersion) ? "" : "-" + definedOsxVersion);
+            .format(NAME_PATTERN, sdkVersion, this.getOs(), this.getArch(),
+                isSafeEmpty(definedOsxVersion) ? "" : "-" + definedOsxVersion);
         warnIfContainsUC("Prefer usage of lower case chars only for SDK base name", sdkBaseName);
         result =
-                loadSDKAndUnpackIntoCache(proxySettings, cacheFolder, sdkBaseName, isDisableSdkLoad());
+            loadSDKAndUnpackIntoCache(proxySettings, cacheFolder, sdkBaseName, isDisableSdkLoad());
       } else {
         logOptionally("Detected predefined SDK root folder : " + predefinedGoRoot);
         result = new File(predefinedGoRoot);
@@ -1510,15 +1554,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   protected boolean doesNeedOneMoreAttempt(@Nonnull final ProcessResult result,
                                            @Nonnull final String consoleOut,
                                            @Nonnull final String consoleErr)
-          throws IOException, MojoExecutionException {
+      throws IOException, MojoExecutionException {
     return false;
   }
 
   protected void doLogging(
-          final int resultCode,
-          final boolean error,
-          @Nonnull final String outLog,
-          @Nonnull final String errLog
+      final int resultCode,
+      final boolean error,
+      @Nonnull final String outLog,
+      @Nonnull final String errLog
   ) throws MojoExecutionException {
     if (getLog().isDebugEnabled()) {
       getLog().debug("OUT_LOG: " + outLog);
@@ -1528,13 +1572,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     this.processLogFiles(outLog, errLog);
 
     this.printLogs(
-            error || isEnforcePrintOutput() || (this.isVerbose() && this.isCommandSupportVerbose()),
-            error, outLog, errLog);
+        error || isEnforcePrintOutput() || (this.isVerbose() && this.isCommandSupportVerbose()),
+        error, outLog, errLog);
   }
 
   protected boolean doMainBusiness(@Nullable final ProxySettings proxySettings,
                                    final int maxAttempts)
-          throws InterruptedException, MojoFailureException, MojoExecutionException, IOException {
+      throws InterruptedException, MojoFailureException, MojoExecutionException, IOException {
     int iterations = 0;
 
     boolean error = false;
@@ -1558,8 +1602,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (doesNeedOneMoreAttempt(result, outLog, errLog)) {
         if (iterations > maxAttempts) {
           throw new MojoExecutionException(
-                  "Too many iterations detected, may be some loop and bug at mojo " +
-                          this.getClass().getName());
+              "Too many iterations detected, may be some loop and bug at mojo " +
+                  this.getClass().getName());
         }
         getLog().warn("Make one more attempt...");
       } else {
@@ -1599,7 +1643,8 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         boolean errorDuringMainBusiness = false;
         try {
           errorDuringMainBusiness = doMainBusiness(proxySettings, 10);
-        } catch (final IOException | InterruptedException | MojoExecutionException | MojoFailureException ex) {
+        } catch (final IOException | InterruptedException | MojoExecutionException |
+                       MojoFailureException ex) {
           if (ex instanceof InterruptedException) {
             Thread.currentThread().interrupt();
           }
@@ -1626,12 +1671,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   public void beforeExecution(@Nullable final ProxySettings proxySettings)
-          throws MojoFailureException, MojoExecutionException {
+      throws MojoFailureException, MojoExecutionException {
 
   }
 
   public void afterExecution(@Nullable final ProxySettings proxySettings, final boolean error)
-          throws MojoFailureException, MojoExecutionException {
+      throws MojoFailureException, MojoExecutionException {
 
   }
 
@@ -1697,7 +1742,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   private void assertProcessResult(@Nonnull final ProcessResult result)
-          throws MojoFailureException {
+      throws MojoFailureException {
     final int code = result.getExitValue();
     if (code != 0) {
       throw new MojoFailureException("Process exit code : " + code);
@@ -1778,7 +1823,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nonnull
   private synchronized HttpClient getHttpClient(@Nullable final ProxySettings proxy)
-          throws MojoExecutionException {
+      throws MojoExecutionException {
     if (this.httpClient == null) {
       final HttpClientBuilder builder = HttpClients.custom();
 
@@ -1786,16 +1831,16 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         if (proxy.hasCredentials()) {
           final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
           credentialsProvider.setCredentials(new AuthScope(proxy.host, proxy.port),
-                  new NTCredentials(GetUtils.ensureNonNull(proxy.username, ""), proxy.password,
-                          extractComputerName(), extractDomainName()));
+              new NTCredentials(GetUtils.ensureNonNull(proxy.username, ""), proxy.password,
+                  extractComputerName(), extractDomainName()));
           builder.setDefaultCredentialsProvider(credentialsProvider);
           getLog().debug(String
-                  .format("Credentials provider has been created for proxy (username : %s): %s",
-                          proxy.username, proxy));
+              .format("Credentials provider has been created for proxy (username : %s): %s",
+                  proxy.username, proxy));
         }
 
         final String[] ignoreForAddresses =
-                proxy.nonProxyHosts == null ? new String[0] : proxy.nonProxyHosts.split("\\|");
+            proxy.nonProxyHosts == null ? new String[0] : proxy.nonProxyHosts.split("\\|");
 
         final WildCardMatcher[] matchers;
 
@@ -1811,29 +1856,29 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
         getLog().debug("Regular routing mode");
 
         final HttpRoutePlanner routePlanner =
-                new DefaultProxyRoutePlanner(new HttpHost(proxy.host, proxy.port, proxy.protocol)) {
-                  @Override
-                  @Nonnull
-                  public HttpRoute determineRoute(@Nonnull final HttpHost host,
-                                                  @Nonnull final HttpRequest request,
-                                                  @Nonnull final HttpContext context)
-                          throws HttpException {
-                    HttpRoute result = null;
-                    final String hostName = host.getHostName();
-                    for (final WildCardMatcher m : matchers) {
-                      if (m.match(hostName)) {
-                        getLog().debug("Ignoring proxy for host : " + hostName);
-                        result = new HttpRoute(host);
-                        break;
-                      }
-                    }
-                    if (result == null) {
-                      result = super.determineRoute(host, request, context);
-                    }
-                    getLog().debug("Made connection route : " + result);
-                    return result;
+            new DefaultProxyRoutePlanner(new HttpHost(proxy.host, proxy.port, proxy.protocol)) {
+              @Override
+              @Nonnull
+              public HttpRoute determineRoute(@Nonnull final HttpHost host,
+                                              @Nonnull final HttpRequest request,
+                                              @Nonnull final HttpContext context)
+                  throws HttpException {
+                HttpRoute result = null;
+                final String hostName = host.getHostName();
+                for (final WildCardMatcher m : matchers) {
+                  if (m.match(hostName)) {
+                    getLog().debug("Ignoring proxy for host : " + hostName);
+                    result = new HttpRoute(host);
+                    break;
                   }
-                };
+                }
+                if (result == null) {
+                  result = super.determineRoute(host, request, context);
+                }
+                getLog().debug("Made connection route : " + result);
+                return result;
+              }
+            };
 
         builder.setRoutePlanner(routePlanner);
         getLog().debug("Proxy will ignore: " + Arrays.toString(matchers));
@@ -1848,32 +1893,32 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
           final SSLContext sslcontext = SSLContext.getInstance("TLS");
           X509TrustManager tm = new X509TrustManager() {
             @Override
+            public void checkClientTrusted(
+                @Nonnull @MustNotContainNull final X509Certificate[] arg0,
+                @Nonnull final String arg1) throws CertificateException {
+            }
+
+            @Override
+            public void checkServerTrusted(
+                @Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull String arg1)
+                throws CertificateException {
+            }
+
+            @Override
             @Nullable
             @MustNotContainNull
             public X509Certificate[] getAcceptedIssuers() {
               return null;
             }
-
-            @Override
-            public void checkClientTrusted(
-                    @Nonnull @MustNotContainNull final X509Certificate[] arg0,
-                    @Nonnull final String arg1) throws CertificateException {
-            }
-
-            @Override
-            public void checkServerTrusted(
-                    @Nonnull @MustNotContainNull final X509Certificate[] arg0, @Nonnull String arg1)
-                    throws CertificateException {
-            }
           };
-          sslcontext.init(null, new TrustManager[]{tm}, null);
+          sslcontext.init(null, new TrustManager[] {tm}, null);
 
           final SSLConnectionSocketFactory sslfactory =
-                  new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
+              new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
           final Registry<ConnectionSocketFactory> r =
-                  RegistryBuilder.<ConnectionSocketFactory>create()
-                          .register("https", sslfactory)
-                          .register("http", new PlainConnectionSocketFactory()).build();
+              RegistryBuilder.<ConnectionSocketFactory>create()
+                  .register("https", sslfactory)
+                  .register("http", new PlainConnectionSocketFactory()).build();
 
           builder.setConnectionManager(new BasicHttpClientConnectionManager(r));
           builder.setSSLSocketFactory(sslfactory);
@@ -1895,12 +1940,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   protected void registerEnvVars(
-          @Nonnull final ProcessExecutor result,
-          @Nonnull final File theGoRoot,
-          @Nullable final String theGoBin,
-          @Nullable final String theGoCache,
-          @Nonnull final File sourcesFile,
-          @MustNotContainNull @Nonnull final File[] goPathParts
+      @Nonnull final ProcessExecutor result,
+      @Nonnull final File theGoRoot,
+      @Nullable final String theGoBin,
+      @Nullable final String theGoCache,
+      @Nonnull final File sourcesFile,
+      @MustNotContainNull @Nonnull final File[] goPathParts
   ) throws IOException {
     logOptionally("....Environment vars....");
 
@@ -1910,13 +1955,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     String preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(goPathParts);
     if (isEnforceGoPathToEnd()) {
       preparedGoPath = IOUtils.makeOsFilePathWithoutDuplications(makePathFromExtraGoPathElements(),
-              removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getSpecialPartOfGoPath(),
-              preparedGoPath);
+          removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()), getSpecialPartOfGoPath(),
+          preparedGoPath);
     } else {
       preparedGoPath = IOUtils
-              .makeOsFilePathWithoutDuplications(preparedGoPath, makePathFromExtraGoPathElements(),
-                      removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()),
-                      getSpecialPartOfGoPath());
+          .makeOsFilePathWithoutDuplications(preparedGoPath, makePathFromExtraGoPathElements(),
+              removeSrcFolderAtEndIfPresented(sourcesFile.getAbsolutePath()),
+              getSpecialPartOfGoPath());
     }
     addEnvVar(result, "GOPATH", preparedGoPath);
     this.project.getProperties().setProperty("mvn.golang.last.gopath", preparedGoPath);
@@ -1964,13 +2009,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     if (gorootbootstrap != null) {
       addEnvVar(result, "GOROOT_BOOTSTRAP", gorootbootstrap.getAbsolutePath());
       this.project.getProperties()
-              .setProperty("mvn.golang.last.goroot_bootstrap", gorootbootstrap.getAbsolutePath());
+          .setProperty("mvn.golang.last.goroot_bootstrap", gorootbootstrap.getAbsolutePath());
     }
 
     String thePath = GetUtils.ensureNonNull(getEnvPath(), "");
     thePath = IOUtils
-            .makeOsFilePathWithoutDuplications((theGoRoot + File.separator + getExecSubpath()), thePath,
-                    theGoBin);
+        .makeOsFilePathWithoutDuplications((theGoRoot + File.separator + getExecSubpath()), thePath,
+            theGoBin);
     addEnvVar(result, "PATH", thePath);
     this.project.getProperties().setProperty("mvn.golang.last.path", thePath);
 
@@ -1980,17 +2025,18 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (ENV_GO111MODULE.equals(record.getKey().toString())) {
         go111moduleDetected = true;
       }
-      addEnvVar(result, record.getKey().toString(), GetUtils.ensureNonNull(record.getValue(),"").toString());
+      addEnvVar(result, record.getKey().toString(),
+          GetUtils.ensureNonNull(record.getValue(), "").toString());
     }
 
     if (this.isModuleMode()) {
       if (go111moduleDetected) {
         this.getLog().warn(String
-                .format("Module mode is true but %s detected among custom environment parameters",
-                        ENV_GO111MODULE));
+            .format("Module mode is true but %s detected among custom environment parameters",
+                ENV_GO111MODULE));
       } else {
         this.getLog().warn(
-                String.format("Forcing '%s = on' because module mode is activated", ENV_GO111MODULE));
+            String.format("Forcing '%s = on' because module mode is activated", ENV_GO111MODULE));
         addEnvVar(result, ENV_GO111MODULE, "on");
       }
     }
@@ -1999,10 +2045,10 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   @Nonnull
   @MustNotContainNull
   protected List<File> findAllGoModsInFolder(@Nonnull @MustNotContainNull final File folder)
-          throws IOException {
+      throws IOException {
     return new ArrayList<>(FileUtils
-            .listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME),
-                    TrueFileFilter.INSTANCE));
+        .listFiles(folder, FileFilterUtils.nameFileFilter(GO_MOD_FILE_NAME),
+            TrueFileFilter.INSTANCE));
   }
 
   @Nonnull
@@ -2021,19 +2067,19 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       if (srcFolder.isDirectory()) {
         final List<File> foundGoMods = this.findAllGoModsInFolder(srcFolder);
         this.getLog().debug(String
-                .format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
+            .format("Detected %d go.mod files in source folder %s", foundGoMods.size(), srcFolder));
 
         foundGoMods.sort(Comparator.comparing(File::toString));
 
         if (foundGoMods.isEmpty()) {
           this.getLog().error(
-                  "Module mode is activated but there is no any go.mod file in the source folder: " +
-                          srcFolder);
+              "Module mode is activated but there is no any go.mod file in the source folder: " +
+                  srcFolder);
           throw new IOException("Can't find any go.mod folder in the source folder: " + srcFolder);
         } else {
           final File gomodFolder = foundGoMods.get(0).getParentFile();
           this.getLog().info(String
-                  .format("Detected module folder '%s' in use as working folder", gomodFolder));
+              .format("Detected module folder '%s' in use as working folder", gomodFolder));
           return gomodFolder;
         }
       } else {
@@ -2076,7 +2122,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
   @Nullable
   protected ProcessExecutor prepareExecutor(@Nullable final ProxySettings proxySettings)
-          throws IOException, MojoFailureException, MojoExecutionException {
+      throws IOException, MojoFailureException, MojoExecutionException {
     initConsoleBuffers();
 
     final String execNameAdaptedForOs = adaptExecNameForOS(makeExecutableFileSubpath());
@@ -2090,19 +2136,19 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     }
 
     final String toolName =
-            FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs));
+        FilenameUtils.normalize(GetUtils.ensureNonNull(getUseGoTool(), execNameAdaptedForOs));
     final File executableFileInPathOrRoot = new File(getPathToFolder(detectedRoot) + toolName);
 
     final File executableFileInBin =
-            gobin == null ? null : new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
+        gobin == null ? null : new File(getPathToFolder(gobin) + adaptExecNameForOS(getExec()));
 
-    final File[] exeVariants = new File[]{executableFileInBin, executableFileInPathOrRoot};
+    final File[] exeVariants = new File[] {executableFileInBin, executableFileInPathOrRoot};
 
     final File foundExecutableTool = findExisting(exeVariants);
 
     if (foundExecutableTool == null) {
       throw new MojoFailureException(
-              "Can't find executable file : " + Arrays.toString(exeVariants));
+          "Can't find executable file : " + Arrays.toString(exeVariants));
     } else {
       logOptionally("Executable file detected : " + foundExecutableTool);
     }
@@ -2155,13 +2201,13 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       result.directory(workingDirectory);
     } else {
       logOptionally("Working directory is not set because provided folder doesn't exist: " +
-              workingDirectory);
+          workingDirectory);
     }
 
     logOptionally("");
 
     registerEnvVars(result, detectedRoot, gobin, gocache,
-            this.getSources(this.isSourceFolderRequired()), gopathParts);
+        this.getSources(this.isSourceFolderRequired()), gopathParts);
 
     logOptionally("........................");
 
@@ -2171,7 +2217,7 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
   }
 
   private void processLogFiles(@Nonnull final String logOut, @Nonnull final String logErr)
-          throws MojoExecutionException {
+      throws MojoExecutionException {
     final File reportsFolderFile = new File(this.getReportsFolder());
 
     final String targetOutFileName = nullIfBlank(this.getOutLogFile());
@@ -2179,10 +2225,12 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
 
     if (targetErrFileName != null ^ targetOutFileName != null) {
       if (targetOutFileName == null && !logOut.isEmpty()) {
-        this.getLog().warn("File logging for ERR stream is ON but also detected text in output stream!");
+        this.getLog()
+            .warn("File logging for ERR stream is ON but also detected text in output stream!");
       }
       if (targetErrFileName == null && !logErr.isEmpty()) {
-        this.getLog().warn("File logging for OUT stream is ON but also detected text in error stream!");
+        this.getLog()
+            .warn("File logging for OUT stream is ON but also detected text in error stream!");
       }
     }
 
@@ -2190,9 +2238,9 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
     this.getLog().debug("log.file.err: " + targetErrFileName);
 
     final File targetOutFile =
-            targetOutFileName == null ? null : new File(reportsFolderFile, targetOutFileName);
+        targetOutFileName == null ? null : new File(reportsFolderFile, targetOutFileName);
     final File targetErrFile =
-            targetErrFileName == null ? null : new File(reportsFolderFile, targetErrFileName);
+        targetErrFileName == null ? null : new File(reportsFolderFile, targetErrFileName);
 
 
     if (targetOutFile == null) {
@@ -2201,14 +2249,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       getLog().debug("Reports folder : " + reportsFolderFile);
       if (!reportsFolderFile.isDirectory() && !reportsFolderFile.mkdirs()) {
         throw new MojoExecutionException(
-                "Can't create folder for console logs : " + reportsFolderFile);
+            "Can't create folder for console logs : " + reportsFolderFile);
       }
       try {
-        getLog().debug("Writing " + logOut.length() + " chars as output console log : " + targetOutFile);
+        getLog().debug(
+            "Writing " + logOut.length() + " chars as output console log : " + targetOutFile);
         FileUtils.write(targetOutFile, logOut, "UTF-8");
       } catch (IOException ex) {
         throw new MojoExecutionException(
-                "Can't save console output log into file : " + targetOutFile, ex);
+            "Can't save console output log into file : " + targetOutFile, ex);
       }
     }
 
@@ -2218,14 +2267,15 @@ public abstract class AbstractGolangMojo extends AbstractMojo {
       getLog().debug("Reports folder : " + reportsFolderFile);
       if (!reportsFolderFile.isDirectory() && !reportsFolderFile.mkdirs()) {
         throw new MojoExecutionException(
-                "Can't create folder for console logs : " + reportsFolderFile);
+            "Can't create folder for console logs : " + reportsFolderFile);
       }
       try {
-        getLog().debug("Writing " + logErr.length() + " chars as error console log : " + targetErrFile);
+        getLog().debug(
+            "Writing " + logErr.length() + " chars as error console log : " + targetErrFile);
         FileUtils.write(targetErrFile, logErr, "UTF-8");
       } catch (IOException ex) {
         throw new MojoExecutionException(
-                "Can't save console error log into file : " + targetErrFile, ex);
+            "Can't save console error log into file : " + targetErrFile, ex);
       }
     }
   }
