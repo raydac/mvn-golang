@@ -1,7 +1,7 @@
 # __2.3.10 (08-jun-2022)__
 
 - updated dependencies
-- default GoSDK version is 1.18.3
+- default GoSDK version is 1.18.4
 
 # __2.3.9 (04-jul-2021)__
 
