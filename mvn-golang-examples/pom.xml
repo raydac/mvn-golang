@@ -13,7 +13,7 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <go.sdk.version>1.20.5</go.sdk.version>
+    <go.sdk.version>1.20.6</go.sdk.version>
   </properties>
 
   <profiles>
@@ -71,7 +71,6 @@
     <module>mvn-golang-example-gocui</module>
     <module>mvn-golang-example-clui</module>
     <module>mvn-golang-example-termboxgo</module>
-    <module>mvn-golang-example-antlr</module>
     <module>mvn-golang-example-maven-repository</module>
     <module>mvn-golang-example-maven-module-mix</module>
     <module>mvn-golang-example-protobuf</module>
