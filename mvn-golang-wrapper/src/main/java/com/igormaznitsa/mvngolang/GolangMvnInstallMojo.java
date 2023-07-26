@@ -284,9 +284,13 @@ public class GolangMvnInstallMojo extends AbstractGoDependencyAwareMojo {
       }
     }
 
-    for (final File f : folder.listFiles(
-            pathname -> pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath()))) {
-      restoreAllBackupGoMod(f);
+    final File[] foundFiles = folder.listFiles(
+        pathname -> pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath()));
+
+    if (foundFiles != null) {
+      for (final File f : foundFiles) {
+        restoreAllBackupGoMod(f);
+      }
     }
   }
 
