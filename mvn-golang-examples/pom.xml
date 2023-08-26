@@ -28,6 +28,7 @@
         <module>mvn-golang-example-nes</module>
         <module>mvn-golang-example-gui</module>
         <module>mvn-golang-example-gui-nuklear</module>
+        <module>mvn-golang-example-primitive</module>
         <module>mvn-golang-example-plugin</module>
       </modules>
     </profile>

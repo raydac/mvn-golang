@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>mvn-golang-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>mvn-golang-example-primitive</artifactId>
+  <packaging>mvn-golang</packaging>
+
+  <name>Primitive converting utility</name>
+  <description>Example of mvn-golang-wrapper usage to build the Primitive project: https://github.com/fogleman/primitive</description>
+
+  <build>
+    <sourceDirectory>${basedir}${file.separator}src</sourceDirectory>
+    <directory>${basedir}${file.separator}bin</directory>
+    <plugins>
+      <plugin>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>mvn-golang-wrapper</artifactId>
+        <version>${main-project-version}</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>default-get</id>
+            <configuration>
+              <buildFlags>
+                <flag>-u</flag>
+              </buildFlags>
+              <packages>
+                <package>github.com/fogleman/primitive</package>
+              </packages>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-build</id>
+            <configuration>
+              <packages>
+                <package>github.com/fogleman/primitive</package>
+              </packages>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <goVersion>${go.sdk.version}</goVersion>
+          <env>
+            <GO111MODULE>auto</GO111MODULE>
+          </env>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+    
+</project>
