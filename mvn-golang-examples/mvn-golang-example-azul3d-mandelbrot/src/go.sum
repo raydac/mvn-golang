@@ -21,3 +21,5 @@ github.com/go-gl/glfw v0.0.0-20220712193148-63cf1f4ef61f h1:z8fT51Xm9eZTbm7yNuei
 github.com/go-gl/glfw v0.0.0-20220712193148-63cf1f4ef61f/go.mod h1:wyvWpaEu9B/VQiV1jsPs7Mha9I7yto/HqIBw197ZAzk=
 github.com/go-gl/glfw v0.0.0-20221017161538-93cebf72946b h1:2hdUMUOJuLQkhaPAwoyOeSzoaBydYEkXkBEuqDuDBfg=
 github.com/go-gl/glfw v0.0.0-20221017161538-93cebf72946b/go.mod h1:wyvWpaEu9B/VQiV1jsPs7Mha9I7yto/HqIBw197ZAzk=
+github.com/go-gl/glfw v0.0.0-20240118000515-a250818d05e3 h1:NwSSG7RUXNhytGezuEEAwP64ffNjUxgKz/xEq2YJCFA=
+github.com/go-gl/glfw v0.0.0-20240118000515-a250818d05e3/go.mod h1:wyvWpaEu9B/VQiV1jsPs7Mha9I7yto/HqIBw197ZAzk=
