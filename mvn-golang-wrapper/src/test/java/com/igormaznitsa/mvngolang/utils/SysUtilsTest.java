@@ -33,6 +33,7 @@ public class SysUtilsTest {
     assertEquals("386", SysUtils.decodeGoSdkArchType("i386"));
     assertEquals("386", SysUtils.decodeGoSdkArchType("i686"));
     assertEquals("amd64", SysUtils.decodeGoSdkArchType("amd64"));
+    assertEquals("arm64", SysUtils.decodeGoSdkArchType("aarch64"));
     assertEquals("s390x", SysUtils.decodeGoSdkArchType("s390"));
   }
 
