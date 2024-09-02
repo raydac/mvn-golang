@@ -58,6 +58,7 @@
   <modules>
     <module>mvn-golang-example-gui-gwt</module>
     <module>mvn-golang-example-preprocessing</module>
+    <module>mvn-golang-example-fyne</module>
     <module>mvn-golang-example-helloworld</module>
     <module>mvn-golang-example-helloworld-gomod</module>
     <module>mvn-golang-example-helloworld-multisrc</module>
