@@ -1,5 +1,8 @@
 ![mvn-golang](assets/git_banner.png)
 
+> [!WARNING]  
+> I have archived this project because Golang has changed significantly since 2016, making maintenance too complex and costly. I am sure that Go's build process will continue to evolve, so I have started a lightweight alternative: [gosdk-wrapper-maven-plugin](https://github.com/raydac/gosdk-wrapper-maven-plugin). This new plugin is designed to provide a highly flexible mechanism that remains compatible with future changes and focuses solely on downloading GoSDK and invoking its tools. 
+
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Java 8.0+](https://img.shields.io/badge/java-8.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 [![Maven central](https://maven-badges.herokuapp.com/maven-central/com.igormaznitsa/mvn-golang-wrapper/badge.svg)](http://search.maven.org/#artifactdetails|com.igormaznitsa|mvn-golang-wrapper|2.3.10|jar)
@@ -8,6 +11,8 @@
 [![YooMoney donation](https://img.shields.io/badge/donation-Yoo.money-blue.svg)](https://yoomoney.ru/to/41001158080699)
 
 # Changelog
+
+__ARCHIVED (03-mar-2025)__
 
 __2.3.10 (08-jun-2022)__
 
